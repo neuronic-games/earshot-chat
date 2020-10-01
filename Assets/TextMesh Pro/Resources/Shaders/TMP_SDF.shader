@@ -1,4 +1,4 @@
-Shader "TextMeshPro/Distance Field Overlay" {
+Shader "TextMeshPro/Distance Field" {
 
 Properties {
 	_FaceTex			("Face Texture", 2D) = "white" {}
@@ -86,8 +86,8 @@ Properties {
 SubShader {
 
 	Tags
-  {
-		"Queue"="Overlay"
+	{
+		"Queue"="Transparent"
 		"IgnoreProjector"="True"
 		"RenderType"="Transparent"
 	}
@@ -105,7 +105,7 @@ SubShader {
 	ZWrite Off
 	Lighting Off
 	Fog { Mode Off }
-	ZTest Always
+	ZTest [unity_GUIZTestMode]
 	Blend One OneMinusSrcAlpha
 	ColorMask [_ColorMask]
 
@@ -185,7 +185,7 @@ SubShader {
 
 			float bias =(.5 - weight) + (.5 / scale);
 
-			float alphaClip = (1.0 - _OutlineWidth*_ScaleRatioA - _OutlineSoftness*_ScaleRatioA);
+			float alphaClip = (1.0 - _OutlineWidth * _ScaleRatioA - _OutlineSoftness * _ScaleRatioA);
 		
 		#if GLOW_ON
 			alphaClip = min(alphaClip, 1.0 - _GlowOffset * _ScaleRatioB - _GlowOuter * _ScaleRatioB);
@@ -227,7 +227,7 @@ SubShader {
 			output.underlayColor =	underlayColor;
 			#endif
 			output.textures = float4(faceUV, outlineUV);
-
+	
 			return output;
 		}
 
@@ -303,8 +303,8 @@ SubShader {
 		#if UNITY_UI_ALPHACLIP
 			clip(faceColor.a - 0.001);
 		#endif
-  		
-			return faceColor * input.color.a;
+
+  		return faceColor * input.color.a;
 		}
 
 		ENDCG
