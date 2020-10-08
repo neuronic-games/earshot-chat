@@ -16,7 +16,7 @@ namespace DiscordCommon
         #region Events
 
         [Serializable]
-        public class DiscordCreatedEvent : UnityEvent<Discord.Discord>
+        public class DiscordCreatedEvent : UnityEvent<DiscordApp>
         {
         }
 
@@ -26,38 +26,41 @@ namespace DiscordCommon
 
         #region Unity Callbacks
 
+        private DiscordApp App;
+
         void Start()
         {
-            Discord.Discord discord =
-                DiscordApp.InitializeApp(760222636701253652, (ulong) CreateFlags.Default, instanceId);
+            App = DiscordApp.InitializeApp(760222636701253652, (ulong) CreateFlags.Default, instanceId);
 
-            if (DiscordApp.Initialized)
+            AppLayer.AppLayer.Set(App); //todo -- logging
+            
+            if (App.Initialized)
             {
-                discord.SetLogHook(LogLevel.Info, LogDiscord);
+                App.Discord.SetLogHook(LogLevel.Info, LogDiscord);
 
-                onCreated?.Invoke(discord);
+                onCreated?.Invoke(App);
             }
         }
 
         public void OnDestroy()
         {
-            if (DiscordApp.Initialized)
+            if (App.Initialized)
             {
-                DiscordApp.DestroyApp();
+                App.DestroyApp();
             }
         }
 
         void Update()
         {
-            if (DiscordApp.Initialized)
+            if (App.Initialized)
             {
-                DiscordApp.Update();
+                App.Update();
             }
         }
 
         #endregion
 
-        #region Callbacks
+        #region Log Hook
 
         private void LogDiscord(LogLevel level, string message)
         {
