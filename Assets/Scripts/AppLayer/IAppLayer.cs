@@ -1,4 +1,6 @@
-﻿using DiscordCommon.Interfaces;
+﻿using System.Collections.Generic;
+using AppLayer.Callbacks;
+using AppLayer.NetworkGroups;
 using ServiceLocator;
 
 namespace AppLayer
@@ -13,6 +15,14 @@ namespace AppLayer
         void RemoveCallbacks(IGroupCallbacks     listener);
         void RemoveCallbacks(IVoiceCallbacks     listener);
         void RemoveCallbacks(IOverlayCallbacks   listener);
+
+        #endregion
+
+        #region Relationships
+
+        IUser                        LocalUser   { get; }
+        IReadOnlyList<IUser>         KnownUsers  { get; }
+        IReadOnlyList<INetworkGroup> KnownGroups { get; }
 
         #endregion
     }
