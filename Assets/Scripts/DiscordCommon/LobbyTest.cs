@@ -6,36 +6,36 @@ using UnityEngine.EventSystems;
 
 namespace DiscordCommon
 {
-    public class LobbyTest : MonoBehaviour, IPointerDownHandler
+    public class LobbyTest : MonoBehaviour/*, IPointerDownHandler */
     {
-        #region Lobby Creation
-        
+        /*#region Lobby Creation
+
         public TextMeshProUGUI lobbyName;
+        public TextMeshProUGUI lobbySecret;
         public TextMeshProUGUI lobbyCapacity;
 
         [NonSerialized]
         public Lobby lobby;
 
-        private long         _id;
-        private LobbyManager _manager;
+        internal LobbyManager Manager { get; set; }
 
         public void Setup(LobbyManager manager)
         {
-            _manager = manager;
+            Manager = manager;
 
             SetupDiscordLobby();
         }
 
         private void SetupDiscordLobby()
         {
-            var lobbyTransaction = _manager.GetLobbyCreateTransaction();
+            var lobbyTransaction = Manager.GetLobbyCreateTransaction();
             lobbyTransaction.SetCapacity(5);
             lobbyTransaction.SetType(LobbyType.Public);
-            
-            _manager.CreateLobby(lobbyTransaction, OnLobbyCreate);
+
+            Manager.CreateLobby(lobbyTransaction, OnLobbyCreate);
         }
 
-        private void OnLobbyCreate(Result result, ref Lobby lobby)
+        public void OnLobbyCreate(Result result, ref Lobby lobby)
         {
             if (result == Result.Ok)
             {
@@ -54,10 +54,11 @@ namespace DiscordCommon
         {
             lobbyName.text     = lobby.Id.ToString();
             lobbyCapacity.text = lobby.Capacity.ToString();
+            lobbySecret.text   = lobby.Secret;
         }
-        
+
         #endregion
-        
+
         #region Voice
 
         public GameObject voiceIndicator;
@@ -82,8 +83,8 @@ namespace DiscordCommon
         {
             if (!voiceConnected || loading) return;
             loading = true;
-            _manager.ConnectVoice(lobby.Id, OnVoiceConnected);
-            
+            Manager.ConnectVoice(lobby.Id, OnVoiceConnected);
+
             void OnVoiceConnected(Result result)
             {
                 loading = false;
@@ -91,6 +92,7 @@ namespace DiscordCommon
                 {
                     voiceConnected = false;
                 }
+
                 voiceIndicator.SetActive(voiceConnected);
                 Debug.Log($"Lobby {lobby.Id}. Voice Connected: {voiceConnected}");
             }
@@ -101,8 +103,8 @@ namespace DiscordCommon
         {
             if (voiceConnected || loading) return;
             loading = true;
-            _manager.DisconnectVoice(lobby.Id, OnVoiceDisconnect);
-            
+            Manager.DisconnectVoice(lobby.Id, OnVoiceDisconnect);
+
             void OnVoiceDisconnect(Result result)
             {
                 loading = false;
@@ -110,11 +112,12 @@ namespace DiscordCommon
                 {
                     voiceConnected = true;
                 }
+
                 voiceIndicator.SetActive(voiceConnected);
                 Debug.Log($"Lobby {lobby.Id}. Voice Connected: {voiceConnected}");
             }
         }
 
-        #endregion
+        #endregion*/
     }
 }

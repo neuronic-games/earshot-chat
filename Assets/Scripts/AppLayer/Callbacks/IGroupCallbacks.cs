@@ -1,8 +1,13 @@
-﻿using System;
-
-namespace DiscordCommon.Interfaces
+﻿namespace AppLayer.Callbacks
 {
-    public interface IGroupCallbacks : IListener
+    /// <summary>
+    /// Callbacks for group activity.
+    /// </summary>
+    /// NOTE: This coding style wasn't adopted to switch services at runtime or adopt multiple services in the same
+    /// build, but to limit the impact of having to change the service layer.
+    /// Thus, the parameters of the callbacks below are based on Discord's lobbies, and will have to be changed
+    /// if the service layer is ever changed.
+    public interface IGroupCallbacks : ICallbacks
     {
         void OnLobbyUpdate(long             lobbyid);
         void OnNetworkMessage(long          lobbyid, long userid, byte channelid, byte[] data);
