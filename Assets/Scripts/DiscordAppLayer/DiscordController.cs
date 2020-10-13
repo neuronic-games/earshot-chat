@@ -1,4 +1,5 @@
 ﻿using System;
+using AppLayer;
 using Discord;
 using UnityEngine;
 using UnityEngine.Events;
@@ -9,7 +10,9 @@ namespace DiscordAppLayer
     {
         #region Serializable
 
-        public int instanceId = 0;
+        public bool debugLog     = true;
+        public bool logAllEvents = true;
+        public int  instanceId   = 0;
 
         #endregion
 
@@ -32,8 +35,15 @@ namespace DiscordAppLayer
         {
             App = DiscordApp.InitializeApp(760222636701253652, (ulong) CreateFlags.Default, instanceId);
 
-            AppLayer.AppLayer.Set(App); //todo -- logging
-            
+            if (debugLog)
+            {
+                AppLayer.AppLayer.Set(new LogAppLayer(App, logAllEvents));
+            }
+            else
+            {
+                AppLayer.AppLayer.Set(App);
+            }
+
             if (App.Initialized)
             {
                 App.Discord.SetLogHook(LogLevel.Info, LogDiscord);

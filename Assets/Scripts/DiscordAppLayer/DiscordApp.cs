@@ -457,6 +457,11 @@ namespace DiscordAppLayer
             Distributor.RegisterCallbacks(listener);
         }
 
+        public void RegisterCallbacks(IUserCallbacks listener)
+        {
+            Distributor.RegisterCallbacks(listener);
+        }
+
         public void RemoveCallbacks(IGroupCallbacks listener)
         {
             Distributor.RemoveCallbacks(listener);
@@ -468,6 +473,11 @@ namespace DiscordAppLayer
         }
 
         public void RemoveCallbacks(IOverlayCallbacks listener)
+        {
+            Distributor.RemoveCallbacks(listener);
+        }
+
+        public void RemoveCallbacks(IUserCallbacks listener)
         {
             Distributor.RemoveCallbacks(listener);
         }

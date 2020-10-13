@@ -237,42 +237,49 @@ namespace DiscordAppLayer
         public void OnNetworkMessage(long lobbyid, long userid, byte channelid, byte[] data)
         {
             if (lobbyid != LobbyId) return;
+            //todo
             throw new System.NotImplementedException();
         }
 
         public void OnMemberConnect(long lobbyid, long userid)
         {
             if (lobbyid != LobbyId) return;
+            //todo
             throw new System.NotImplementedException();
         }
 
         public void OnSpeaking(long lobbyid, long userid, bool speaking)
         {
             if (lobbyid != LobbyId) return;
+            //todo
             throw new System.NotImplementedException();
         }
 
         public void OnMemberUpdate(long lobbyid, long userid)
         {
             if (lobbyid != LobbyId) return;
+            //todo
             throw new System.NotImplementedException();
         }
 
         public void OnMemberDisconnect(long lobbyid, long userid)
         {
             if (lobbyid != LobbyId) return;
+            //todo
             throw new System.NotImplementedException();
         }
 
         public void OnLobbyDelete(long lobbyid, uint reason)
         {
             if (lobbyid != LobbyId) return;
+            //todo
             throw new System.NotImplementedException();
         }
 
         public void OnLobbyMessage(long lobbyid, long userid, byte[] data)
         {
             if (lobbyid != LobbyId) return;
+            //todo
             throw new System.NotImplementedException();
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using AppLayer.NetworkGroups;
 using Discord;
 
@@ -7,6 +8,20 @@ namespace DiscordAppLayer
 {
     public class DiscordUser : IUser, IEquatable<DiscordUser>
     {
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"User ID: {DiscordUserId}");
+            sb.AppendLine($"Name: {Name}\tPermission Level: {PermissionLevel}\tReady: {IsReady}");
+            sb.AppendLine($"Current Custom Properties:-");
+            foreach (var kvp in CustomProperties)
+            {
+                sb.AppendLine($"\t{kvp.Key} : {kvp.Value}");
+            }
+
+            return sb.ToString();
+        }
+
         #region IUser
 
         public bool   IsReady         { get; protected set; }

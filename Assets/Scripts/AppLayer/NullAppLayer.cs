@@ -35,7 +35,19 @@ namespace AppLayer
         {
         }
 
+        public void RegisterCallbacks(IUserCallbacks listener)
+        {
+        }
+
+        public void RemoveCallbacks(IUserCallbacks listener)
+        {
+        }
+
         #endregion
+
+        public void DestroyApp()
+        {
+        }
 
         #region Management
 
