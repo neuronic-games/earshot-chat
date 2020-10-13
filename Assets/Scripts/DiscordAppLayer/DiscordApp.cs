@@ -4,6 +4,7 @@ using AppLayer;
 using AppLayer.Callbacks;
 using AppLayer.NetworkGroups;
 using Discord;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace DiscordAppLayer
@@ -18,13 +19,22 @@ namespace DiscordAppLayer
         public DiscordApp(long clientId, ulong flags, int instanceId)
         {
             Environment.SetEnvironmentVariable("DISCORD_INSTANCE_ID", instanceId.ToString());
-            _discord = new Discord.Discord(clientId, flags);
+            _discord    = new Discord.Discord(clientId, flags);
+            Initialized = true;
 
             Distributor = new EventDistributor(this);
             Distributor.RegisterCallbacks(this);
             Distributor.SubscribeGameSDK();
+            
+            UpdateLobbyList(OnUpdateList);
 
-            Initialized = true;
+            void OnUpdateList(Result res)
+            {
+                if (res == Result.Ok)
+                {
+                    Initialized = true;
+                }
+            }
         }
 
         #endregion
@@ -109,7 +119,7 @@ namespace DiscordAppLayer
                 return _overlayManager;
             }
         }
-        
+
         private UserManager _userManager = null;
 
         public UserManager UserManager
@@ -144,6 +154,11 @@ namespace DiscordAppLayer
         public void Update()
         {
             _discord.RunCallbacks();
+        }
+
+        public void UpdateLobbyList(LobbyManager.SearchHandler onUpdate)
+        {
+            LobbyManager.Search(LobbyManager.GetSearchQuery(), onUpdate);
         }
 
         public void DestroyApp()
@@ -185,7 +200,7 @@ namespace DiscordAppLayer
             private HashSet<IVoiceCallbacks> _voiceListeners = new HashSet<IVoiceCallbacks>();
 
             private HashSet<IOverlayCallbacks> _overlayListeners = new HashSet<IOverlayCallbacks>();
-            
+
             private HashSet<IUserCallbacks> _userCallbacks = new HashSet<IUserCallbacks>();
 
             #endregion
@@ -283,6 +298,7 @@ namespace DiscordAppLayer
             #region Invoke Listeners
 
             #region Voice
+
             private void OnSettingsUpdateInvoke()
             {
                 VoiceManager voice = App.VoiceManager;
@@ -291,9 +307,11 @@ namespace DiscordAppLayer
                     listener.OnSettingsUpdate();
                 }
             }
+
             #endregion
 
             #region Overlay
+
             private void OnToggleInvoke(bool locked)
             {
                 OverlayManager manager = App.OverlayManager;
@@ -302,9 +320,11 @@ namespace DiscordAppLayer
                     overlay.OnToggle(locked);
                 }
             }
+
             #endregion
 
             #region Lobby Group
+
             private void InvokeOnNetworkMessage(long lobbyid, long userid, byte channelid, byte[] data)
             {
                 LobbyManager manager = App.LobbyManager;
@@ -376,9 +396,11 @@ namespace DiscordAppLayer
                     group.OnLobbyDelete(lobbyid, reason);
                 }
             }
+
             #endregion
-            
+
             #region User
+
             private void InvokeOnCurrentUserUpdate()
             {
                 UserManager manager = App.UserManager;
@@ -387,6 +409,7 @@ namespace DiscordAppLayer
                     listener.OnCurrentUserUpdate(App.LocalUser);
                 }
             }
+
             #endregion
 
             #endregion
@@ -427,7 +450,7 @@ namespace DiscordAppLayer
             {
                 _overlayListeners.Remove(listener);
             }
-            
+
             public void RemoveCallbacks(IUserCallbacks listener)
             {
                 _userCallbacks.Remove(listener);
@@ -486,20 +509,123 @@ namespace DiscordAppLayer
 
         #region Relationships
 
-        private readonly DiscordUser               _localUser   = new DiscordUser();
+        private readonly LocalDiscordUser          _localUser   = new LocalDiscordUser();
         private readonly List<DiscordUser>         _knownUsers  = new List<DiscordUser>();
         private readonly List<DiscordNetworkGroup> _knownGroups = new List<DiscordNetworkGroup>();
 
-        public IUser       LocalUser        => _localUser;
-        public DiscordUser LocalDiscordUser => _localUser;
+        public IUser LocalUser => _localUser;
+
+        /// <summary>
+        /// Do not set custom properties directly on the local discord user.
+        /// </summary>
+        public LocalDiscordUser LocalDiscordUser => _localUser;
 
         public IReadOnlyList<IUser>       KnownUsers        => _knownUsers;
         public IReadOnlyList<DiscordUser> KnownDiscordUsers => _knownUsers;
 
-        public IReadOnlyList<INetworkGroup> KnownGroups => _knownGroups;
+        public IReadOnlyList<INetworkGroup> KnownGroups        => _knownGroups;
         public IReadOnlyList<INetworkGroup> KnownDiscordGroups => _knownGroups;
 
         #endregion
+
+        #region Factory
+
+        private const int  MAX_GROUPS = 5;
+        public        int  GroupCapacity  => KnownGroups.Count; //todo -- change for admins
+        public        bool CanCreateGroup => KnownGroups.Count < MAX_GROUPS;
+
+        public void CreateNewGroup(uint capacity, bool locked, Action<INetworkGroup> onCreated)
+        {
+            if (!CanCreateGroup)
+            {
+                onCreated?.Invoke(null);
+                return;
+            }
+            var manager     = LobbyManager;
+            var transaction = manager.GetLobbyCreateTransaction();
+            transaction.SetCapacity(capacity);
+            transaction.SetLocked(locked);
+            transaction.SetType(LobbyType.Public);
+            manager.CreateLobby(transaction, OnCreateLobby);
+
+            void OnCreateLobby(Result result, ref Lobby lobby)
+            {
+                DiscordNetworkGroup group      = null;
+                if (result == Result.Ok) group = CreateGroupFromLobby(ref lobby);
+                onCreated?.Invoke(group);
+            }
+        }
+
+        public void JoinGroup(long groupId, string secret, Action<INetworkGroup> onJoined)
+        {
+            if (_knownGroups.Exists(group => group.LobbyId == groupId))
+            {
+                onJoined?.Invoke(_knownGroups.Find(group => group.LobbyId == groupId));
+                return;
+            }
+            UpdateLobbyList((res) =>
+            {
+                if (res != Result.Ok)
+                {
+                    Debug.Log($"Failed to update lobbies. Will try to join anyway.");
+                }
+
+                var manager = LobbyManager;
+                manager.ConnectLobby(groupId, secret, OnJoinLobby);
+
+                void OnJoinLobby(Result result, ref Lobby lobby)
+                {
+                    DiscordNetworkGroup group      = null;
+                    if (result == Result.Ok) group = CreateGroupFromLobby(ref lobby);
+                    onJoined?.Invoke(group);
+                }
+            });
+        }
+
+        public void DeleteGroup(INetworkGroup group)
+        {
+            if (!(group is DiscordNetworkGroup discGroup)) return;
+            if (!_knownGroups.Contains(discGroup)) return;
+            _knownGroups.Remove(discGroup);
+            discGroup.OnLobbyDelete(discGroup.LobbyId, 0);
+        }
+
+        public void DeleteMember(DiscordUser user)
+        {
+            if (!_knownUsers.Contains(user)) return;
+            _knownUsers.Remove(user);
+        }
+        
+        #region Private
+
+        private DiscordNetworkGroup CreateGroupFromLobby(ref Lobby lobby)
+        {
+            DiscordNetworkGroup result = new DiscordNetworkGroup(this, ref lobby);
+            _knownGroups.Add(result);
+            RegisterCallbacks(result);
+            return result;
+        }
+
+        #endregion
+
+        #endregion
+
+        #endregion
+
+        #region Static
+
+        public static bool GetDiscordApp(out DiscordApp discord)
+        {
+            IAppLayer layer = AppLayer.AppLayer.Get();
+            discord = layer as DiscordApp;
+            if (discord == null)
+            {
+                UnityEngine.Debug.Log($"Expected {nameof(DiscordApp)} service. Found {layer.GetType().Name}.");
+                return false;
+            }
+
+            return true;
+        }
 
         #endregion
     }

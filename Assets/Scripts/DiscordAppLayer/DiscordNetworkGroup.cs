@@ -4,6 +4,7 @@ using AppLayer.Callbacks;
 using AppLayer.NetworkGroups;
 using AppLayer.Voice;
 using Discord;
+using UnityEngine;
 
 namespace DiscordAppLayer
 {
@@ -16,13 +17,24 @@ namespace DiscordAppLayer
 
         public readonly DiscordApp App;
         public readonly long       LobbyId;
+        public readonly string     Secret;
 
-        public DiscordNetworkGroup(DiscordApp app, long networkId)
+        public uint Capacity { get; protected set; }
+        public bool Locked   { get; protected set; }
+        public long OwnerId  { get; protected set; }
+
+        public DiscordNetworkGroup(DiscordApp app, ref Lobby lobby)
         {
-            App     = app;
-            LobbyId = networkId;
+            App      = app;
+            LobbyId  = lobby.Id;
+            Secret   = lobby.Secret;
+            Capacity = lobby.Capacity;
+            Locked   = lobby.Locked;
+            OwnerId  = lobby.OwnerId;
 
             _channel = new VoiceChannel(InvokeDisconnect);
+
+            Subscribe();
         }
 
         public void Subscribe()
@@ -174,10 +186,10 @@ namespace DiscordAppLayer
         public IReadOnlyDictionary<string, string> CustomProperties
         {
             get => _customProperties;
-            set => SetCustomProperties(value);
+            set => SetCustomProperties(value, null);
         }
 
-        public void SetCustomProperties(IReadOnlyDictionary<string, string> properties)
+        public void SetCustomProperties(IReadOnlyDictionary<string, string> properties, Action onImplemented)
         {
             LobbyManager     lobby  = App.LobbyManager;
             LobbyTransaction update = lobby.GetLobbyUpdateTransaction(LobbyId);
@@ -189,11 +201,24 @@ namespace DiscordAppLayer
 
             lobby.UpdateLobby(LobbyId, update, result =>
             {
-                //todo -- success/failure callbacks?
+                if (result == Result.Ok)
+                {
+                    Debug.Log($"Succeeded in setting properties for lobby {LobbyId}.");
+                    foreach (var kvp in properties)
+                    {
+                        _customProperties[kvp.Key] = kvp.Value;
+                    } //todo -- fix race condition
+                }
+                else
+                {
+                    Debug.Log($"Failed to set properties for lobby {LobbyId}.");
+                }
+
+                onImplemented?.Invoke();
             });
         }
 
-        public void DeleteCustomProperties(IReadOnlyList<string> properties)
+        public void DeleteCustomProperties(IReadOnlyList<string> properties, Action onImplemented)
         {
             LobbyManager     lobby  = App.LobbyManager;
             LobbyTransaction update = lobby.GetLobbyUpdateTransaction(LobbyId);
@@ -204,7 +229,20 @@ namespace DiscordAppLayer
 
             lobby.UpdateLobby(LobbyId, update, result =>
             {
-                //todo -- success/failure callbacks?
+                if (result == Result.Ok)
+                {
+                    Debug.Log($"Succeeded in deleting properties for lobby {LobbyId}.");
+                    foreach (var property in properties)
+                    {
+                        _customProperties.Remove(property);
+                    }
+                }
+                else
+                {
+                    Debug.Log($"Failed to delete properties for lobby {LobbyId}.");
+                }
+
+                onImplemented?.Invoke();
             });
         }
 
@@ -237,43 +275,42 @@ namespace DiscordAppLayer
         public void OnNetworkMessage(long lobbyid, long userid, byte channelid, byte[] data)
         {
             if (lobbyid != LobbyId) return;
-            //todo
-            throw new System.NotImplementedException();
+            //todo network message
         }
 
         public void OnMemberConnect(long lobbyid, long userid)
         {
             if (lobbyid != LobbyId) return;
-            //todo
-            throw new System.NotImplementedException();
+            //todo member connect
         }
 
         public void OnSpeaking(long lobbyid, long userid, bool speaking)
         {
             if (lobbyid != LobbyId) return;
-            //todo
-            throw new System.NotImplementedException();
+            //todo on speaking
         }
 
         public void OnMemberUpdate(long lobbyid, long userid)
         {
             if (lobbyid != LobbyId) return;
-            //todo
-            throw new System.NotImplementedException();
+            //todo on update
         }
 
         public void OnMemberDisconnect(long lobbyid, long userid)
         {
             if (lobbyid != LobbyId) return;
-            //todo
-            throw new System.NotImplementedException();
+            //todo on disconnect
         }
 
         public void OnLobbyDelete(long lobbyid, uint reason)
         {
             if (lobbyid != LobbyId) return;
-            //todo
-            throw new System.NotImplementedException();
+            App.DeleteGroup(this);
+            for (var i = 0; i < _members.Count; i++)
+            {
+                DiscordUser member = _members[i];
+                App.DeleteMember(member);
+            }
         }
 
         public void OnLobbyMessage(long lobbyid, long userid, byte[] data)

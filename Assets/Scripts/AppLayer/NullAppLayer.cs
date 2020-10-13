@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AppLayer.Callbacks;
 using AppLayer.NetworkGroups;
 
@@ -54,18 +55,20 @@ namespace AppLayer
         public class NullUser : IUser
         {
             public                  int                        PermissionLevel => 0;
+            public                  INetworkGroup              Group           => null;
             public                  bool                       IsReady         => false;
             public                  string                     Name            => string.Empty;
-            private static readonly Dictionary<string, string> S_CustomProperties = new Dictionary<string, string>();
+            private static readonly Dictionary<string, string> s_CustomProperties = new Dictionary<string, string>();
 
             public IReadOnlyDictionary<string, string> CustomProperties
             {
-                get => S_CustomProperties;
-                set => SetCustomProperties(value);
+                get => s_CustomProperties;
+                set => SetCustomProperties(value, null);
             }
 
-            public void SetCustomProperties(IReadOnlyDictionary<string, string> value)
+            public void SetCustomProperties(IReadOnlyDictionary<string, string> value, Action onImplemented)
             {
+                onImplemented?.Invoke();
             }
 
             public bool Equals(IUser other)
@@ -73,14 +76,37 @@ namespace AppLayer
                 return other is NullUser;
             }
 
-            public void DeleteCustomProperties(IReadOnlyList<string> properties)
+            public void DeleteCustomProperties(IReadOnlyList<string> properties, Action onImplemented)
             {
+                onImplemented?.Invoke();
             }
         }
 
         public IUser                        LocalUser   { get; } = new NullUser();
         public IReadOnlyList<IUser>         KnownUsers  { get; } = new List<IUser>();
         public IReadOnlyList<INetworkGroup> KnownGroups { get; } = new List<INetworkGroup>();
+
+        #endregion
+
+        #region Factory
+
+        public int  GroupCapacity  => 0;
+        public bool CanCreateGroup => false;
+
+        public void CreateNewGroup(uint capacity, bool locked, Action<INetworkGroup> onCreated)
+        {
+            onCreated?.Invoke(null);
+        }
+
+        public void JoinGroup(long groupId, string secret, Action<INetworkGroup> onJoined)
+        {
+            onJoined?.Invoke(null);
+        }
+
+        public void DeleteGroup(INetworkGroup group)
+        {
+            
+        }
 
         #endregion
     }

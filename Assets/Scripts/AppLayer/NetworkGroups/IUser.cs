@@ -6,10 +6,11 @@ namespace AppLayer.NetworkGroups
 {
     public interface IUser : IExecutor, IEquatable<IUser>
     {
-        bool                                IsReady          { get; }
-        string                              Name             { get; }
+        INetworkGroup Group { get; }
+        bool IsReady { get; }
+        string Name { get; }
         IReadOnlyDictionary<string, string> CustomProperties { get; set; }
-        void SetCustomProperties(IReadOnlyDictionary<string, string> value);
-        void DeleteCustomProperties(IReadOnlyList<string> properties);
+        void SetCustomProperties(IReadOnlyDictionary<string, string> value, Action onImplemented);
+        void DeleteCustomProperties(IReadOnlyList<string> properties, Action onImplemented);
     }
 }

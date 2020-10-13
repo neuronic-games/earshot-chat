@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AppLayer.Callbacks;
 using AppLayer.NetworkGroups;
 using ServiceLocator;
@@ -12,7 +13,7 @@ namespace AppLayer
         void DestroyApp();
 
         #endregion
-        
+
         #region Callback Registration
 
         void RegisterCallbacks(IGroupCallbacks   listener);
@@ -31,6 +32,16 @@ namespace AppLayer
         IUser                        LocalUser   { get; }
         IReadOnlyList<IUser>         KnownUsers  { get; }
         IReadOnlyList<INetworkGroup> KnownGroups { get; }
+
+        #endregion
+
+        #region Factory
+
+        int  GroupCapacity  { get; }
+        bool CanCreateGroup { get; }
+        void CreateNewGroup(uint capacity, bool   locked, Action<INetworkGroup> onCreated);
+        void JoinGroup(long      groupId,  string secret, Action<INetworkGroup> onJoined);
+        void DeleteGroup(INetworkGroup group);
 
         #endregion
     }

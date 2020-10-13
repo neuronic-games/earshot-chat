@@ -33,6 +33,7 @@ namespace DiscordAppLayer
 
         void Start()
         {
+            Debug.Log($"Started.");
             App = DiscordApp.InitializeApp(760222636701253652, (ulong) CreateFlags.Default, instanceId);
 
             if (debugLog)
@@ -44,12 +45,9 @@ namespace DiscordAppLayer
                 AppLayer.AppLayer.Set(App);
             }
 
-            if (App.Initialized)
-            {
-                App.Discord.SetLogHook(LogLevel.Info, LogDiscord);
+            App.Discord.SetLogHook(LogLevel.Info, LogDiscord);
 
-                onCreated?.Invoke(App);
-            }
+            onCreated?.Invoke(App);
         }
 
         public void OnDestroy()

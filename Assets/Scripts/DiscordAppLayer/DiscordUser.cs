@@ -3,59 +3,95 @@ using System.Collections.Generic;
 using System.Text;
 using AppLayer.NetworkGroups;
 using Discord;
+using UnityEngine;
 
 namespace DiscordAppLayer
 {
     public class DiscordUser : IUser, IEquatable<DiscordUser>
     {
-        public override string ToString()
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"User ID: {DiscordUserId}");
-            sb.AppendLine($"Name: {Name}\tPermission Level: {PermissionLevel}\tReady: {IsReady}");
-            sb.AppendLine($"Current Custom Properties:-");
-            foreach (var kvp in CustomProperties)
-            {
-                sb.AppendLine($"\t{kvp.Key} : {kvp.Value}");
-            }
-
-            return sb.ToString();
-        }
-
         #region IUser
 
-        public bool   IsReady         { get; protected set; }
-        public int    PermissionLevel { get; protected set; }
-        public string Name            { get; protected set; }
+        public INetworkGroup Group
+        {
+            get => DiscordGroup;
+        }
 
-        private readonly Dictionary<string, string> _customProperties = new Dictionary<string, string>();
+        public DiscordNetworkGroup DiscordGroup    { get; protected set; }
+        public bool                IsReady         { get; protected set; }
+        public int                 PermissionLevel { get; protected set; }
+        public string              Name            { get; protected set; }
+
+        protected readonly Dictionary<string, string> _customProperties = new Dictionary<string, string>();
 
         public IReadOnlyDictionary<string, string> CustomProperties
         {
             get => _customProperties;
-            set => SetCustomProperties(value);
+            set => SetCustomProperties(value, null);
         }
 
-        public void SetCustomProperties(IReadOnlyDictionary<string, string> value)
+        public void SetCustomProperties(IReadOnlyDictionary<string, string> properties, Action onImplemented)
         {
-            //todo
-            throw new System.NotImplementedException();
+            if (!DiscordApp.GetDiscordApp(out DiscordApp discord)) return;
+            var manager     = discord.LobbyManager;
+            var transaction = manager.GetMemberUpdateTransaction(DiscordGroup.LobbyId, DiscordUserId);
+            foreach (var property in properties)
+            {
+                transaction.SetMetadata(property.Key, property.Value);
+            }
+
+            manager.UpdateMember(DiscordGroup.LobbyId, DiscordUserId, transaction, OnPropertiesSet);
+
+            void OnPropertiesSet(Result result)
+            {
+                if (result != Result.Ok)
+                {
+                    Debug.Log(
+                        $"Failed to set properties on {DiscordUserId} of group {DiscordGroup.LobbyId}. Result: {result}");
+                }
+                else
+                {
+                    Debug.Log($"Succeeded to set properties on {DiscordUserId} of group {DiscordGroup.LobbyId}.");
+                    foreach (var kvp in properties)
+                    {
+                        _customProperties[kvp.Key] = kvp.Value; //todo fix race condition
+                    }
+                }
+
+                onImplemented?.Invoke();
+            }
         }
 
-        public void DeleteCustomProperties(IReadOnlyList<string> properties)
+        public void DeleteCustomProperties(IReadOnlyList<string> properties, Action onImplemented)
         {
-            //todo
-            throw new System.NotImplementedException();
+            if (!DiscordApp.GetDiscordApp(out DiscordApp discord)) return;
+            var manager     = discord.LobbyManager;
+            var transaction = manager.GetMemberUpdateTransaction(DiscordGroup.LobbyId, DiscordUserId);
+            for (var i = 0; i < properties.Count; i++)
+            {
+                transaction.DeleteMetadata(properties[i]);
+            }
+
+            manager.UpdateMember(DiscordGroup.LobbyId, DiscordUserId, transaction, OnPropertiesSet);
+
+            void OnPropertiesSet(Result result)
+            {
+                if (result != Result.Ok)
+                {
+                    Debug.Log(
+                        $"Failed to set properties on {DiscordUserId} of group {DiscordGroup.LobbyId}. Result: {result}");
+                }
+                else
+                {
+                    Debug.Log($"Succeeded to set properties on {DiscordUserId} of group {DiscordGroup.LobbyId}.");
+                    foreach (var property in properties)
+                    {
+                        _customProperties.Remove(property);
+                    }
+                }
+
+                onImplemented?.Invoke();
+            }
         }
-
-        #region IEquatable<IUser>
-
-        public bool Equals(IUser other)
-        {
-            return this.Equals(other as DiscordUser);
-        }
-
-        #endregion
 
         #endregion
 
@@ -63,15 +99,20 @@ namespace DiscordAppLayer
 
         #region Constructors and Assignment Methods
 
-        public DiscordUser()
+        public DiscordUser(DiscordNetworkGroup group)
         {
-            IsReady = false;
+            IsReady           = false;
+            this.DiscordGroup = group;
         }
 
-        public DiscordUser(long userId, int permLevel, string name)
+        public DiscordUser(long userId, int permLevel, string name, DiscordNetworkGroup group)
         {
-            DiscordUserId = userId;
-            IsReady       = true;
+            DiscordUserId     = userId;
+            PermissionLevel   = permLevel;
+            Name              = name;
+            this.DiscordGroup = group;
+            IsReady           = true;
+            OnReady();
         }
 
         public void SetUserIdName(long userId)
@@ -79,6 +120,7 @@ namespace DiscordAppLayer
             if (IsReady) return;
             DiscordUserId = userId;
             IsReady       = true;
+            OnReady();
         }
 
         public void UpdateName(string name)
@@ -94,12 +136,21 @@ namespace DiscordAppLayer
         #endregion
 
         #region IEquatable<DiscordUser>
-
+        
+        public bool Equals(IUser other)
+        {
+            return this.Equals(other as DiscordUser);
+        }
+        
         public bool Equals(DiscordUser other)
         {
             if (object.ReferenceEquals(this, other)) return true;
             if (other               == null) return false;
-            if (other.DiscordUserId == DiscordUserId) return true;
+            if (other.DiscordUserId == DiscordUserId)
+            {
+                if (other.Group == this.Group) return true; // even if both are null
+                return false;
+            }
             return false;
         }
 
@@ -108,6 +159,39 @@ namespace DiscordAppLayer
         public void FillFromDiscordUser(ref User user)
         {
             Name = user.Username;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"User ID: {DiscordUserId}");
+            sb.AppendLine($"Name: {Name}\tPermission Level: {PermissionLevel}\tReady: {IsReady}");
+            sb.AppendLine($"Current Custom Properties:-");
+            foreach (var kvp in CustomProperties)
+            {
+                sb.AppendLine($"\t{kvp.Key} : {kvp.Value}");
+            }
+
+            return sb.ToString();
+        }
+
+        private void OnReady()
+        {
+            UpdateDiscordUser();
+        }
+
+        public void UpdateDiscordUser()
+        {
+            DiscordApp app = DiscordGroup.App;
+            if (app == null) DiscordApp.GetDiscordApp(out app);
+            var manager = app.UserManager;
+            manager.GetUser(DiscordUserId, ((Result result, ref User user) =>
+            {
+                if (result == Result.Ok)
+                {
+                    FillFromDiscordUser(ref user);
+                }
+            }));
         }
     }
 }

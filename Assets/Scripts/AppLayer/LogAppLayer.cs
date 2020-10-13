@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using AppLayer.Callbacks;
 using AppLayer.NetworkGroups;
+using DiscordAppLayer;
 using UnityEngine;
 
 namespace AppLayer
@@ -133,6 +134,8 @@ namespace AppLayer
             RemoveLoggersFromListeners();
             Logged.DestroyApp();
         }
+        
+        #region Registration
 
         public void RegisterCallbacks(IGroupCallbacks listener)
         {
@@ -181,11 +184,51 @@ namespace AppLayer
             Debug.Log($"Removed callbacks of {nameof(IUserCallbacks)} to {listener}.");
             Logged.RemoveCallbacks(listener);
         }
+        
+        #endregion
+        
+        #region Relationships
 
         public IUser                        LocalUser   => Logged.LocalUser;
         public IReadOnlyList<IUser>         KnownUsers  => Logged.KnownUsers;
         public IReadOnlyList<INetworkGroup> KnownGroups => Logged.KnownGroups;
 
+        #endregion
+
+        #region Factory
+
+        public int  GroupCapacity => Logged.GroupCapacity;
+        public bool CanCreateGroup => Logged.CanCreateGroup;
+        public void CreateNewGroup(uint capacity, bool   locked, Action<INetworkGroup> onCreated)
+        {
+            Debug.Log($"Requesting creation of new group.");
+            Logged.CreateNewGroup(capacity, locked, group =>
+            {
+                if (group == null) Debug.Log($"Failed to create group.");
+                else Debug.Log($"Created group {(group as DiscordNetworkGroup)?.LobbyId}.");
+                onCreated?.Invoke(group);
+            });
+        }
+
+        public void JoinGroup(long      groupId,  string secret, Action<INetworkGroup> onJoined)
+        {
+            Debug.Log($"Requesting joining of group with id {groupId} and secret {secret}.");
+            Logged.JoinGroup(groupId, secret, group =>
+            {
+                if (group == null) Debug.Log($"Failed to join group.");
+                else Debug.Log($"Joined group {groupId} {(group as DiscordNetworkGroup)?.LobbyId}.");
+                onJoined?.Invoke(group);
+            });
+        }
+
+        public void DeleteGroup(INetworkGroup @group)
+        {
+            Debug.Log($"Group {group} deleted.");
+            Logged.DeleteGroup(group);
+        }
+
+        #endregion
+        
         #endregion
     }
 }
