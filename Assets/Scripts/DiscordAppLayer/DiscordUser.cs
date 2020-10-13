@@ -23,11 +23,13 @@ namespace DiscordAppLayer
 
         public void SetCustomProperties(IReadOnlyDictionary<string, string> value)
         {
+            //todo
             throw new System.NotImplementedException();
         }
 
         public void DeleteCustomProperties(IReadOnlyList<string> properties)
         {
+            //todo
             throw new System.NotImplementedException();
         }
 

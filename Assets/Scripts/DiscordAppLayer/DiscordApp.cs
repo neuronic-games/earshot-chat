@@ -148,6 +148,7 @@ namespace DiscordAppLayer
 
         public void DestroyApp()
         {
+            Distributor.RemoveCallbacks(this);
             Distributor.UnsubscribeGameSDK();
             _discord.Dispose();
             Initialized = false;
@@ -479,11 +480,14 @@ namespace DiscordAppLayer
         private readonly List<DiscordUser>         _knownUsers  = new List<DiscordUser>();
         private readonly List<DiscordNetworkGroup> _knownGroups = new List<DiscordNetworkGroup>();
 
-        public IUser LocalUser => _localUser;
+        public IUser       LocalUser        => _localUser;
+        public DiscordUser LocalDiscordUser => _localUser;
 
-        public IReadOnlyList<IUser> KnownUsers => _knownUsers;
+        public IReadOnlyList<IUser>       KnownUsers        => _knownUsers;
+        public IReadOnlyList<DiscordUser> KnownDiscordUsers => _knownUsers;
 
         public IReadOnlyList<INetworkGroup> KnownGroups => _knownGroups;
+        public IReadOnlyList<INetworkGroup> KnownDiscordGroups => _knownGroups;
 
         #endregion
 
