@@ -93,6 +93,8 @@ namespace AppLayer
         public int  GroupCapacity  => 0;
         public bool CanCreateGroup => false;
 
+        public bool CanJoinGroup => false;
+
         public void CreateNewGroup(uint capacity, bool locked, Action<INetworkGroup> onCreated)
         {
             onCreated?.Invoke(null);
@@ -105,7 +107,6 @@ namespace AppLayer
 
         public void DeleteGroup(INetworkGroup group)
         {
-            
         }
 
         #endregion

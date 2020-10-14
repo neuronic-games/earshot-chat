@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using AppLayer.Callbacks;
 using AppLayer.NetworkGroups;
+using Discord;
 using DiscordAppLayer;
 using UnityEngine;
 
@@ -29,6 +30,7 @@ namespace AppLayer
         private IOverlayCallbacks _overlayLogger = new LoggingOverlay();
         private IUserCallbacks    _userLogger    = new LoggingUser();
         private IVoiceCallbacks   _voiceLogger   = new LoggingVoice();
+        private IActivityCallbacks _activityLogger = new LoggingActivity();
 
         private void AttachLoggersToListeners()
         {
@@ -36,6 +38,11 @@ namespace AppLayer
             Logged.RegisterCallbacks(_overlayLogger);
             Logged.RegisterCallbacks(_userLogger);
             Logged.RegisterCallbacks(_voiceLogger);
+
+            if (Logged is DiscordApp discord)
+            {
+                discord.RegisterCallbacks(_activityLogger);
+            }
         }
 
         private void RemoveLoggersFromListeners()
@@ -44,6 +51,11 @@ namespace AppLayer
             Logged.RemoveCallbacks(_overlayLogger);
             Logged.RemoveCallbacks(_userLogger);
             Logged.RemoveCallbacks(_voiceLogger);
+            
+            if (Logged is DiscordApp discord)
+            {
+                discord.RemoveCallbacks(_activityLogger);
+            }
         }
 
         #region Logging Listeners Callbacks
@@ -132,6 +144,30 @@ namespace AppLayer
             }
         }
 
+        public class LoggingActivity : IActivityCallbacks
+        {
+            public void OnActivityJoin(ActivityManager activityManager, string secret)
+            {
+                Debug.Log($"Joined through activity. Secret: {secret}.");
+            }
+
+            public void OnActivityJoinRequest(ActivityManager activityManager, ref User user)
+            {
+                Debug.Log($"Requested to join by user {user.Id}/{user.Username}.");
+            }
+
+            public void OnActivitySpectate(ActivityManager activityManager, string secret)
+            {
+                Debug.Log($"Spectating through activity. Secret: {secret}.");
+            }
+
+            public void OnActivityInvite(ActivityManager activityManager, ActivityActionType type, ref User user,
+                ref Activity                             activity)
+            {
+                Debug.Log($"Invite through Activity.\nType: {type}\nUser: {user.Id}/{user.Username}\nActivity: {activity}");
+            }
+        }
+
         #endregion
 
         #region IAppLayer
@@ -207,6 +243,8 @@ namespace AppLayer
 
         public int  GroupCapacity  => Logged.GroupCapacity;
         public bool CanCreateGroup => Logged.CanCreateGroup;
+
+        public bool CanJoinGroup => Logged.CanJoinGroup;
 
         public void CreateNewGroup(uint capacity, bool locked, Action<INetworkGroup> onCreated)
         {

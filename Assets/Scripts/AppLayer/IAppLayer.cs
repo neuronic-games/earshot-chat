@@ -39,8 +39,9 @@ namespace AppLayer
 
         int  GroupCapacity  { get; }
         bool CanCreateGroup { get; }
-        void CreateNewGroup(uint capacity, bool   locked, Action<INetworkGroup> onCreated);
-        void JoinGroup(long      groupId,  string secret, Action<INetworkGroup> onJoined);
+        bool CanJoinGroup   { get; }
+        void CreateNewGroup(uint       capacity, bool   locked, Action<INetworkGroup> onCreated);
+        void JoinGroup(long            groupId,  string secret, Action<INetworkGroup> onJoined);
         void DeleteGroup(INetworkGroup group);
 
         #endregion

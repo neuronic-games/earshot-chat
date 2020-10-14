@@ -3,6 +3,7 @@ using AppLayer;
 using Discord;
 using UnityEngine;
 using UnityEngine.Events;
+using Whoo;
 
 namespace DiscordAppLayer
 {
@@ -34,7 +35,8 @@ namespace DiscordAppLayer
         void Start()
         {
             Debug.Log($"Started.");
-            App = DiscordApp.InitializeApp(760222636701253652, (ulong) CreateFlags.Default, instanceId);
+            App = DiscordApp.InitializeApp(WhooSettings.Instance.discordAppId,
+                (ulong) WhooSettings.Instance.discordCreateFlags, instanceId);
 
             if (debugLog)
             {

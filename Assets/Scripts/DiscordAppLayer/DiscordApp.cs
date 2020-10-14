@@ -138,6 +138,22 @@ namespace DiscordAppLayer
             }
         }
 
+        private ActivityManager _activityManager = null;
+
+        public ActivityManager ActivityManager
+        {
+            get
+            {
+                Assert.IsTrue(Initialized);
+                if (_activityManager == null)
+                {
+                    _activityManager = _discord.GetActivityManager();
+                }
+
+                return _activityManager;
+            }
+        }
+
         #endregion
 
         #endregion
@@ -205,6 +221,8 @@ namespace DiscordAppLayer
 
             private HashSet<IUserCallbacks> _userCallbacks = new HashSet<IUserCallbacks>();
 
+            private HashSet<IActivityCallbacks> _activityCallbacks = new HashSet<IActivityCallbacks>();
+
             #endregion
 
             public EventDistributor(DiscordApp app)
@@ -222,6 +240,7 @@ namespace DiscordAppLayer
                 UnsubscribeOverlay();
                 UnsubscribeLobbyGroup();
                 UnsubscribeUser();
+                UnsubscribeActivity();
             }
 
             public void UnsubscribeVoice()
@@ -255,6 +274,15 @@ namespace DiscordAppLayer
                 user.OnCurrentUserUpdate -= InvokeOnCurrentUserUpdate;
             }
 
+            public void UnsubscribeActivity()
+            {
+                ActivityManager act = App.ActivityManager;
+                act.OnActivityInvite      -= OnActivityInvite;
+                act.OnActivityJoin        -= OnActivityJoin;
+                act.OnActivitySpectate    -= OnActivitySpectate;
+                act.OnActivityJoinRequest -= OnActivityJoinRequest;
+            }
+
             public void SubscribeGameSDK()
             {
                 UnsubscribeGameSDK();
@@ -262,6 +290,7 @@ namespace DiscordAppLayer
                 SubscribeOverlay();
                 SubscribeLobbyGroup();
                 SubscribeUser();
+                SubscribeActivity();
             }
 
             public void SubscribeVoice()
@@ -293,6 +322,15 @@ namespace DiscordAppLayer
             {
                 UserManager user = App.UserManager;
                 user.OnCurrentUserUpdate += InvokeOnCurrentUserUpdate;
+            }
+
+            public void SubscribeActivity()
+            {
+                ActivityManager act = App.ActivityManager;
+                act.OnActivityInvite      += OnActivityInvite;
+                act.OnActivityJoin        += OnActivityJoin;
+                act.OnActivitySpectate    += OnActivitySpectate;
+                act.OnActivityJoinRequest += OnActivityJoinRequest;
             }
 
             #endregion
@@ -414,6 +452,46 @@ namespace DiscordAppLayer
 
             #endregion
 
+            #region Activity
+
+            private void OnActivityJoinRequest(ref User user)
+            {
+                ActivityManager manager = App.ActivityManager;
+                foreach (var listener in _activityCallbacks)
+                {
+                    listener.OnActivityJoinRequest(manager, ref user);
+                }
+            }
+
+            private void OnActivitySpectate(string secret)
+            {
+                ActivityManager manager = App.ActivityManager;
+                foreach (var listener in _activityCallbacks)
+                {
+                    listener.OnActivitySpectate(manager, secret);
+                }
+            }
+
+            private void OnActivityJoin(string secret)
+            {
+                ActivityManager manager = App.ActivityManager;
+                foreach (var listener in _activityCallbacks)
+                {
+                    listener.OnActivityJoin(manager, secret);
+                }
+            }
+
+            private void OnActivityInvite(ActivityActionType type, ref User user, ref Activity activity)
+            {
+                ActivityManager manager = App.ActivityManager;
+                foreach (var listener in _activityCallbacks)
+                {
+                    listener.OnActivityInvite(manager, type, ref user, ref activity);
+                }
+            }
+
+            #endregion
+
             #endregion
 
             #region Listener Registration
@@ -438,6 +516,11 @@ namespace DiscordAppLayer
                 _userCallbacks.Add(listener);
             }
 
+            public void RegisterCallbacks(IActivityCallbacks listener)
+            {
+                _activityCallbacks.Add(listener);
+            }
+
             public void RemoveCallbacks(IGroupCallbacks listener)
             {
                 _groupListeners.Remove(listener);
@@ -456,6 +539,11 @@ namespace DiscordAppLayer
             public void RemoveCallbacks(IUserCallbacks listener)
             {
                 _userCallbacks.Remove(listener);
+            }
+
+            public void RemoveCallbacks(IActivityCallbacks listener)
+            {
+                _activityCallbacks.Remove(listener);
             }
 
             #endregion
@@ -487,6 +575,11 @@ namespace DiscordAppLayer
             Distributor.RegisterCallbacks(listener);
         }
 
+        public void RegisterCallbacks(IActivityCallbacks listener)
+        {
+            Distributor.RegisterCallbacks(listener);
+        }
+
         public void RemoveCallbacks(IGroupCallbacks listener)
         {
             Distributor.RemoveCallbacks(listener);
@@ -503,6 +596,11 @@ namespace DiscordAppLayer
         }
 
         public void RemoveCallbacks(IUserCallbacks listener)
+        {
+            Distributor.RemoveCallbacks(listener);
+        }
+
+        public void RemoveCallbacks(IActivityCallbacks listener)
         {
             Distributor.RemoveCallbacks(listener);
         }
@@ -535,6 +633,7 @@ namespace DiscordAppLayer
         private const int  MAX_GROUPS = 5;
         public        int  GroupCapacity  => KnownGroups.Count; //todo -- change for admins
         public        bool CanCreateGroup => KnownGroups.Count < MAX_GROUPS;
+        public        bool CanJoinGroup   => CanCreateGroup;
 
         public void CreateNewGroup(uint capacity, bool locked, Action<INetworkGroup> onCreated)
         {
@@ -647,7 +746,7 @@ namespace DiscordAppLayer
                     discord = log.Logged as DiscordApp;
                     if (discord != null) return true;
                 }
-                
+
                 UnityEngine.Debug.Log($"Expected {nameof(DiscordApp)} service. Found {layer.GetType().Name}.");
                 return false;
             }
