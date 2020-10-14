@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using AppLayer.Callbacks;
 using AppLayer.NetworkGroups;
 using AppLayer.Voice;
@@ -246,6 +247,26 @@ namespace DiscordAppLayer
             });
         }
 
+        public void LeaveOrDestroy(Action<bool> onLeft)
+        {
+            var manager = App.LobbyManager;
+            if (OwnerId == App.LocalDiscordUser.DiscordUserId)
+            {
+                //destroy
+                manager.DeleteLobby(LobbyId, result =>
+                {
+                    onLeft?.Invoke(result == Result.Ok);
+                });
+            }
+            else
+            {
+                manager.DisconnectLobby(LobbyId, result =>
+                {
+                    onLeft?.Invoke(result == Result.Ok);
+                });
+            }
+        }
+
         #endregion
 
         #region IEquatables
@@ -309,8 +330,9 @@ namespace DiscordAppLayer
             for (var i = 0; i < _members.Count; i++)
             {
                 DiscordUser member = _members[i];
-                App.DeleteMember(member);
+                RemoveMember(member);
             }
+            _members.Clear();
         }
 
         public void OnLobbyMessage(long lobbyid, long userid, byte[] data)
@@ -318,6 +340,53 @@ namespace DiscordAppLayer
             if (lobbyid != LobbyId) return;
             //todo
             throw new System.NotImplementedException();
+        }
+
+        #endregion
+
+        #region Discord Group Methods
+
+        public DiscordUser AddMember(User user)
+        {
+            var discordUser = _members.Find(disc => disc.DiscordUserId == user.Id);
+            if (discordUser != null) return discordUser;
+            discordUser = new DiscordUser(user.Id, 0, user.Username, App, this);
+            _members.Add(discordUser);
+            App.AddUser(discordUser); //todo -- handle in constructor
+            return discordUser;
+        }
+
+        public void RemoveMember(DiscordUser member)
+        {
+            _members.Remove(member);
+            App.DeleteUser(member);
+        }
+
+        #endregion
+
+        #region Misc Methods
+
+        private StringBuilder _sb = new StringBuilder();
+
+        public override string ToString()
+        {
+            _sb.Clear();
+            _sb.AppendLine($"GroupId: {LobbyId} Secret: {Secret}");
+            _sb.AppendLine($"OwnerId: {OwnerId}");
+            _sb.AppendLine($"Capacity: {Capacity}\tLocked: {Locked}");
+            _sb.AppendLine($"Custom Properties:-");
+            foreach (var kvp in _customProperties)
+            {
+                _sb.AppendLine($"\t{kvp.Key} : {kvp.Value}");
+            }
+
+            _sb.AppendLine($"Members:-");
+            foreach (var discordUser in _members)
+            {
+                _sb.AppendLine($"{discordUser}");
+            }
+
+            return _sb.ToString();
         }
 
         #endregion

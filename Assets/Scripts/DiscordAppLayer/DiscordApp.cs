@@ -22,10 +22,12 @@ namespace DiscordAppLayer
             _discord    = new Discord.Discord(clientId, flags);
             Initialized = true;
 
+            _localUser = new LocalDiscordUser(this);
+
             Distributor = new EventDistributor(this);
             Distributor.RegisterCallbacks(this);
             Distributor.SubscribeGameSDK();
-            
+
             UpdateLobbyList(OnUpdateList);
 
             void OnUpdateList(Result res)
@@ -509,7 +511,7 @@ namespace DiscordAppLayer
 
         #region Relationships
 
-        private readonly LocalDiscordUser          _localUser   = new LocalDiscordUser();
+        private readonly LocalDiscordUser          _localUser;
         private readonly List<DiscordUser>         _knownUsers  = new List<DiscordUser>();
         private readonly List<DiscordNetworkGroup> _knownGroups = new List<DiscordNetworkGroup>();
 
@@ -541,6 +543,7 @@ namespace DiscordAppLayer
                 onCreated?.Invoke(null);
                 return;
             }
+
             var manager     = LobbyManager;
             var transaction = manager.GetLobbyCreateTransaction();
             transaction.SetCapacity(capacity);
@@ -550,8 +553,12 @@ namespace DiscordAppLayer
 
             void OnCreateLobby(Result result, ref Lobby lobby)
             {
-                DiscordNetworkGroup group      = null;
-                if (result == Result.Ok) group = CreateGroupFromLobby(ref lobby);
+                DiscordNetworkGroup group = null;
+                if (result == Result.Ok)
+                {
+                    group = CreateGroupFromLobby(ref lobby);
+                }
+
                 onCreated?.Invoke(group);
             }
         }
@@ -563,6 +570,7 @@ namespace DiscordAppLayer
                 onJoined?.Invoke(_knownGroups.Find(group => group.LobbyId == groupId));
                 return;
             }
+
             UpdateLobbyList((res) =>
             {
                 if (res != Result.Ok)
@@ -575,8 +583,12 @@ namespace DiscordAppLayer
 
                 void OnJoinLobby(Result result, ref Lobby lobby)
                 {
-                    DiscordNetworkGroup group      = null;
-                    if (result == Result.Ok) group = CreateGroupFromLobby(ref lobby);
+                    DiscordNetworkGroup group = null;
+                    if (result == Result.Ok)
+                    {
+                        group = CreateGroupFromLobby(ref lobby);
+                    }
+
                     onJoined?.Invoke(group);
                 }
             });
@@ -590,12 +602,17 @@ namespace DiscordAppLayer
             discGroup.OnLobbyDelete(discGroup.LobbyId, 0);
         }
 
-        public void DeleteMember(DiscordUser user)
+        public void AddUser(DiscordUser user)
+        {
+            if (!_knownUsers.Contains(user)) _knownUsers.Add(user);
+        }
+
+        public void DeleteUser(DiscordUser user)
         {
             if (!_knownUsers.Contains(user)) return;
             _knownUsers.Remove(user);
         }
-        
+
         #region Private
 
         private DiscordNetworkGroup CreateGroupFromLobby(ref Lobby lobby)
@@ -603,6 +620,11 @@ namespace DiscordAppLayer
             DiscordNetworkGroup result = new DiscordNetworkGroup(this, ref lobby);
             _knownGroups.Add(result);
             RegisterCallbacks(result);
+            foreach (var user in LobbyManager.GetMemberUsers(lobby.Id))
+            {
+                var discUser = result.AddMember(user);
+            }
+
             return result;
         }
 
@@ -620,6 +642,12 @@ namespace DiscordAppLayer
             discord = layer as DiscordApp;
             if (discord == null)
             {
+                if (layer is LogAppLayer log)
+                {
+                    discord = log.Logged as DiscordApp;
+                    if (discord != null) return true;
+                }
+                
                 UnityEngine.Debug.Log($"Expected {nameof(DiscordApp)} service. Found {layer.GetType().Name}.");
                 return false;
             }

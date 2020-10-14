@@ -112,7 +112,15 @@ namespace AppLayer
         {
             public void OnToggle(bool manager)
             {
-                Debug.Log($"Overlay is open: {manager}.");
+                if (DiscordApp.GetDiscordApp(out var app))
+                {
+                    var o = app.OverlayManager;
+                    Debug.Log($"Overlay toggled.\nIsEnabled: {o.IsEnabled()}\nIsLocked: {o.IsLocked()}");
+                }
+                else
+                {
+                    Debug.Log($"Overlay is open: {manager}.");
+                }
             }
         }
 
@@ -120,7 +128,7 @@ namespace AppLayer
         {
             public void OnCurrentUserUpdate(IUser localUser)
             {
-                Debug.Log($"Current user updated. {localUser}");
+                Debug.Log($"Current user updated.\n{localUser}");
             }
         }
 
@@ -134,7 +142,7 @@ namespace AppLayer
             RemoveLoggersFromListeners();
             Logged.DestroyApp();
         }
-        
+
         #region Registration
 
         public void RegisterCallbacks(IGroupCallbacks listener)
@@ -184,9 +192,9 @@ namespace AppLayer
             Debug.Log($"Removed callbacks of {nameof(IUserCallbacks)} to {listener}.");
             Logged.RemoveCallbacks(listener);
         }
-        
+
         #endregion
-        
+
         #region Relationships
 
         public IUser                        LocalUser   => Logged.LocalUser;
@@ -197,27 +205,28 @@ namespace AppLayer
 
         #region Factory
 
-        public int  GroupCapacity => Logged.GroupCapacity;
+        public int  GroupCapacity  => Logged.GroupCapacity;
         public bool CanCreateGroup => Logged.CanCreateGroup;
-        public void CreateNewGroup(uint capacity, bool   locked, Action<INetworkGroup> onCreated)
+
+        public void CreateNewGroup(uint capacity, bool locked, Action<INetworkGroup> onCreated)
         {
             Debug.Log($"Requesting creation of new group.");
             Logged.CreateNewGroup(capacity, locked, group =>
             {
                 if (group == null) Debug.Log($"Failed to create group.");
-                else Debug.Log($"Created group {(group as DiscordNetworkGroup)?.LobbyId}.");
+                else Debug.Log($"Created group.\n{group}");
                 onCreated?.Invoke(group);
             });
         }
 
-        public void JoinGroup(long      groupId,  string secret, Action<INetworkGroup> onJoined)
+        public void JoinGroup(long groupId, string secret, Action<INetworkGroup> onJoined)
         {
             Debug.Log($"Requesting joining of group with id {groupId} and secret {secret}.");
             Logged.JoinGroup(groupId, secret, group =>
             {
+                onJoined?.Invoke(group); //invoke before so everything is ready for printing.
                 if (group == null) Debug.Log($"Failed to join group.");
-                else Debug.Log($"Joined group {groupId} {(group as DiscordNetworkGroup)?.LobbyId}.");
-                onJoined?.Invoke(group);
+                else Debug.Log($"Joined group.\n{group}");
             });
         }
 
@@ -228,7 +237,7 @@ namespace AppLayer
         }
 
         #endregion
-        
+
         #endregion
     }
 }

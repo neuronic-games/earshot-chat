@@ -10,12 +10,12 @@ namespace DiscordAppLayer
             DiscordGroup = group;
         }
 
-        public LocalDiscordUser() : base(null)
+        public LocalDiscordUser(DiscordApp app) : base(app, null)
         {
         }
 
-        public LocalDiscordUser(long userId, int permLevel, string name, DiscordNetworkGroup @group) : base(userId,
-            permLevel, name, @group)
+        public LocalDiscordUser(long userId, int permLevel, string name, DiscordNetworkGroup @group, DiscordApp app) : base(userId,
+            permLevel, name, app, @group)
         {
         }
 

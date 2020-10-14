@@ -16,10 +16,11 @@ namespace DiscordAppLayer
             get => DiscordGroup;
         }
 
-        public DiscordNetworkGroup DiscordGroup    { get; protected set; }
-        public bool                IsReady         { get; protected set; }
-        public int                 PermissionLevel { get; protected set; }
-        public string              Name            { get; protected set; }
+        public readonly DiscordApp          App;
+        public          DiscordNetworkGroup DiscordGroup    { get; protected set; }
+        public          bool                IsReady         { get; protected set; }
+        public          int                 PermissionLevel { get; protected set; }
+        public          string              Name            { get; protected set; }
 
         protected readonly Dictionary<string, string> _customProperties = new Dictionary<string, string>();
 
@@ -95,22 +96,24 @@ namespace DiscordAppLayer
 
         #endregion
 
-        public long DiscordUserId { get; protected set; }
+        public long DiscordUserId { get; protected set; } = -1;
 
         #region Constructors and Assignment Methods
 
-        public DiscordUser(DiscordNetworkGroup group)
+        public DiscordUser(DiscordApp app, DiscordNetworkGroup group)
         {
             IsReady           = false;
-            this.DiscordGroup = group;
+            App               = app;
+            DiscordGroup = group;
         }
 
-        public DiscordUser(long userId, int permLevel, string name, DiscordNetworkGroup group)
+        public DiscordUser(long userId, int permLevel, string name, DiscordApp app, DiscordNetworkGroup group)
         {
             DiscordUserId     = userId;
             PermissionLevel   = permLevel;
             Name              = name;
-            this.DiscordGroup = group;
+            App               = app;
+            DiscordGroup = group;
             IsReady           = true;
             OnReady();
         }
@@ -159,6 +162,10 @@ namespace DiscordAppLayer
         public void FillFromDiscordUser(ref User user)
         {
             Name = user.Username;
+            if (DiscordUserId == -1)
+            {
+                SetUserIdName(user.Id);
+            }
         }
 
         public override string ToString()
@@ -182,9 +189,7 @@ namespace DiscordAppLayer
 
         public void UpdateDiscordUser()
         {
-            DiscordApp app = DiscordGroup.App;
-            if (app == null) DiscordApp.GetDiscordApp(out app);
-            var manager = app.UserManager;
+            var manager = App.UserManager;
             manager.GetUser(DiscordUserId, ((Result result, ref User user) =>
             {
                 if (result == Result.Ok)

@@ -1,4 +1,5 @@
 ﻿using AppLayer.NetworkGroups;
+using DiscordAppLayer;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,11 +13,15 @@ namespace Whoo
         public Button makeRoomButton;
         public Button leaveRoomButton;
 
+        public Button voiceSettingsButton;
+
         public void Awake()
         {
             ToStartScreen();
             makeRoomButton.onClick.AddListener(MakeRoom);
             leaveRoomButton.onClick.AddListener(LeaveRoom);
+            
+            voiceSettingsButton.onClick.AddListener(OpenVoiceSettings);
         }
 
         private bool _loading    = false;
@@ -27,11 +32,11 @@ namespace Whoo
         public void MakeRoom()
         {
             if (_loading) return;
-            _loading    = true;
-            isRoomOwner = true;
             var app = AppLayer.AppLayer.Get();
             if (app.CanCreateGroup)
             {
+                _loading    = true;
+                isRoomOwner = true;
                 app.CreateNewGroup(5, false, group =>
                 {
                     _loading = false;
@@ -60,10 +65,28 @@ namespace Whoo
             if (_loading) return;
             _loading    = true;
             isRoomOwner = false;
-            var app = AppLayer.AppLayer.Get();
-            app.DeleteGroup(room);
-            room = null;
-            ToStartScreen();
+            room.LeaveOrDestroy((success) =>
+            {
+                _loading = false;
+                if (success)
+                {
+                    room = null;
+                    ToStartScreen();
+                }
+            });
+        }
+
+        private void OpenVoiceSettings()
+        {
+            if (DiscordApp.GetDiscordApp(out var discord))
+            {
+                var manager = discord.OverlayManager;
+                manager.OpenVoiceSettings(_ => {});
+            }
+            else
+            {
+                Debug.Log($"Discord app not found.");
+            }
         }
 
         private void ToRoomScreen()
