@@ -9,10 +9,10 @@ namespace DiscordCommon
     public class StatusIndicator : MonoBehaviour
     {
         [SerializeField]
-        private Image indicator;
+        private Image indicator = null;
 
         [SerializeField]
-        private List<Pair> statuses;
+        private List<Pair> statuses = null;
 
         [Serializable]
         public class Pair

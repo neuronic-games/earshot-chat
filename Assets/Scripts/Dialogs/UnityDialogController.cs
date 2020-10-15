@@ -36,13 +36,13 @@ namespace Dialogs
         //todo -- self registering custom dialogs
 
         [SerializeField]
-        private InfoDialog infoDialog;
+        private InfoDialog infoDialog = null;
 
         [SerializeField]
-        private LoadingDialog loadingDialog;
+        private LoadingDialog loadingDialog = null;
 
         [SerializeField]
-        private OptionsDialog optionsDialog;
+        private OptionsDialog optionsDialog = null;
 
         public void Awake()
         {

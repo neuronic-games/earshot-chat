@@ -5,7 +5,7 @@ using UnityEngine.Events;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-namespace DiscordCommon
+namespace UI
 {
     public abstract class AvatarBase : MonoBehaviour
     {

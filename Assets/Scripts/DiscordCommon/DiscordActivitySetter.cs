@@ -8,7 +8,7 @@ namespace DiscordCommon
     {
         [SerializeField] private bool setOnEnable = true;
 
-        [SerializeField] private SerializedDiscordActivity activity;
+        [SerializeField] private SerializedDiscordActivity activity = null;
 
         public void OnEnable()
         {

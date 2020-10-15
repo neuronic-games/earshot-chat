@@ -80,6 +80,13 @@ namespace AppLayer
             {
                 onImplemented?.Invoke();
             }
+
+            public event Action<bool> OnSpeaking;
+
+            public void Speaking()
+            {
+                OnSpeaking?.Invoke(false);
+            }
         }
 
         public IUser                        LocalUser   { get; } = new NullUser();
@@ -108,6 +115,8 @@ namespace AppLayer
         public void DeleteGroup(INetworkGroup group)
         {
         }
+        
+        
 
         #endregion
     }

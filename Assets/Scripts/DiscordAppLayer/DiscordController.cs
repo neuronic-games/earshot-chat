@@ -7,6 +7,7 @@ using Whoo;
 
 namespace DiscordAppLayer
 {
+    [DefaultExecutionOrder(-100)]
     public class DiscordController : MonoBehaviour
     {
         #region Serializable

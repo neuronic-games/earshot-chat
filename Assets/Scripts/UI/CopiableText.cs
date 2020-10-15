@@ -8,16 +8,16 @@ namespace UI
     public class CopiableText : MonoBehaviour, IPointerDownHandler
     {
         [SerializeField]
-        private TextMeshProUGUI textDisplay;
+        private TextMeshProUGUI textDisplay = null;
 
         [SerializeField]
-        private string textFormat;
+        private string textFormat = "{0}";
 
         [SerializeField]
-        private bool copyWholeFormattedText;
+        private bool copyWholeFormattedText = false;
 
         [SerializeField]
-        private UnityEvent onCopied;
+        private UnityEvent onCopied = null;
 
         private string _currentText;
 

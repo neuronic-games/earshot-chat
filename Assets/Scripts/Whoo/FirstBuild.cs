@@ -14,7 +14,7 @@ namespace Whoo
         [Header("Screens")]
         public GameObject startScreen;
 
-        public GameObject roomScreen;
+        public Room roomScreen;
 
         public Button makeRoomButton;
 
@@ -102,6 +102,9 @@ namespace Whoo
         {
             if (_loading) return;
             _loading = true;
+            var lobby = room as DiscordNetworkGroup;
+            Assert.IsNotNull(lobby);
+            if(lobby.IsConnectedVoice) lobby.DisconnectVoice();
             room.LeaveOrDestroy((success) =>
             {
                 _loading = false;
@@ -126,20 +129,34 @@ namespace Whoo
             }
         }
 
-        private void ToRoomScreen()
+        public void ToRoomScreen()
         {
             startScreen.SetActive(false);
-            roomScreen.SetActive(true);
+            roomScreen.gameObject.SetActive(true);
+            roomScreen.Setup(room);
             DiscordNetworkGroup lobby = room as DiscordNetworkGroup;
             Assert.IsNotNull(lobby);
             lobbySecretDisplay.Text = lobby.Secret;
             lobbyIdDisplay.Text     = lobby.LobbyId.ToString();
+
+            if (!lobby.IsConnectedVoice)
+            {
+                lobby.ConnectVoice(null, null);
+                lobby.OnDisconnectVoice += VoiceDisconnected;
+            }
         }
 
-        private void ToStartScreen()
+        private void VoiceDisconnected()
+        {
+            if (room is DiscordNetworkGroup lobby) lobby.OnDisconnectVoice -= VoiceDisconnected;
+            
+            Debug.Log($"Voice disconnected.");
+        }
+
+        public void ToStartScreen()
         {
             startScreen.SetActive(true);
-            roomScreen.SetActive(false);
+            roomScreen.gameObject.SetActive(false);
         }
     }
 }

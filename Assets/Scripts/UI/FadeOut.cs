@@ -7,16 +7,16 @@ namespace UI
     public class FadeOut : MonoBehaviour
     {
         [SerializeField]
-        private CanvasGroup group;
+        private CanvasGroup group = null;
 
         [SerializeField]
-        private float duration;
+        private float duration = 1;
 
         [SerializeField, Range(0, 1)]
-        private float startAmount;
+        private float startAmount = 1;
 
         [SerializeField, Range(0, 1)]
-        private float endAmount;
+        private float endAmount = 0.2f;
 
         [SerializeField]
         private bool interactableOnEnable = true;
@@ -31,16 +31,16 @@ namespace UI
         public enum EndAction
         {
             DisableObject       = 1 << 0,
-            DisableGroupObject           = 1 << 1,
+            DisableGroupObject  = 1 << 1,
             UnInteractableGroup = 1 << 2,
             InvokeEvent         = 1 << 3
         }
 
         [SerializeField]
-        private EndAction endAction;
+        private EndAction endAction = EndAction.DisableObject;
 
         [SerializeField]
-        private UnityEvent invokeAction;
+        private UnityEvent invokeAction = null;
 
         private float _fadeStart = 0.0f;
         private bool  _isFading  = false;
@@ -85,14 +85,17 @@ namespace UI
             {
                 gameObject.SetActive(false);
             }
+
             if (endAction.HasFlag(EndAction.DisableGroupObject))
             {
                 @group.gameObject.SetActive(false);
             }
+
             if (endAction.HasFlag(EndAction.InvokeEvent))
             {
                 invokeAction.Invoke();
             }
+
             if (endAction.HasFlag(EndAction.UnInteractableGroup))
             {
                 @group.blocksRaycasts = false;

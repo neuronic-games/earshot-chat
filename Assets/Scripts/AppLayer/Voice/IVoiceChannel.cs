@@ -7,9 +7,9 @@ namespace AppLayer.Voice
     /// </summary>
     public interface IVoiceChannel
     {
-        bool         IsConnected { get; }
-        void         Connect(Action onConnect, Action onFail);
-        void         Disconnect();
-        event Action OnDisconnect;
+        bool         IsConnectedVoice { get; }
+        void         ConnectVoice(Action onConnect, Action onFail);
+        void         DisconnectVoice();
+        event Action OnDisconnectVoice;
     }
 }

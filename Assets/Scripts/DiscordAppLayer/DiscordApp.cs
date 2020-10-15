@@ -153,6 +153,22 @@ namespace DiscordAppLayer
                 return _activityManager;
             }
         }
+        
+        private ImageManager _imageManager = null;
+
+        public ImageManager ImageManager
+        {
+            get
+            {
+                Assert.IsTrue(Initialized);
+                if (_imageManager == null)
+                {
+                    _imageManager = _discord.GetImageManager();
+                }
+
+                return _imageManager;
+            }
+        }
 
         #endregion
 

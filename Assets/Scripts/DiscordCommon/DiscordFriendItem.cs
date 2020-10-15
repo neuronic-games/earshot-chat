@@ -1,6 +1,7 @@
 ﻿using System;
 using Discord;
 using TMPro;
+using UI;
 using UnityEngine;
 
 namespace DiscordCommon

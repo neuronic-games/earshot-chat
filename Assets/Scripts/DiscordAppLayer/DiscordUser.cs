@@ -198,5 +198,12 @@ namespace DiscordAppLayer
                 }
             }));
         }
+
+        public event Action<bool> OnSpeaking;
+
+        public void Speaking(bool speaking)
+        {
+            OnSpeaking?.Invoke(speaking);
+        }
     }
 }

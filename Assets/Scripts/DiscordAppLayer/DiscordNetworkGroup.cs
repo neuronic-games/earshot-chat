@@ -119,11 +119,11 @@ namespace DiscordAppLayer
 
         private VoiceChannel _channel;
 
-        public bool IsConnected => IsAlive && _channel.IsConnected;
+        public bool IsConnectedVoice => IsAlive && _channel.IsConnected;
 
-        public void Connect(Action onSuccess, Action onFail)
+        public void ConnectVoice(Action onSuccess, Action onFail)
         {
-            if (IsConnected || _channel.IsConnecting) return;
+            if (IsConnectedVoice || _channel.IsConnecting) return;
             _channel.ConnectingState();
             _channel.OnConnectSuccess = onSuccess;
             _channel.OnConnectFail    = onFail;
@@ -131,9 +131,9 @@ namespace DiscordAppLayer
             lobby.ConnectVoice(LobbyId, _channel.OnVoiceConnect);
         }
 
-        public void Disconnect()
+        public void DisconnectVoice()
         {
-            if (!IsConnected) return;
+            if (!IsConnectedVoice) return;
             if (_channel.IsConnecting)
             {
                 _channel.DisconnectedState();
@@ -144,16 +144,18 @@ namespace DiscordAppLayer
             lobby.DisconnectVoice(LobbyId, _channel.OnVoiceDisconnect);
         }
 
-        public event Action OnDisconnect;
+        public event Action OnDisconnectVoice;
 
         private void InvokeDisconnect()
         {
-            OnDisconnect?.Invoke();
+            OnDisconnectVoice?.Invoke();
         }
 
         #endregion
 
         #region INetworkGroup
+        
+        #region Properties
 
         private List<DiscordUser> _members = new List<DiscordUser>();
 
@@ -266,6 +268,16 @@ namespace DiscordAppLayer
                 });
             }
         }
+        
+        #endregion
+
+        #region Events
+
+        public event Action OnDestroyed;
+        public event Action OnUsersUpdated;
+        public event Action OnGroupPropertiesUpdated;
+
+        #endregion
 
         #endregion
 
@@ -291,6 +303,7 @@ namespace DiscordAppLayer
         public void OnLobbyUpdate(long lobbyid)
         {
             if (lobbyid != LobbyId) return;
+            OnGroupPropertiesUpdated?.Invoke();
         }
 
         public void OnNetworkMessage(long lobbyid, long userid, byte channelid, byte[] data)
@@ -303,24 +316,34 @@ namespace DiscordAppLayer
         {
             if (lobbyid != LobbyId) return;
             //todo member connect
+            OnUsersUpdated?.Invoke();
         }
 
         public void OnSpeaking(long lobbyid, long userid, bool speaking)
         {
             if (lobbyid != LobbyId) return;
-            //todo on speaking
+            for (var i = 0; i < Members.Count; i++)
+            {
+                var member = _members[i];
+                if (member.DiscordUserId == userid)
+                {
+                    member.Speaking(speaking);
+                }
+            }
         }
 
         public void OnMemberUpdate(long lobbyid, long userid)
         {
             if (lobbyid != LobbyId) return;
             //todo on update
+            OnUsersUpdated?.Invoke();
         }
 
         public void OnMemberDisconnect(long lobbyid, long userid)
         {
             if (lobbyid != LobbyId) return;
             //todo on disconnect
+            OnUsersUpdated?.Invoke();
         }
 
         public void OnLobbyDelete(long lobbyid, uint reason)
@@ -333,13 +356,13 @@ namespace DiscordAppLayer
                 RemoveMember(member);
             }
             _members.Clear();
+            OnDestroyed?.Invoke();
         }
 
         public void OnLobbyMessage(long lobbyid, long userid, byte[] data)
         {
             if (lobbyid != LobbyId) return;
             //todo
-            throw new System.NotImplementedException();
         }
 
         #endregion

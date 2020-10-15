@@ -1,7 +1,7 @@
 ﻿using Discord;
 using UnityEngine;
 
-namespace DiscordCommon
+namespace UI
 {
     public class DiscordAvatar : AvatarBase
     {
