@@ -10,6 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bec4597675714b0690f60845b18a5cde, type: 3}
-  m_Name: Test Whoo Settings
+  m_Name: Whoo Test Settings
   m_EditorClassIdentifier: 
   discordAppId: 760222636701253652
+  discordCreateFlags: 0

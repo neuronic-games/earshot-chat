@@ -16,3 +16,7 @@ MonoBehaviour:
   details: Engaged in the room screen.
   state: Engaged
   type: 2
+  LargeTooltipText: Busy, busy...
+  LargeImageKey: whoo-test-large
+  SmallTooltipText: Jump right in!
+  SmallImageKey: whoo-test-small

@@ -16,3 +16,7 @@ MonoBehaviour:
   details: Idling on the start screen.
   state: Idle
   type: 3
+  LargeTooltipText: Idling...
+  LargeImageKey: whoo-test-large
+  SmallTooltipText: Staying idle.
+  SmallImageKey: whoo-test-small
