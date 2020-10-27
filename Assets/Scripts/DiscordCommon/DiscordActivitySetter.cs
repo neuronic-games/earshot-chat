@@ -1,6 +1,5 @@
 ﻿using Discord;
 using DiscordAppLayer;
-using UnityEditor.PackageManager;
 using UnityEngine;
 
 namespace DiscordCommon
@@ -34,11 +33,6 @@ namespace DiscordCommon
             if (activity != null)
                 manager.UpdateActivity(activity.GetActivity(), OnActivitySet);
             else manager.ClearActivity((result => { Debug.Log($"Clear Activity result: {result}"); }));
-        }
-
-        public static Discord.Discord GetManager()
-        {
-            return new Discord.Discord();
         }
 
         private static void OnActivitySet(Result result)

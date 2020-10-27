@@ -29,5 +29,11 @@ namespace Whoo.Views
                 Debug.LogWarning($"User that isn't a discord user attached to {nameof(DiscordUserView)}.");
             }
         }
+
+        protected override void CustomPropertiesUpdated()
+        {
+            base.CustomPropertiesUpdated();
+            gameObject.SetActive(User.CustomProperties.ContainsKey(Constants.Sitting));
+        }
     }
 }

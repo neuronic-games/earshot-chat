@@ -14,8 +14,9 @@ namespace DiscordAppLayer
         {
         }
 
-        public LocalDiscordUser(long userId, int permLevel, string name, DiscordNetworkGroup @group, DiscordApp app) : base(userId,
-            permLevel, name, app, @group)
+        public LocalDiscordUser(long userId, int permLevel, string name, DiscordNetworkGroup @group, DiscordApp app) :
+            base(userId,
+                permLevel, name, app, @group)
         {
         }
 
@@ -31,6 +32,23 @@ namespace DiscordAppLayer
         {
             SetDiscordGroup(group);
             base.DeleteCustomProperties(properties, onImplemented);
+        }
+
+        public void UpdateCustomProperties(DiscordNetworkGroup group)
+        {
+            SetDiscordGroup(group);
+            base.UpdateCustomProperties();
+        }
+
+        public void SetOrDeleteCustomProperty(string key, string value, DiscordNetworkGroup group)
+        {
+            SetDiscordGroup(group);
+            base.SetOrDeleteCustomProperty(key, value);
+        }
+
+        public override void UpdateCustomProperties()
+        {
+            
         }
     }
 }

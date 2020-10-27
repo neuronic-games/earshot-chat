@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AppLayer.NetworkGroups;
 using UnityEngine;
 
 namespace Whoo.Views
 {
     //todo -- change to interface
-    public class RoomUsersView : MonoBehaviour
+    public class UserListView : MonoBehaviour
     {
         #region Serialized
 
@@ -26,21 +27,30 @@ namespace Whoo.Views
             instance.RegisterUser(user);
         }
 
-        public void RemoveView(IUser user)
+        public void RemoveUser(IUser user)
         {
             if (_views.TryGetValue(user, out var view))
             {
-                Destroy(view.gameObject);
+                RemoveView(view);
+                _views.Remove(user);
             }
+        }
+
+        private static void RemoveView(UserView view)
+        {
+            if (view != null) view.DeleteView();
         }
 
         private HashSet<IUser> _toKeep = new HashSet<IUser>();
         private HashSet<IUser> _toRemove = new HashSet<IUser>();
-        public void KeepOnly(IReadOnlyList<IUser> users)
+        
+        public void KeepOnly(IReadOnlyList<IUser> users, Predicate<IUser> satisfies = null)
         {
+            if (satisfies == null) satisfies = AlwaysTrue;
             for (var i = 0; i < users.Count; i++)
             {
                 var user = users[i];
+                if (!satisfies.Invoke(user)) continue;
                 _toKeep.Add(user);
                 if (_views.TryGetValue(user, out var view))
                 {
@@ -60,11 +70,13 @@ namespace Whoo.Views
             
             foreach (var user in _toRemove)
             {
-                RemoveView(user);
+                RemoveUser(user);
             }
             
             _toKeep.Clear();
             _toRemove.Clear();
+
         }
+        bool AlwaysTrue(IUser u) => true;
     }
 }

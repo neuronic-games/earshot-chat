@@ -14,3 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   discordAppId: 760222636701253652
   discordCreateFlags: 0
+  roomScreen: {fileID: 2834008572589149173, guid: f3b4b0849b84fe24fb87e9581568aabc,
+    type: 3}
+  startScreen: {fileID: 5280672345489207402, guid: 79e88d1afab302c43a0db2a8a580eaea,
+    type: 3}
+  fadeOut: {fileID: 1297314241039701540, guid: abcf64efdbcb37c438684ce09d1c839e, type: 3}
+  tableView: {fileID: 8465652785150667373, guid: 0a55ee126cdf7dd498e6686088311566,
+    type: 3}
+  startAmount: 1
+  endAmount: 0
+  duration: 0.75
+  defaultTablesWhenCreate:
+  - rect:
+      serializedVersion: 2
+      x: 400
+      y: 400
+      width: 300
+      height: 200
+    seats: 6

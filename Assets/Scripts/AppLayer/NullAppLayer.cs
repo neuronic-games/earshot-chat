@@ -81,7 +81,14 @@ namespace AppLayer
                 onImplemented?.Invoke();
             }
 
+            public void SetOrDeleteCustomProperty(string key, string value)
+            {
+                
+            }
+
             public event Action<bool> OnSpeaking;
+
+            public event Action OnCustomPropertiesUpdated;
 
             public void Speaking()
             {

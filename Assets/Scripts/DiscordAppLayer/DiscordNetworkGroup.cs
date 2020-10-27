@@ -32,6 +32,7 @@ namespace DiscordAppLayer
             Capacity = lobby.Capacity;
             Locked   = lobby.Locked;
             OwnerId  = lobby.OwnerId;
+            IsAlive  = true;
 
             _channel = new VoiceChannel(InvokeDisconnect);
 
@@ -159,7 +160,7 @@ namespace DiscordAppLayer
 
         private List<DiscordUser> _members = new List<DiscordUser>();
 
-        public bool                 IsAlive { get; protected set; }
+        public bool        IsAlive { get; protected set; }
         public IReadOnlyList<IUser> Members => _members;
 
         public void Broadcast(byte[] message)
@@ -249,6 +250,27 @@ namespace DiscordAppLayer
             });
         }
 
+        public void SetOrDeleteCustomProperty(string key, string value)
+        {
+            LobbyManager     lobby  = App.LobbyManager;
+            LobbyTransaction update = lobby.GetLobbyUpdateTransaction(LobbyId);
+            if (string.IsNullOrEmpty(value))
+            {
+                update.DeleteMetadata(key);
+            }
+            else
+            {
+                update.SetMetadata(key, value);
+            }
+            lobby.UpdateLobby(LobbyId, update, (result =>
+            {
+                if (result != Result.Ok)
+                {
+                    Debug.Log($"Update lobby.");
+                }
+            }));
+        }
+
         public void LeaveOrDestroy(Action<bool> onLeft)
         {
             var manager = App.LobbyManager;
@@ -315,7 +337,9 @@ namespace DiscordAppLayer
         public void OnMemberConnect(long lobbyid, long userid)
         {
             if (lobbyid != LobbyId) return;
-            //todo member connect
+            var manager = App.LobbyManager;
+            var user = manager.GetMemberUser(LobbyId, userid);
+            AddMember(user);
             OnUsersUpdated?.Invoke();
         }
 
@@ -335,14 +359,17 @@ namespace DiscordAppLayer
         public void OnMemberUpdate(long lobbyid, long userid)
         {
             if (lobbyid != LobbyId) return;
-            //todo on update
+
+            var member = _members.Find(m => m.DiscordUserId == userid);
+            member.UpdateCustomProperties();
             OnUsersUpdated?.Invoke();
         }
 
         public void OnMemberDisconnect(long lobbyid, long userid)
         {
             if (lobbyid != LobbyId) return;
-            //todo on disconnect
+            var member = _members.Find(m => m.DiscordUserId == userid);
+            _members.Remove(member);
             OnUsersUpdated?.Invoke();
         }
 
@@ -356,6 +383,7 @@ namespace DiscordAppLayer
                 RemoveMember(member);
             }
             _members.Clear();
+            IsAlive = false;
             OnDestroyed?.Invoke();
         }
 

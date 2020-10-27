@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Discord;
+using DiscordAppLayer;
 using UnityEngine;
 
 namespace DiscordCommon
@@ -17,6 +18,12 @@ namespace DiscordCommon
         
         public Discord.Discord discord;
         public RelationshipManager manager;
+
+        public void Init()
+        {
+            if (!DiscordApp.GetDiscordApp(out var app)) return;
+            Init(app.Discord);
+        }
         
         public void Init(Discord.Discord discord)
         {
