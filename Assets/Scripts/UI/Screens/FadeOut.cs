@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 namespace UI.Screens
 {
-    public class FadeOut : MonoBehaviour, IScreen<FadeOut.FadeSettings>
+    public class FadeOut : Screen<FadeOut.FadeSettings>
     {
         [SerializeField]
         private CanvasGroup group = null;
@@ -142,41 +142,18 @@ namespace UI.Screens
 
         #region IScreen
 
-        public bool IsDisplayed
+        public override void Refresh()
         {
-            get => gameObject.activeInHierarchy;
-            set => gameObject.SetActive(value);
+            StartFadeOut();
         }
 
-        public void Setup()
+        public override void Setup(ref FadeSettings settings)
         {
             _isFading = false;
-            Hide();
+            
+            _currentSettings = settings;
 
             SetupCurrentSettings();
-        }
-
-        public void Display(Dictionary<string, object> values)
-        {
-            var fadeSettings = new FadeSettings();
-            Display(ref fadeSettings);
-        }
-
-        public void Hide()
-        {
-            IsDisplayed = false;
-        }
-
-        public void Refresh()
-        {
-            StartFadeOut();
-        }
-
-        public void Display(ref FadeSettings settings)
-        {
-            IsDisplayed      = true;
-            _currentSettings = settings;
-            StartFadeOut();
         }
 
         #endregion
