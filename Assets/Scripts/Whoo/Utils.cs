@@ -2,6 +2,7 @@
 using System.Collections;
 using AppLayer.NetworkGroups;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Whoo
 {
@@ -44,6 +45,14 @@ namespace Whoo
         }
 
         public static string GetTableMetaDataKey(int i) => $"Table{i}";
+
+        #endregion
+
+        #region PointerEventData
+
+        public static bool LeftClick(this   PointerEventData evt) => evt.button == PointerEventData.InputButton.Left;
+        public static bool RightClick(this  PointerEventData evt) => evt.button == PointerEventData.InputButton.Right;
+        public static bool MiddleClick(this PointerEventData evt) => evt.button == PointerEventData.InputButton.Middle;
 
         #endregion
     }
