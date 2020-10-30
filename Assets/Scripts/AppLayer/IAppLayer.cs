@@ -29,7 +29,6 @@ namespace AppLayer
 
         #region Relationships
 
-        IUser                        LocalUser   { get; }
         IReadOnlyList<IUser>         KnownUsers  { get; }
         IReadOnlyList<INetworkGroup> KnownGroups { get; }
 

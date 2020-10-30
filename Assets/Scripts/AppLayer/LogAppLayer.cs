@@ -20,16 +20,25 @@ namespace AppLayer
         public LogAppLayer(IAppLayer logged, bool attachLoggersToListeners)
         {
             Logged = logged;
+            if (logged is DiscordApp app)
+            {
+                _groupLogger = new LoggingDiscordGroup(app);
+            }
+            else
+            {
+                _groupLogger = new LoggingNetworkGroup();
+            }
+
             if (attachLoggersToListeners)
             {
                 AttachLoggersToListeners();
             }
         }
 
-        private IGroupCallbacks   _groupLogger   = new LoggingNetworkGroup();
-        private IOverlayCallbacks _overlayLogger = new LoggingOverlay();
-        private IUserCallbacks    _userLogger    = new LoggingUser();
-        private IVoiceCallbacks   _voiceLogger   = new LoggingVoice();
+        private IGroupCallbacks    _groupLogger    = null;
+        private IOverlayCallbacks  _overlayLogger  = new LoggingOverlay();
+        private IUserCallbacks     _userLogger     = new LoggingUser();
+        private IVoiceCallbacks    _voiceLogger    = new LoggingVoice();
         private IActivityCallbacks _activityLogger = new LoggingActivity();
 
         private void AttachLoggersToListeners()
@@ -51,7 +60,7 @@ namespace AppLayer
             Logged.RemoveCallbacks(_overlayLogger);
             Logged.RemoveCallbacks(_userLogger);
             Logged.RemoveCallbacks(_voiceLogger);
-            
+
             if (Logged is DiscordApp discord)
             {
                 discord.RemoveCallbacks(_activityLogger);
@@ -62,7 +71,7 @@ namespace AppLayer
 
         public class LoggingNetworkGroup : IGroupCallbacks
         {
-            public void OnLobbyUpdate(long lobbyid)
+            public virtual void OnLobbyUpdate(long lobbyid)
             {
                 Debug.Log($"Lobby {lobbyid} updated.");
             }
@@ -90,7 +99,7 @@ namespace AppLayer
                 }
             }
 
-            public void OnMemberUpdate(long lobbyid, long userid)
+            public virtual void OnMemberUpdate(long lobbyid, long userid)
             {
                 Debug.Log($"Member {userid} in lobby {lobbyid} has updated their metadata.");
             }
@@ -112,7 +121,53 @@ namespace AppLayer
             }
         }
 
-        public class LoggingVoice : IVoiceCallbacks
+        public sealed class LoggingDiscordGroup : LoggingNetworkGroup
+        {
+            public readonly DiscordApp App;
+
+            public LoggingDiscordGroup(DiscordApp app)
+            {
+                App = app;
+            }
+
+            private StringBuilder _sb = new StringBuilder();
+
+            public override void OnLobbyUpdate(long lobbyid)
+            {
+                _sb.Clear();
+
+                var manager   = App.LobbyManager;
+                int metaCount = manager.LobbyMetadataCount(lobbyid);
+                _sb.AppendLine($"Lobby {lobbyid} has updated. New Metadata Count: {metaCount}.");
+                for (int i = 0; i < metaCount; i++)
+                {
+                    string key   = manager.GetLobbyMetadataKey(lobbyid, i);
+                    string value = manager.GetLobbyMetadataValue(lobbyid, key);
+                    _sb.AppendLine($"\t{key} : {value}");
+                }
+
+                Debug.Log(_sb.ToString());
+            }
+
+            public override void OnMemberUpdate(long lobbyid, long userid)
+            {
+                _sb.Clear();
+
+                var manager   = App.LobbyManager;
+                int metaCount = manager.MemberMetadataCount(lobbyid, userid);
+                _sb.AppendLine($"User {userid} in {lobbyid} has updated. New Metadata Count: {metaCount}.");
+                for (int i = 0; i < metaCount; i++)
+                {
+                    string key   = manager.GetMemberMetadataKey(lobbyid, userid, i);
+                    string value = manager.GetMemberMetadataValue(lobbyid, userid, key);
+                    _sb.AppendLine($"\t{key} : {value}");
+                }
+
+                Debug.Log(_sb.ToString());
+            }
+        }
+
+        public sealed class LoggingVoice : IVoiceCallbacks
         {
             public void OnSettingsUpdate()
             {
@@ -120,7 +175,7 @@ namespace AppLayer
             }
         }
 
-        public class LoggingOverlay : IOverlayCallbacks
+        public sealed class LoggingOverlay : IOverlayCallbacks
         {
             public void OnToggle(bool manager)
             {
@@ -136,15 +191,18 @@ namespace AppLayer
             }
         }
 
-        public class LoggingUser : IUserCallbacks
+        public sealed class LoggingUser : IUserCallbacks
         {
-            public void OnCurrentUserUpdate(IUser localUser)
+            public void OnCurrentUserUpdate()
+            {
+                Debug.Log($"Current user updated.\n");
+            } /*public void OnCurrentUserUpdate(IUser localUser)
             {
                 Debug.Log($"Current user updated.\n{localUser}");
-            }
+            }*/
         }
 
-        public class LoggingActivity : IActivityCallbacks
+        public sealed class LoggingActivity : IActivityCallbacks
         {
             public void OnActivityJoin(ActivityManager activityManager, string secret)
             {
@@ -164,7 +222,8 @@ namespace AppLayer
             public void OnActivityInvite(ActivityManager activityManager, ActivityActionType type, ref User user,
                 ref Activity                             activity)
             {
-                Debug.Log($"Invite through Activity.\nType: {type}\nUser: {user.Id}/{user.Username}\nActivity: {activity}");
+                Debug.Log(
+                    $"Invite through Activity.\nType: {type}\nUser: {user.Id}/{user.Username}\nActivity: {activity}");
             }
         }
 
@@ -233,7 +292,6 @@ namespace AppLayer
 
         #region Relationships
 
-        public IUser                        LocalUser   => Logged.LocalUser;
         public IReadOnlyList<IUser>         KnownUsers  => Logged.KnownUsers;
         public IReadOnlyList<INetworkGroup> KnownGroups => Logged.KnownGroups;
 

@@ -4,6 +4,6 @@ namespace AppLayer.Callbacks
 {
     public interface IUserCallbacks : ICallbacks
     {
-        void OnCurrentUserUpdate(IUser localUser);
+        void OnCurrentUserUpdate();
     }
 }
