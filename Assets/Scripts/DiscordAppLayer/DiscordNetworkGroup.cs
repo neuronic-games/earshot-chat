@@ -37,6 +37,8 @@ namespace DiscordAppLayer
             _channel = new VoiceChannel(InvokeDisconnect);
 
             Subscribe();
+            
+            UpdateCustomProperties();
         }
 
         public void Subscribe()
@@ -208,15 +210,7 @@ namespace DiscordAppLayer
 
             lobby.UpdateLobby(LobbyId, update, result =>
             {
-                if (result == Result.Ok)
-                {
-                    Debug.Log($"Succeeded in setting properties for lobby {LobbyId}.");
-                    foreach (var kvp in properties)
-                    {
-                        _customProperties[kvp.Key] = kvp.Value;
-                    } //todo -- fix race condition
-                }
-                else
+                if (result != Result.Ok)
                 {
                     Debug.Log($"Failed to set properties for lobby {LobbyId}.");
                 }
@@ -236,15 +230,7 @@ namespace DiscordAppLayer
 
             lobby.UpdateLobby(LobbyId, update, result =>
             {
-                if (result == Result.Ok)
-                {
-                    Debug.Log($"Succeeded in deleting properties for lobby {LobbyId}.");
-                    foreach (var property in properties)
-                    {
-                        _customProperties.Remove(property);
-                    }
-                }
-                else
+                if (result != Result.Ok)
                 {
                     Debug.Log($"Failed to delete properties for lobby {LobbyId}.");
                 }
@@ -270,9 +256,27 @@ namespace DiscordAppLayer
             {
                 if (result != Result.Ok)
                 {
-                    Debug.Log($"Update lobby.");
+                    Debug.Log($"Update lobby failed {result}.");
                 }
             }));
+        }
+        
+        public void UpdateCustomProperties()
+        {
+            _customProperties.Clear();
+
+            var manager   = App.LobbyManager;
+            int metaCount = manager.LobbyMetadataCount(LobbyId);
+
+            for (int i = 0; i < metaCount; i++)
+            {
+                string key   = manager.GetLobbyMetadataKey(LobbyId, i);
+                string value = manager.GetLobbyMetadataValue(LobbyId, key);
+
+                _customProperties[key] = value;
+            }
+
+            OnGroupPropertiesUpdated?.Invoke();
         }
 
         public void LeaveOrDestroy(Action<bool> onLeft)
@@ -325,7 +329,7 @@ namespace DiscordAppLayer
         public void OnLobbyUpdate(long lobbyid)
         {
             if (lobbyid != LobbyId) return;
-            OnGroupPropertiesUpdated?.Invoke();
+            UpdateCustomProperties();
         }
 
         public void OnNetworkMessage(long lobbyid, long userid, byte channelid, byte[] data)
