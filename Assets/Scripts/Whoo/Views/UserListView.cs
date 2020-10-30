@@ -15,9 +15,9 @@ namespace Whoo.Views
 
         [SerializeField]
         private UserView perUserView = null;
-        
+
         #endregion
-        
+
         private Dictionary<IUser, UserView> _views = new Dictionary<IUser, UserView>();
 
         public void AddView(IUser user)
@@ -41,30 +41,47 @@ namespace Whoo.Views
             if (view != null) view.DeleteView();
         }
 
-        private HashSet<IUser> _toKeep = new HashSet<IUser>();
+        private HashSet<IUser> _toKeep   = new HashSet<IUser>();
         private HashSet<IUser> _toRemove = new HashSet<IUser>();
-        
-        public void KeepOnly(IReadOnlyList<IUser> users, Predicate<IUser> satisfies = null)
+
+        public void KeepOnly(IReadOnlyList<IUser> users)
         {
-            if (satisfies == null) satisfies = AlwaysTrue;
+            _toKeep.Clear();
+            _toRemove.Clear();
+            
             for (var i = 0; i < users.Count; i++)
             {
                 var user = users[i];
-                if (!satisfies.Invoke(user)) continue;
                 _toKeep.Add(user);
                 if (_views.TryGetValue(user, out var view))
                 {
-                    view.Refresh();
+                    //view.Refresh();
                 }
                 else
                 {
                     AddView(user);
                 }
             }
-            
+
             foreach (var kvp in _views)
             {
                 if (_toKeep.Contains(kvp.Key)) continue;
+                _toRemove.Add(kvp.Key);
+            }
+
+            foreach (var user in _toRemove)
+            {
+                RemoveUser(user);
+            }
+        }
+
+        public void KeepOnly(Predicate<IUser> keep)
+        {
+            _toRemove.Clear();
+
+            foreach (var kvp in _views)
+            {
+                if (keep.Invoke(kvp.Key)) continue;
                 _toRemove.Add(kvp.Key);
             }
             
@@ -73,10 +90,7 @@ namespace Whoo.Views
                 RemoveUser(user);
             }
             
-            _toKeep.Clear();
             _toRemove.Clear();
-
         }
-        bool AlwaysTrue(IUser u) => true;
     }
 }

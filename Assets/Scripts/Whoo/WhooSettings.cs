@@ -2,6 +2,7 @@
 using Discord;
 using UI.Screens;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Whoo.Views;
 
 namespace Whoo
@@ -38,6 +39,9 @@ namespace Whoo
 
         [Header("Tables")]
         public TableDisplayProperties[] defaultTablesWhenCreate;
+
+        [Header("Navigation Preferences")]
+        public PointerEventData.InputButton moveToTableOrLobby = PointerEventData.InputButton.Left;
     }
 
     [Serializable]

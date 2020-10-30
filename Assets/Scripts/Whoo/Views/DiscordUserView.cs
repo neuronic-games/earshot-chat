@@ -17,11 +17,15 @@ namespace Whoo.Views
             widget.SetSpeaking(speaking);
         }
 
+        private bool _triedLoadingAvatar = false;
+        
         public override void Refresh()
         {
             base.Refresh();
+            if (_triedLoadingAvatar) return;
             if (User is DiscordUser user)
             {
+                _triedLoadingAvatar = true;
                 avatar.LoadAvatar(user.DiscordUserId, user.App.ImageManager);
             }
             else

@@ -36,14 +36,6 @@ namespace Whoo.Views
 
         protected virtual void CustomPropertiesUpdated()
         {
-            var sb = new StringBuilder();
-            sb.AppendLine("Updated User " + User.Name);
-
-            foreach (var prop in User.CustomProperties)
-            {
-                sb.AppendLine($"\t{prop.Key} : {prop.Value}");
-            }
-            Debug.Log(sb.ToString());
         }
 
         protected virtual bool AttachListeners()
