@@ -15,6 +15,8 @@ namespace Whoo.Views
 
         public bool IsRunning { get; private set; }
 
+        public bool IsCleared => !timer.TextDisplayed;
+
         public bool CanStop
         {
             get
@@ -37,6 +39,7 @@ namespace Whoo.Views
         public void Awake()
         {
             _Stop();
+            ClearTimer();
 
             Transform up = transform.parent;
             while (up != null && view == null)
@@ -79,7 +82,6 @@ namespace Whoo.Views
         {
             IsRunning = false;
             timer.Stop();
-            timer.Clear();
         }
 
         public void StartStopwatch()
@@ -91,6 +93,11 @@ namespace Whoo.Views
         public void StopStopwatch()
         {
             view.Table.Group.SetOrDeleteCustomProperty(Constants.Stopwatch, null);
+        }
+
+        public void ClearTimer()
+        {
+            timer.Clear();
         }
     }
 }

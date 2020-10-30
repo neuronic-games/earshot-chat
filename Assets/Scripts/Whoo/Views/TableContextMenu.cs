@@ -36,15 +36,20 @@ namespace Whoo.Views
                 menu.RegisterAction("Sit at Table", Sit);
             }
 
-            if (watch != null)
+            if (watch != null && view.Table.Group.IsOwner)
             {
-                if (watch.IsRunning && watch.CanStop)
+                if (watch.IsRunning)
                 {
-                    menu.RegisterAction("Stop Stopwatch.", watch.StopStopwatch);
+                    if(watch.CanStop)
+                        menu.RegisterAction("Stop Stopwatch.", watch.StopStopwatch);
                 }
                 else
                 {
                     menu.RegisterAction("Start Stopwatch.", watch.StartStopwatch);
+                    if (!watch.IsCleared)
+                    {
+                        menu.RegisterAction("Clear Timer", watch.ClearTimer);
+                    }
                 }
             }
 

@@ -709,7 +709,7 @@ namespace DiscordAppLayer
             if (!(group is DiscordNetworkGroup discGroup)) return;
             if (!_knownGroups.Contains(discGroup)) return;
             _knownGroups.Remove(discGroup);
-            discGroup.OnLobbyDelete(discGroup.LobbyId, 0);
+            //discGroup.OnLobbyDelete(discGroup.LobbyId, 0);
         }
 
         public void AddUser(DiscordUser user)

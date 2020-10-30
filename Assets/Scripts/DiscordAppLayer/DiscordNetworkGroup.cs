@@ -167,6 +167,7 @@ namespace DiscordAppLayer
         public IUser LocalUser => LocalDiscordUser;
         public DiscordUser LocalDiscordUser => _members.Find(m => m.DiscordUserId == App.LocalUser.Id);
         public IReadOnlyList<IUser> Members => _members;
+        public bool IsOwner => App.LocalUser.Id == OwnerId;
 
         public void Broadcast(byte[] message)
         {
@@ -365,6 +366,12 @@ namespace DiscordAppLayer
             if (lobbyid != LobbyId) return;
 
             var member = _members.Find(m => m.DiscordUserId == userid);
+            if (member == null)
+            {
+                var manager = App.LobbyManager;
+                manager.GetMemberUser(lobbyid, userid);
+                
+            }
             member.UpdateCustomProperties();
             OnUsersUpdated?.Invoke();
         }
@@ -388,6 +395,7 @@ namespace DiscordAppLayer
             }
 
             _members.Clear();
+            
             IsAlive = false;
             OnDestroyed?.Invoke();
         }

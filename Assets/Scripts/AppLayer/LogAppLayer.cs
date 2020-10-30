@@ -89,14 +89,14 @@ namespace AppLayer
 
             public void OnSpeaking(long lobbyid, long userid, bool speaking)
             {
-                if (speaking)
+                /*if (speaking)
                 {
                     Debug.Log($"Member {userid} speaking in lobby {lobbyid}.");
                 }
                 else
                 {
                     Debug.Log($"Member {userid} went silent in lobby {lobbyid}.");
-                }
+                }*/
             }
 
             public virtual void OnMemberUpdate(long lobbyid, long userid)

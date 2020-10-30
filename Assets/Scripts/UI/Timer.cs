@@ -25,6 +25,7 @@ namespace UI
 
         private bool  _running    = false;
         private float accumulator = 0.0f;
+        public  bool  TextDisplayed => text.text.Length > 0 && gameObject.activeSelf;
 
         public void Set(int stamp, TimerType type)
         {
