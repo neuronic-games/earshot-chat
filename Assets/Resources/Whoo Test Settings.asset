@@ -27,15 +27,16 @@ MonoBehaviour:
   defaultTablesWhenCreate:
   - rect:
       serializedVersion: 2
-      x: 200
+      x: 300
       y: 200
       width: 300
       height: 125
     seats: 6
   - rect:
       serializedVersion: 2
-      x: 600
+      x: 700
       y: 250
       width: 100
       height: 300
     seats: 6
+  moveToTableOrLobby: 0
