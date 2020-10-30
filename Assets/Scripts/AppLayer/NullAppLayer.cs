@@ -58,6 +58,7 @@ namespace AppLayer
             public                  INetworkGroup              Group           => null;
             public                  bool                       IsReady         => false;
             public                  string                     Name            => string.Empty;
+            public                  string                     UniqueId        => string.Empty;
             private static readonly Dictionary<string, string> s_CustomProperties = new Dictionary<string, string>();
 
             public IReadOnlyDictionary<string, string> CustomProperties
@@ -83,7 +84,6 @@ namespace AppLayer
 
             public void SetOrDeleteCustomProperty(string key, string value)
             {
-                
             }
 
             public event Action<bool> OnSpeaking;
@@ -122,8 +122,6 @@ namespace AppLayer
         public void DeleteGroup(INetworkGroup group)
         {
         }
-        
-        
 
         #endregion
     }

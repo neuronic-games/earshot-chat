@@ -20,6 +20,7 @@ namespace DiscordAppLayer
         public          DiscordNetworkGroup DiscordGroup    { get; protected set; }
         public          bool                IsReady         { get; protected set; }
         public          int                 PermissionLevel { get; protected set; }
+        public          string              UniqueId        { get; protected set; }
         public          string              Name            { get; protected set; }
 
         protected readonly Dictionary<string, string> _customProperties = new Dictionary<string, string>();
@@ -101,7 +102,7 @@ namespace DiscordAppLayer
             {
                 transaction.SetMetadata(key, value);
             }
-            
+
             manager.UpdateMember(DiscordGroup.LobbyId, DiscordUserId, transaction, OnPropertiesSet);
 
             void OnPropertiesSet(Result result)
@@ -129,6 +130,7 @@ namespace DiscordAppLayer
         public DiscordUser(long userId, int permLevel, string name, DiscordApp app, DiscordNetworkGroup group)
         {
             DiscordUserId   = userId;
+            UniqueId = DiscordUserId.ToString();
             PermissionLevel = permLevel;
             Name            = name;
             App             = app;
@@ -141,6 +143,7 @@ namespace DiscordAppLayer
         {
             if (IsReady) return;
             DiscordUserId = userId;
+            UniqueId = DiscordUserId.ToString();
             IsReady       = true;
             OnReady();
         }

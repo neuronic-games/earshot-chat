@@ -10,6 +10,7 @@ namespace AppLayer.NetworkGroups
 
         INetworkGroup Group { get; }
         bool IsReady { get; }
+        string UniqueId { get; }
         string Name { get; }
         IReadOnlyDictionary<string, string> CustomProperties { get; set; }
         void SetCustomProperties(IReadOnlyDictionary<string, string> value, Action onImplemented);
