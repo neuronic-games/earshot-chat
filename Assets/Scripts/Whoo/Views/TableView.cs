@@ -3,60 +3,54 @@ using UnityEngine.EventSystems;
 
 namespace Whoo.Views
 {
-    public class TableView : GroupView, IPointerDownHandler
+    public class TableView : GroupView
     {
         public RectTransform root;
         public RectTransform tableArea;
 
-        public override void ForceRefresh()
-        {
-            base.ForceRefresh();
+        public Table Table { get; protected set; }
 
-            ResizeTable();
+        public void Setup(Table table)
+        {
+            Table = table;
+            base.Setup(table.Group);
+            ResizeTable(Table.Properties.rect, Table.Properties.seats);
         }
 
         #region Table Sizing
-        
-        public void ResizeTable()
-        {
-            if (Group.CustomProperties.TryGetValue(Constants.DisplayProperties, out string fullString))
-            {
-                string[] props    = fullString.Split(',');
-                float    posX     = float.Parse(props[0]);
-                float    posY     = float.Parse(props[1]);
-                float    width    = float.Parse(props[2]);
-                float    height   = float.Parse(props[3]);
-                int      numSeats = int.Parse(props[4]);
-
-                ResizeTable(new Rect(posX, posY, width, height), numSeats);
-            }
-        }
 
         private void ResizeTable(Rect rect, int numSeats)
         {
             root.anchorMin        = Vector2.zero;
             root.anchorMax        = Vector2.zero;
             root.anchoredPosition = rect.position;
-            tableArea.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, rect.x);
-            tableArea.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical,   rect.y);
+            tableArea.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, rect.width);
+            tableArea.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical,   rect.height);
         }
 
-        public void SetTableSizes(Rect rect, int numSeats)
-        {
-            Group.SetOrDeleteCustomProperty(Constants.DisplayProperties,
-                $"{rect.x},{rect.y},{rect.width},{rect.height},{numSeats}");
-            ResizeTable(rect, numSeats);
-        }
-        
         #endregion
 
-        #region Events
-
-        //todo -- more sophisticated event distribution
-
-        public void OnPointerDown(PointerEventData eventData)
+        protected override void OnGroupPropertiesUpdated()
         {
-            Build.MoveLocalUserToGroup(Group);
+            ResizeTable(Table.Properties.rect, Table.Properties.seats);
+        }
+
+        #region IPointerDownHandler
+        
+        protected override void MiddleClicked(PointerEventData eventData)
+        {
+            //ignore
+        }
+
+        protected override void RightClicked(PointerEventData eventData)
+        {
+            //ignore
+        }
+
+        protected override void LeftClicked(PointerEventData eventData)
+        {
+            if (Table.Group.LocalUser.IsSitting()) return;
+            Table.SeatUserHere();
         }
 
         #endregion
