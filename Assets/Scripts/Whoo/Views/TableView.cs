@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 namespace Whoo.Views
@@ -7,6 +8,8 @@ namespace Whoo.Views
     {
         public RectTransform root;
         public RectTransform tableArea;
+
+        public UnityEvent onPropertiesUpdate;
 
         public Table Table { get; protected set; }
 
@@ -33,21 +36,23 @@ namespace Whoo.Views
         protected override void OnGroupPropertiesUpdated()
         {
             ResizeTable(Table.Properties.rect, Table.Properties.seats);
+            
+            onPropertiesUpdate.Invoke();
         }
 
         #region IPointerDownHandler
-        
-        protected override void MiddleClicked(PointerEventData eventData)
+
+        public override void MiddleClick()
         {
             //ignore
         }
 
-        protected override void RightClicked(PointerEventData eventData)
+        public override void RightClick()
         {
             //ignore
         }
 
-        protected override void LeftClicked(PointerEventData eventData)
+        public override void LeftClick()
         {
             if (Table.Group.LocalUser.IsSitting()) return;
             Table.SeatUserHere();

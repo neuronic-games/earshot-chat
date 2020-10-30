@@ -1,12 +1,13 @@
 ﻿using AppLayer.NetworkGroups;
 using DiscordAppLayer;
+using UI;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 
 namespace Whoo.Views
 {
-    public abstract class GroupView : MonoBehaviour, IPointerDownHandler
+    public abstract class GroupView : MonoBehaviour, IClickHandler
     {
         #region Serialized
 
@@ -97,29 +98,11 @@ namespace Whoo.Views
 
         #endregion
 
-        #region IPointerDownHandler
+        #region IClickHandler
 
-        public void OnPointerDown(PointerEventData eventData)
-        {
-            if (eventData.button == PointerEventData.InputButton.Left)
-            {
-                LeftClicked(eventData);
-            }
-            else if(eventData.button == PointerEventData.InputButton.Middle)
-            {
-                MiddleClicked(eventData);
-            }
-            else
-            {
-                RightClicked(eventData);
-            }
-        }
-
-        protected abstract void MiddleClicked(PointerEventData eventData);
-
-        protected abstract void RightClicked(PointerEventData eventData);
-
-        protected abstract void LeftClicked(PointerEventData eventData);
+        public abstract void LeftClick();
+        public abstract void RightClick();
+        public abstract void MiddleClick();
 
         #endregion
     }

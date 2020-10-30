@@ -986,6 +986,7 @@ GameObject:
   - component: {fileID: 2834008573640990514}
   - component: {fileID: 6391234117961770180}
   - component: {fileID: 1723632523022230813}
+  - component: {fileID: 2839477190750789194}
   m_Layer: 5
   m_Name: Room Users
   m_TagString: Untagged
@@ -1094,6 +1095,18 @@ MonoBehaviour:
   notSeated: Left click to return back to room.
   isSeated: Click on a table to move there.
   contextMenu: 
+--- !u!114 &2839477190750789194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2834008573640990510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3419dfe580048d19267db897619529b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2834008573724410285
 GameObject:
   m_ObjectHideFlags: 0

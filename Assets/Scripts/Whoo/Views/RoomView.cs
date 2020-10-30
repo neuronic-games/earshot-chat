@@ -14,17 +14,17 @@ namespace Whoo.Views
 
         #region IPointerDownHandler
 
-        protected override void MiddleClicked(PointerEventData eventData)
+        public override void MiddleClick()
         {
             //ignore
         }
 
-        protected override void RightClicked(PointerEventData eventData)
+        public override void RightClick()
         {
             //ignore
         }
 
-        protected override void LeftClicked(PointerEventData eventData)
+        public override void LeftClick()
         {
             if (Room.RoomGroup.LocalUser.IsSitting()) return;
             Room.SeatLocalUserAtGroup(Room.RoomGroup);

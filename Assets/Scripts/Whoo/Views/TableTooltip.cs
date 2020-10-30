@@ -22,7 +22,7 @@ namespace UI.Tooltip
             base.Start();
             if (view == null)
             {
-                view = transform.parent.GetComponentInChildren<TableView>();
+                view = GetComponentInParent<TableView>();
             }
         }
 
