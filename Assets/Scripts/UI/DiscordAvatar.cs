@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using System.Collections.Generic;
+using Discord;
 using UnityEngine;
 
 namespace UI
@@ -17,12 +18,19 @@ namespace UI
             LoadAvatar();
         }
 
+        private static Dictionary<string, Texture2D> _cache = new Dictionary<string, Texture2D>();
+
         public override void LoadAvatar()
         {
             if (userId == 0)
             {
                 AlphaInvisible();
                 return;
+            }
+
+            if (_cache.TryGetValue(userId.ToString(), out var tex))
+            {
+                ApplyTexture(tex);
             }
             
             var handle = new ImageHandle()
@@ -36,11 +44,9 @@ namespace UI
             {
                 if (result == Result.Ok)
                 {
-                    var tex = manager.GetTexture(handleResult);
-                    image.texture = tex;
-                    AlphaVisible();
-                    SetUvRectToVerticalFlipped();
-                    onAvatarAvailable.Invoke(tex);
+                    tex = manager.GetTexture(handleResult);
+                    _cache[userId.ToString()] = tex;
+                    ApplyTexture(tex);
                 }
                 else
                 {
@@ -60,6 +66,15 @@ namespace UI
                 var color = image.color;
                 color.a     = 0.0f;
                 image.color = color;
+            }
+
+            void ApplyTexture(Texture2D value)
+            {
+                if (image == null) return;
+                image.texture = value;
+                AlphaVisible();
+                SetUvRectToVerticalFlipped();
+                onAvatarAvailable.Invoke(value);
             }
         }
 
