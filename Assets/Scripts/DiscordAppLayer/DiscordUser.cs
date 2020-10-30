@@ -164,6 +164,11 @@ namespace DiscordAppLayer
 
         #region IEquatable<DiscordUser>
 
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as DiscordUser);
+        }
+
         public bool Equals(IUser other)
         {
             return this.Equals(other as DiscordUser);
@@ -177,7 +182,7 @@ namespace DiscordAppLayer
             {
                 //for easier finding
                 //if (other.Group == this.Group) return true;
-                return false;
+                return true;
             }
 
             return false;

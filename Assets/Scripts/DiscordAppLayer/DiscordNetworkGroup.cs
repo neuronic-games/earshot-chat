@@ -155,12 +155,15 @@ namespace DiscordAppLayer
         #endregion
 
         #region INetworkGroup
-        
+
         #region Properties
 
         private List<DiscordUser> _members = new List<DiscordUser>();
 
-        public bool        IsAlive { get; protected set; }
+        public (string GroupId, string JoinPassword) IdAndPassword => (LobbyId.ToString(), Secret);
+        public bool IsAlive { get; protected set; }
+        public IUser LocalUser => LocalDiscordUser;
+        public DiscordUser LocalDiscordUser => _members.Find(m => m.DiscordUserId == App.LocalUser.Id);
         public IReadOnlyList<IUser> Members => _members;
 
         public void Broadcast(byte[] message)
@@ -262,6 +265,7 @@ namespace DiscordAppLayer
             {
                 update.SetMetadata(key, value);
             }
+
             lobby.UpdateLobby(LobbyId, update, (result =>
             {
                 if (result != Result.Ok)
@@ -273,24 +277,20 @@ namespace DiscordAppLayer
 
         public void LeaveOrDestroy(Action<bool> onLeft)
         {
+            if(IsConnectedVoice) DisconnectVoice();
+            
             var manager = App.LobbyManager;
-            if (OwnerId == App.LocalDiscordUser.DiscordUserId)
+            if (OwnerId == App.LocalUser.Id)
             {
                 //destroy
-                manager.DeleteLobby(LobbyId, result =>
-                {
-                    onLeft?.Invoke(result == Result.Ok);
-                });
+                manager.DeleteLobby(LobbyId, result => { onLeft?.Invoke(result == Result.Ok); });
             }
             else
             {
-                manager.DisconnectLobby(LobbyId, result =>
-                {
-                    onLeft?.Invoke(result == Result.Ok);
-                });
+                manager.DisconnectLobby(LobbyId, result => { onLeft?.Invoke(result == Result.Ok); });
             }
         }
-        
+
         #endregion
 
         #region Events
@@ -338,7 +338,7 @@ namespace DiscordAppLayer
         {
             if (lobbyid != LobbyId) return;
             var manager = App.LobbyManager;
-            var user = manager.GetMemberUser(LobbyId, userid);
+            var user    = manager.GetMemberUser(LobbyId, userid);
             AddMember(user);
             OnUsersUpdated?.Invoke();
         }
@@ -382,6 +382,7 @@ namespace DiscordAppLayer
                 DiscordUser member = _members[i];
                 RemoveMember(member);
             }
+
             _members.Clear();
             IsAlive = false;
             OnDestroyed?.Invoke();

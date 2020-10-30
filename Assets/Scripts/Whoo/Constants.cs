@@ -2,15 +2,18 @@
 {
     public class Constants
     {
-
         #region Custom Property Keys
 
         public const string Sitting = "Sitting";
 
-        public const string DisplayProperties = "Display Properties";
+        public const string TableDisplay = "DisplayProperties";
+
+        public const string TableCount = "TableCount";
 
         #endregion
-        
-        public const string True = "true";
+
+        public const string True            = "true";
+        public const uint   DefaultCapacity = 200;
+        public const float GroupCreateRate = 5f;
     }
 }

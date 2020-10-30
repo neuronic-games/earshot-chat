@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace DiscordAppLayer
-{
+{/*
     public class LocalDiscordUser : DiscordUser
     {
         public void SetDiscordGroup(DiscordNetworkGroup group)
@@ -50,5 +50,5 @@ namespace DiscordAppLayer
         {
             
         }
-    }
+    }*/
 }

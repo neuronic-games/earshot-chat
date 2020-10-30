@@ -31,7 +31,7 @@ namespace DiscordAppLayer
 
         #region Unity Callbacks
 
-        private DiscordApp App;
+        public DiscordApp App { get; private set; }
 
         void Start()
         {

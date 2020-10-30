@@ -7,8 +7,10 @@ namespace AppLayer.NetworkGroups
     {
         #region Properties
 
+        (string GroupId, string JoinPassword) IdAndPassword { get; }
         bool IsAlive { get; }
         IReadOnlyList<IUser> Members { get; }
+        IUser LocalUser { get; }
         void Broadcast(byte[] message);
         void Broadcast(string message);
         IReadOnlyDictionary<string, string> CustomProperties { get; set; }

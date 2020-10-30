@@ -22,7 +22,8 @@ namespace DiscordAppLayer
             _discord    = new Discord.Discord(clientId, flags);
             Initialized = true;
 
-            _localUser = new LocalDiscordUser(this);
+            /*
+            _localUser = new LocalDiscordUser(this);*/
 
             Distributor = new EventDistributor(this);
             Distributor.RegisterCallbacks(this);
@@ -209,12 +210,12 @@ namespace DiscordAppLayer
 
         #region IUserCallbacks
 
-        public void OnCurrentUserUpdate(IUser localUser)
+        public void OnCurrentUserUpdate()
         {
-            if (!LocalUser.IsReady)
+            if(!LocalUserSet)
             {
                 var user = UserManager.GetCurrentUser();
-                _localUser.FillFromDiscordUser(ref user);
+                LocalUser = user;
             }
         }
 
@@ -459,10 +460,9 @@ namespace DiscordAppLayer
 
             private void InvokeOnCurrentUserUpdate()
             {
-                UserManager manager = App.UserManager;
                 foreach (var listener in _userCallbacks)
                 {
-                    listener.OnCurrentUserUpdate(App.LocalUser);
+                    listener.OnCurrentUserUpdate();
                 }
             }
 
@@ -625,16 +625,11 @@ namespace DiscordAppLayer
 
         #region Relationships
 
-        private readonly LocalDiscordUser          _localUser;
         private readonly List<DiscordUser>         _knownUsers  = new List<DiscordUser>();
         private readonly List<DiscordNetworkGroup> _knownGroups = new List<DiscordNetworkGroup>();
 
-        public IUser LocalUser => _localUser;
-
-        /// <summary>
-        /// Do not set custom properties directly on the local discord user.
-        /// </summary>
-        public LocalDiscordUser LocalDiscordUser => _localUser;
+        public bool LocalUserSet { get; private set; } = false;
+        public User LocalUser { get; private set; } = default;
 
         public IReadOnlyList<IUser>       KnownUsers        => _knownUsers;
         public IReadOnlyList<DiscordUser> KnownDiscordUsers => _knownUsers;
