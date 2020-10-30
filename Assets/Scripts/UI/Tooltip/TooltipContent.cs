@@ -1,8 +1,7 @@
-﻿using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace UI
+namespace UI.Tooltip
 {
     public abstract class TooltipContent : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {

@@ -4,6 +4,7 @@ using DiscordAppLayer;
 using TMPro;
 using UI;
 using UnityEngine;
+using Whoo.Screens;
 using FadeOut = UI.Screens.FadeOut;
 
 namespace Whoo

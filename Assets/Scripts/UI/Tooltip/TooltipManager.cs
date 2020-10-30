@@ -1,8 +1,7 @@
-﻿using System;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 
-namespace UI
+namespace UI.Tooltip
 {
     /// <summary>
     /// Only supports overlay camera.

@@ -19,14 +19,18 @@ namespace Whoo
 
         public IUser CurrentSitting { get; private set; }
 
-        public Room(INetworkGroup group) //: base(group)
+        public Room(INetworkGroup group)
         {
             RoomGroup = group;
             Tables    = new List<Table>();
 
             SeatLocalUserAtGroup(RoomGroup);
+            
+            LoadAllTablesFromMetadata();
+        }
 
-            //load all tables from the metadata
+        public int LoadAllTablesFromMetadata()
+        {
             if (RoomGroup.CustomProperties.TryGetValue(Constants.TableCount, out string countStr) &&
                 int.TryParse(countStr, out int count))
             {
@@ -40,9 +44,13 @@ namespace Whoo
                                 Debug.Log((b ? "Successfully loaded" : "Failed to load") +
                                           $" table number {iLambda}.");
                             })
-                        , (iLambda + 1) * Constants.GroupCreateRate);
+                        , (iLambda + 1) * Constants.GroupJoinRate);
                 }
+
+                return count;
             }
+
+            return 0;
         }
 
         #region Table Methods
@@ -109,6 +117,12 @@ namespace Whoo
                     string[] details  = joinDetails.Split(',');
                     long     id       = long.Parse(details[0]); //discord detail
                     string   password = details[1];
+
+                    if (Tables.Exists(t => t.Group.IdAndPassword.GroupId == details[0]))
+                    {
+                        success?.Invoke(true);
+                        return;
+                    }
 
                     AppLayer.AppLayer.Get().JoinGroup(id, password, OnJoin);
 

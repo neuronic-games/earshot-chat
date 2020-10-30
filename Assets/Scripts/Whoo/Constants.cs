@@ -14,6 +14,7 @@
 
         public const string True            = "true";
         public const uint   DefaultCapacity = 200;
-        public const float GroupCreateRate = 5f;
+        public const float GroupCreateRate = 0.5f;
+        public const float GroupJoinRate = 1f;
     }
 }

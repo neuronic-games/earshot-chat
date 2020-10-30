@@ -1,11 +1,10 @@
-﻿using System;
-using Dialogs;
+﻿using Dialogs;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Screen = UI.Screens.Screen;
 
-namespace Whoo
+namespace Whoo.Screens
 {
     public class StartScreen : Screen
     {

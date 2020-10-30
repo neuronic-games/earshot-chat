@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using AppLayer.NetworkGroups;
 using DiscordAppLayer;
 using TMPro;
@@ -10,7 +9,7 @@ using UnityEngine.Assertions;
 using UnityEngine.UI;
 using Whoo.Views;
 
-namespace Whoo
+namespace Whoo.Screens
 {
     public class RoomScreen : Screen<RoomScreen.RoomSettings>
     {
@@ -75,6 +74,10 @@ namespace Whoo
                             (iUnchanging + 1) * Constants.GroupCreateRate);
                     }
                 }
+            }
+            else
+            {
+                _initialLoadingTables = Room.LoadAllTablesFromMetadata();
             }
 
             DiscordNetworkGroup lobby = settings.LobbyGroup as DiscordNetworkGroup;

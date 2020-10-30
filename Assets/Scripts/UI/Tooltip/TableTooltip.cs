@@ -1,9 +1,9 @@
 ﻿using System.Text;
-using UI;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using Whoo;
+using Whoo.Views;
 
-namespace Whoo.Views
+namespace UI.Tooltip
 {
     public class TableTooltip : TooltipContent
     {
