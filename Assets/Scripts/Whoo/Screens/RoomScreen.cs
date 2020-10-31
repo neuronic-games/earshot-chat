@@ -83,8 +83,10 @@ namespace Whoo.Screens
             DiscordNetworkGroup lobby = settings.LobbyGroup as DiscordNetworkGroup;
             Assert.IsNotNull(lobby);
 
-            lobbySecretDisplay.Text = lobby.Secret;
+            lobbySecretDisplay.Text = lobby.LobbyId.ToString() + ":" + lobby.Secret;
             lobbyIdDisplay.Text     = lobby.LobbyId.ToString();
+
+            Debug.Log(lobbySecretDisplay.Text);
         }
 
         public override void Close()

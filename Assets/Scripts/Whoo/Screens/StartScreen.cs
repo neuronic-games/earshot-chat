@@ -69,9 +69,9 @@ namespace Whoo.Screens
         {
             if (_loading) return;
             _loading = true;
-            if (!ExtractLobbyIdFromInput(lobbyIdInput.text, out long lobbyId)) return;
+            //if (!ExtractLobbyIdFromInput(lobbyIdInput.text, out long lobbyId)) return;
 
-            if (!ExtractSecretFromJoinInput(lobbySecretInput.text, out string secret))
+            if (!ExtractSecretFromJoinInput(lobbySecretInput.text, out long groupId, out string secret))
             {
                 Dialog.Get().RequestInfo("Invalid Input", "Secret is incorrect.", DialogStyle.Error, null);
                 return;
@@ -80,7 +80,7 @@ namespace Whoo.Screens
             var app = AppLayer.AppLayer.Get();
             if (app.CanJoinGroup)
             {
-                app.JoinGroup(lobbyId, secret, group =>
+                app.JoinGroup(groupId, secret, group =>
                 {
                     _loading = false;
                     if (group == null)
@@ -112,15 +112,28 @@ namespace Whoo.Screens
             return success;
         }
 
-        private bool ExtractSecretFromJoinInput(string input, out string secret)
+        private bool ExtractSecretFromJoinInput(string input, out long groupId, out string secret)
         {
+            groupId = 0;
+            secret = "";
+
             bool success = input.Length > 0;
             if (!success)
             {
-                Dialog.Get().RequestInfo("Invalid Input", "Secret is empty.", DialogStyle.Error, null);
+                Dialog.Get().RequestInfo("Invalid Input", "Room identifier is empty.", DialogStyle.Error, null);
             }
 
-            secret = input.Trim(' ');
+            string[] groupSecret = input.Trim(' ').Split(':');
+            if (groupSecret.Length != 2)
+            {
+                success = false;
+                Dialog.Get().RequestInfo("Invalid Input", "Room identifier is invalid.", DialogStyle.Error, null);
+            }
+            else
+            {
+                long.TryParse(groupSecret[0], out groupId);
+                secret = groupSecret[1];
+            }
             return success;
         }
 
