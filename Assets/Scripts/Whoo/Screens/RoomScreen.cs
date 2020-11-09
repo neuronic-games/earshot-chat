@@ -32,6 +32,9 @@ namespace Whoo.Screens
 
         public TextMeshProUGUI tablesLeftText = null;
 
+        [Header("Settings")]
+        public SettingsScreen settings;
+
         #endregion
 
         #region Screen<RoomSettings>
@@ -164,7 +167,8 @@ namespace Whoo.Screens
         public void Awake()
         {
             leaveRoomButton.onClick.AddListener(LeaveRoom);
-            voiceSettingsButton.onClick.AddListener(OpenVoiceSettings);
+            //voiceSettingsButton.onClick.AddListener(OpenVoiceSettings);
+            voiceSettingsButton.onClick.AddListener(OpenSettingsPanel);
         }
 
         public void Update()
@@ -207,32 +211,10 @@ namespace Whoo.Screens
 
             roomView.Refresh();
         }
-
-        /*public void CreateGroupAndTable(TableDisplayProperties props, bool retry = false)
+        
+        private void OpenSettingsPanel()
         {
-            var app = AppLayer.AppLayer.Get();
-            app.CreateNewGroup(200, false, group =>
-            {
-                if (group == null)
-                {
-                    if (!retry)
-                        Utils.DelayedAction(() => CreateGroupAndTable(props, true), 5.0f);
-                    return;
-                }
-
-                var table = CreateTableFromGroup(group);
-                table.SetTableSizes(props.rect, props.seats);
-            });
+            settings.Display();
         }
-
-        public TableView CreateTableFromGroup(INetworkGroup group)
-        {
-            var groupView = tables.Find(t => t.Group == @group);
-            if (groupView != null) return groupView;
-
-            var table = Instantiate(Build.Settings.tableView, tableArea);
-            table.Setup(group);
-            return table;
-        }*/
     }
 }

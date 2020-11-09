@@ -11,6 +11,8 @@ namespace Whoo.Views
         protected TextMeshProUGUI displayName;
 
         public IUser User { get; protected set; }
+        
+        #region Registration
 
         public virtual void RegisterUser(IUser user)
         {
@@ -34,16 +36,19 @@ namespace Whoo.Views
             return true;
         }
 
-        protected virtual void CustomPropertiesUpdated()
-        {
-        }
-
         protected virtual bool AttachListeners()
         {
             if (User == null) return false;
             User.OnSpeaking                += Speaking;
             User.OnCustomPropertiesUpdated += CustomPropertiesUpdated;
             return true;
+        }
+        
+        #endregion
+
+        protected virtual void CustomPropertiesUpdated()
+        {
+            
         }
 
         public virtual void Refresh()
