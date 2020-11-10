@@ -3,7 +3,6 @@ using DiscordAppLayer;
 using UI;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.EventSystems;
 
 namespace Whoo.Views
 {

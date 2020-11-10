@@ -105,7 +105,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.2264151, g: 0.07796369, b: 0.17952342, a: 1}
+  m_Color: {r: 0.2264151, g: 0.07796369, b: 0.17952342, a: 0.6666667}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -191,6 +191,7 @@ MonoBehaviour:
   displayName: {fileID: 594658681673087877}
   widget: {fileID: 594658683051603182}
   avatar: {fileID: 594658681536661317}
+  debugLog: 0
   onHoverDisplay: {fileID: 336106401699649896}
   volumeSlider: {fileID: 5614421338176481951}
 --- !u!114 &513758144581536425

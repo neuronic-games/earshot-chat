@@ -16,6 +16,9 @@ namespace Whoo.Views
         [SerializeField]
         private DiscordAvatar avatar = null;
 
+        [SerializeField, Header("Hover/Volume")]
+        private bool debugLog = false;
+        
         [SerializeField]
         private RectTransform onHoverDisplay = null;
 
@@ -109,18 +112,8 @@ namespace Whoo.Views
                 {
                     var volume = (byte) Mathf.Clamp(newValue, 0, 200);
                     app.VoiceManager.SetLocalVolume(user.DiscordUserId, volume);
-                    Debug.Log($"Volume Set to {volume}");
+                    if(debugLog) Debug.Log($"Volume Set to {volume}");
                 }
-
-                /*
-                foreach (var group in app.KnownDiscordGroups)
-                {
-                    var user = @group.Members.OfType<DiscordUser>().FirstOrDefault(u => u.Eqsuals(User));
-                    if (user != null)
-                    {
-                        app.VoiceManager.SetLocalVolume();
-                    }
-                }*/
             }
 
             _lastUpdate = Time.time;
@@ -132,7 +125,7 @@ namespace Whoo.Views
             {
                 var volume = app.VoiceManager.GetLocalVolume(dUser.DiscordUserId);
                 volumeSlider.value = volume;
-                Debug.Log($"Volume Get to {volume}");
+                if(debugLog) Debug.Log($"Volume Get to {volume}");
             }
         }
 
