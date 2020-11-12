@@ -1,14 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.Networking;
+using Whoo.Data;
 
+/// <summary>
+/// Common properties for strapi objects.
+/// </summary>
 [Serializable]
 public class StrapiCommon
 {
     //track changes
+    /// <summary>
+    /// Unique id assigned by strapi to the object.
+    /// </summary>
     public string id;
+
     public string _id;
+
+    /// <summary>
+    /// Means different things depending on the object.
+    /// </summary>
     public string name;
+
+    /// <summary>
+    /// Timestamp of last update on object.
+    /// </summary>
     public string updatedAt;
+
+    /// <summary>
+    /// Timestamp of creation of object.
+    /// </summary>
     public string createdAt;
 }
 
@@ -104,6 +127,26 @@ public class RoomData : StrapiCommon
     public int        capacity;
     public UserCommon created_by;
     public UserCommon updated_by;
+
+    #region Methods
+
+    private string __roomId;
+
+    public async UniTask Refresh()
+    {
+        var roomEndpoint = StrapiEndpoints.RoomEndpoint(__roomId);
+        string response = (await UnityWebRequest.Get(roomEndpoint).SendWebRequest()).
+                          downloadHandler.text;
+        JsonUtility.FromJsonOverwrite(response, this);
+    }
+
+    public async UniTask Fill(string roomId)
+    {
+        __roomId = roomId;
+        await Refresh();
+    }
+
+    #endregion
 }
 
 [Serializable]
@@ -124,4 +167,23 @@ public class ZoneData : StrapiCommon
 
     public string room;
     public string seats;
+
+    #region Methods
+
+    private string __zoneId;
+
+    public async UniTask Refresh()
+    {
+        string response = (await UnityWebRequest.Get(StrapiEndpoints.ZoneEndpoint(__zoneId)).SendWebRequest()).
+                          downloadHandler.text;
+        JsonUtility.FromJsonOverwrite(response, this);
+    }
+
+    public async UniTask Fill(string zoneId)
+    {
+        __zoneId = zoneId;
+        await Refresh();
+    }
+
+    #endregion
 }

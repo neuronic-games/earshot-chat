@@ -37,40 +37,40 @@ namespace Whoo.Data
 
         //todo -- handle web request failure
 
-        private async UniTask RefreshRoom()
+        public async UniTask RefreshRoom()
         {
             Ready = false;
-            var roomEndpoint = StrapiEndpoints.RoomEndpoint(_roomId);
-            string response = (await UnityWebRequest.Get(roomEndpoint).SendWebRequest()).
-                              downloadHandler.text;
 
-            RoomData = new RoomData();
-            JsonUtility.FromJsonOverwrite(response, RoomData);
+            RoomData = RoomData ?? new RoomData();
+
+            await RoomData.Fill(_roomId);
 
             Ready = true;
         }
 
-        private async UniTask RefreshZones()
+        public async UniTask RefreshZones()
         {
             Ready = false;
 
-            List<UniTask<UnityWebRequest>> pendingOps = new List<UniTask<UnityWebRequest>>();
-
-            for (var i = 0; i < RoomData.room_zones.Count; i++)
-            {
-                pendingOps.Add(UnityWebRequest.Get(StrapiEndpoints.RoomEndpoint(_roomId)).SendWebRequest().ToUniTask());
-            }
-
-            UnityWebRequest[] result = await UniTask.WhenAll(pendingOps);
-
             ZoneDatas.Clear();
+            List<UniTask> pendingOps = new List<UniTask>();
 
-            for (var i = 0; i < pendingOps.Count; i++)
+            var roomZones = RoomData.room_zones;
+            for (var i = 0; i < roomZones.Count; i++)
             {
-                var zoneData = new ZoneData();
-                JsonUtility.FromJsonOverwrite(result[i].downloadHandler.text, zoneData);
-                ZoneDatas.Add(zoneData);
+                while (i >= ZoneDatas.Count)
+                {
+                    ZoneDatas.Add(new ZoneData());
+                }
+                ZoneData zoneData = ZoneDatas[i];
+                
+                pendingOps.Add(zoneData.Fill(roomZones[i].zone));
             }
+            
+            while(roomZones.Count < ZoneDatas.Count)
+                ZoneDatas.RemoveAt(ZoneDatas.Count - 1);
+
+            await UniTask.WhenAll(pendingOps);
 
             Ready = true;
         }
