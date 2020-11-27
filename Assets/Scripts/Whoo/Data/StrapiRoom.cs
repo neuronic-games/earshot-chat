@@ -10,16 +10,16 @@ namespace Whoo.Data
     {
         #region IDataProvider
 
-        public RoomData       RoomData  { get; private set; }
-        public List<ZoneData> ZoneDatas { get; set; }
+        public Layout       Layout  { get; private set; }
+        public List<Zone> ZoneDatas { get; set; }
         public bool           Ready     { get; private set; }
 
         private string _roomId = string.Empty;
 
         public StrapiRoom()
         {
-            RoomData  = default;
-            ZoneDatas = new List<ZoneData>();
+            Layout  = default;
+            ZoneDatas = new List<Zone>();
         }
 
         public async UniTask LoadRoom(string roomId)
@@ -41,9 +41,9 @@ namespace Whoo.Data
         {
             Ready = false;
 
-            RoomData = RoomData ?? new RoomData();
+            Layout = Layout ?? new Layout();
 
-            await RoomData.Fill(_roomId);
+            await Layout.Fill(_roomId);
 
             Ready = true;
         }
@@ -55,14 +55,14 @@ namespace Whoo.Data
             ZoneDatas.Clear();
             List<UniTask> pendingOps = new List<UniTask>();
 
-            var roomZones = RoomData.room_zones;
+            var roomZones = Layout.room_zones;
             for (var i = 0; i < roomZones.Count; i++)
             {
                 while (i >= ZoneDatas.Count)
                 {
-                    ZoneDatas.Add(new ZoneData());
+                    ZoneDatas.Add(new Zone());
                 }
-                ZoneData zoneData = ZoneDatas[i];
+                Zone zoneData = ZoneDatas[i];
                 
                 pendingOps.Add(zoneData.Fill(roomZones[i].zone));
             }

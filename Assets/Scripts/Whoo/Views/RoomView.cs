@@ -1,8 +1,9 @@
-﻿using UnityEngine.EventSystems;
+﻿using UI;
+using UnityEngine.EventSystems;
 
 namespace Whoo.Views
 {
-    public class RoomView : GroupView
+    public class RoomView : GroupView, IClickDownHandler
     {
         public Room Room { get; private set; }
         
@@ -14,17 +15,17 @@ namespace Whoo.Views
 
         #region IPointerDownHandler
 
-        public override void MiddleClick()
+        public void MiddleClick(PointerEventData ptrData)
         {
             //ignore
         }
 
-        public override void RightClick()
+        public void RightClick(PointerEventData ptrData)
         {
             //ignore
         }
 
-        public override void LeftClick()
+        public void LeftClick(PointerEventData ptrData)
         {
             if (Room.RoomGroup.LocalUser.IsSitting()) return;
             Room.SeatLocalUserAtGroup(Room.RoomGroup);

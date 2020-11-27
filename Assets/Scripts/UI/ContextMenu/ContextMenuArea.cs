@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace UI.ContextMenu
 {
-    public abstract class ContextMenuArea : MonoBehaviour, IClickHandler
+    public abstract class ContextMenuArea : MonoBehaviour, IClickDownHandler
     {
         [Header("Config")]
         public bool openLeftClick;
@@ -19,17 +20,17 @@ namespace UI.ContextMenu
         #region IClickHandler
 
 
-        public void LeftClick()
+        public void LeftClick(PointerEventData ptrData)
         {
             if(openLeftClick) OpenContextMenu();
         }
 
-        public void RightClick()
+        public void RightClick(PointerEventData ptrData)
         {
             if(openRightClick) OpenContextMenu();
         }
 
-        public void MiddleClick()
+        public void MiddleClick(PointerEventData ptrData)
         {
             
         }

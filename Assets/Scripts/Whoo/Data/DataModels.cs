@@ -3,187 +3,224 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
-using Whoo.Data;
 
-/// <summary>
-/// Common properties for strapi objects.
-/// </summary>
-[Serializable]
-public class StrapiCommon
+namespace Whoo.Data
 {
-    //track changes
-    /// <summary>
-    /// Unique id assigned by strapi to the object.
-    /// </summary>
-    public string id;
-
-    public string _id;
+    #region Commons
 
     /// <summary>
-    /// Means different things depending on the object.
+    /// Common properties for strapi objects.
     /// </summary>
-    public string name;
-
-    /// <summary>
-    /// Timestamp of last update on object.
-    /// </summary>
-    public string updatedAt;
-
-    /// <summary>
-    /// Timestamp of creation of object.
-    /// </summary>
-    public string createdAt;
-}
-
-[Serializable]
-public class ImageCommon
-{
-    public string hash;
-
-    public string ext;
-
-    public string mime;
-
-    public float size;
-
-    public int width;
-
-    public int height;
-
-    public string url;
-}
-
-[Serializable]
-public class UserCommon
-{
-    public string _id;
-    public string username;
-    public string firstname;
-    public string lastname;
-    public string createdAt;
-    public string updatedAt;
-    public int    __v;
-    public string id;
-}
-
-[Serializable]
-public class RoomData : StrapiCommon
-{
-    #region Definitions
-
     [Serializable]
-    public class TableData : StrapiCommon
+    public abstract class StrapiCommon
     {
-        public string[] zones;
-        public int      x;
-        public int      y;
-        public string   updated_by;
-        public string   created_by;
+        //track changes
+        /// <summary>
+        /// Unique id assigned by strapi to the object.
+        /// </summary>
+        public string id;
 
-        public string zone;
+        public string _id;
+
+        /// <summary>
+        /// Means different things depending on the object.
+        /// </summary>
+        public string name;
+
+        /// <summary>
+        /// Timestamp of last update on object.
+        /// </summary>
+        public string updatedAt;
+
+        /// <summary>
+        /// Timestamp of creation of object.
+        /// </summary>
+        public string createdAt;
+
+        public abstract string EndPoint { get; }
+
+        public virtual async UniTaskVoid GetAsync()
+        {
+            var endp = EndPoint;
+            string response = (await UnityWebRequest.Get(endp).SendWebRequest()).
+                              downloadHandler.text;
+            //try-catch
+            JsonUtility.FromJsonOverwrite(response, this);
+        }
+
+        public virtual async UniTaskVoid PutAsync(object updateObj)
+        {
+            var endp = EndPoint;
+            var response = (await UnityWebRequest.Put(endp, JsonUtility.ToJson(updateObj)).SendWebRequest()).
+                           downloadHandler.text;
+            JsonUtility.FromJsonOverwrite(response, this);
+        }
     }
 
     [Serializable]
-    public class ImageData : StrapiCommon
+    public class ImageCommon
+    {
+        public string hash;
+
+        public string ext;
+
+        public string mime;
+
+        public float size;
+
+        public int width;
+
+        public int height;
+
+        public string url;
+    }
+
+    [Serializable]
+    public class UserCommon
+    {
+        public string _id;
+        public string username;
+        public string firstname;
+        public string lastname;
+        public string createdAt;
+        public string updatedAt;
+        public int    __v;
+        public string id;
+    }
+
+    #endregion
+
+    [Serializable]
+    public class Layout : StrapiCommon
     {
         #region Definitions
 
-        public class Format : ImageCommon
+        [Serializable]
+        public class ImageData : ImageCommon
         {
-            public string path;
-        }
+            #region Definitions
 
-        public class Formats
-        {
-            public Format thumbnail;
-            public Format medium;
-            public Format small;
+            public class Format : ImageCommon
+            {
+                public string path;
+            }
+
+            public class Formats
+            {
+                public Format thumbnail;
+                public Format medium;
+                public Format small;
+            }
+
+            #endregion
+
+            public string id;
+
+            public string _id;
+
+            public string alternativeText;
+
+            public string updated_by;
+
+            public string created_by;
+
+            public string caption;
+
+            public Formats formats;
+
+            public string provider;
+
+            public string[] related;
         }
 
         #endregion
 
-        public string alternativeText;
+        public ImageData image;
 
-        public string updated_by;
+        //room properties
+        public int        capacity;
+        public UserCommon created_by;
+        public UserCommon updated_by;
 
-        public string created_by;
+        #region Methods
 
-        public string caption;
+        public override string EndPoint => StrapiEndpoints.LayoutEndpoint(id);
 
-        public Formats formats;
-
-        public string provider;
-
-        public string[] related;
+        #endregion
     }
 
-    #endregion
-
-    public List<TableData> room_zones;
-
-    public ImageData image;
-
-    //room properties
-    public int        capacity;
-    public UserCommon created_by;
-    public UserCommon updated_by;
-
-    #region Methods
-
-    private string __roomId;
-
-    public async UniTask Refresh()
+    /// <summary>
+    /// The platform-specific room used for realtime network/voice.
+    /// </summary>
+    [Serializable]
+    public class Room : StrapiCommon
     {
-        var roomEndpoint = StrapiEndpoints.RoomEndpoint(__roomId);
-        string response = (await UnityWebRequest.Get(roomEndpoint).SendWebRequest()).
-                          downloadHandler.text;
-        JsonUtility.FromJsonOverwrite(response, this);
+        public const string Platform_Discord = "Discord";
+        public const string Platform_Agora   = "Agora";
+
+        public string platform;
+        public string platform_id;
+        public string platform_secret;
+
+        public Layout layout;
+
+        public override string EndPoint => StrapiEndpoints.RoomEndpoint(id);
+
+        public async UniTask<List<Zone>> GetAllZonesAsync()
+        {
+            string   endpoint = StrapiEndpoints.AllZones(id);
+            string   response = (await UnityWebRequest.Get(id).SendWebRequest()).downloadHandler.text;
+            ZoneList list     = new ZoneList();
+            JsonUtility.FromJsonOverwrite(response, list);
+            return list.list;
+        }
+
+        [Serializable]
+        private class ZoneList
+        {
+            public List<Zone> list;
+        }
     }
 
-    public async UniTask Fill(string roomId)
+    [Serializable]
+    public class Zone : StrapiCommon
     {
-        __roomId = roomId;
-        await Refresh();
+        public bool proximity;
+
+        public UserCommon created_by;
+        public UserCommon updated_by;
+
+        public Layout.ImageData image;
+
+        public int x;
+        public int y;
+        public int width;
+        public int height;
+
+        public string seats;
+
+        public Layout layout;
+
+        #region Methods
+
+        public override string EndPoint => StrapiEndpoints.ZoneEndpoint(id);
+
+        #endregion
     }
 
-    #endregion
-}
-
-[Serializable]
-public class ZoneData : StrapiCommon
-{
-    public bool proximity;
-
-    public UserCommon created_by;
-    public UserCommon updated_by;
-
-    public bool seated;
-
-    public int x;
-    public int y;
-    public int width;
-    public int height;
-    public int capacity;
-
-    public string room;
-    public string seats;
-
-    #region Methods
-
-    private string __zoneId;
-
-    public async UniTask Refresh()
+    [Serializable]
+    public class Profile : StrapiCommon
     {
-        string response = (await UnityWebRequest.Get(StrapiEndpoints.ZoneEndpoint(__zoneId)).SendWebRequest()).
-                          downloadHandler.text;
-        JsonUtility.FromJsonOverwrite(response, this);
-    }
+        [Serializable]
+        public class Avatar
+        {
+            public bool male;
+            public int  hair;
+            public int  faceA;
+            public int  faceB;
+            public int  torso;
+        }
 
-    public async UniTask Fill(string zoneId)
-    {
-        __zoneId = zoneId;
-        await Refresh();
+        public Avatar avatar;
     }
-
-    #endregion
 }

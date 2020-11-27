@@ -10,7 +10,7 @@ namespace UI.ContextMenu
         public Canvas        mainCanvas;
         public RectTransform contextMenuRect;
         public Transform     contentContainer;
-        public ClicksCatcher clicksCatcher;
+        public LocalClicksCatcher clicksCatcher;
 
         [Header("Templates")]
         public GameObject titleObject;
@@ -40,7 +40,7 @@ namespace UI.ContextMenu
                 mainCanvas = gameObject.GetComponentInParent<Canvas>();
 
             if (clicksCatcher == null)
-                clicksCatcher = GetComponentInChildren<ClicksCatcher>();
+                clicksCatcher = GetComponentInChildren<LocalClicksCatcher>();
 
             zHelper            = GetComponentInParent<RectTransform>();
             contextMenuContent = contextMenuRect.GetComponentInChildren<RectTransform>();

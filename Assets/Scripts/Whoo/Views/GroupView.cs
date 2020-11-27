@@ -6,7 +6,7 @@ using UnityEngine.Assertions;
 
 namespace Whoo.Views
 {
-    public abstract class GroupView : MonoBehaviour, IClickHandler
+    public abstract class GroupView : MonoBehaviour
     {
         #region Serialized
 
@@ -94,14 +94,6 @@ namespace Whoo.Views
         }
 
         #endregion
-
-        #endregion
-
-        #region IClickHandler
-
-        public abstract void LeftClick();
-        public abstract void RightClick();
-        public abstract void MiddleClick();
 
         #endregion
     }

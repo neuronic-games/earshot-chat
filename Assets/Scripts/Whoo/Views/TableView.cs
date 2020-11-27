@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 
 namespace Whoo.Views
 {
@@ -40,24 +39,10 @@ namespace Whoo.Views
             onPropertiesUpdate.Invoke();
         }
 
-        #region IPointerDownHandler
-
-        public override void MiddleClick()
-        {
-            //ignore
-        }
-
-        public override void RightClick()
-        {
-            //ignore
-        }
-
-        public override void LeftClick()
+        public void SeatHere()
         {
             if (Table.Group.LocalUser.IsSitting()) return;
             Table.SeatUserHere();
         }
-
-        #endregion
     }
 }

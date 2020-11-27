@@ -5,8 +5,8 @@ namespace Whoo.Data
 {
     public interface IDataProvider
     {
-        RoomData       RoomData  { get; }
-        List<ZoneData> ZoneDatas { get; }
+        Layout       Layout  { get; }
+        List<Zone> ZoneDatas { get; }
         bool           Ready     { get; }
         UniTask        LoadRoom(string roomId);
         UniTask        Refresh();
