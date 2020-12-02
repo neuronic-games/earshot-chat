@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using AppLayer.Callbacks;
 using AppLayer.NetworkGroups;
@@ -37,7 +38,7 @@ namespace DiscordAppLayer
             _channel = new VoiceChannel(InvokeDisconnect);
 
             Subscribe();
-            
+
             UpdateCustomProperties();
         }
 
@@ -261,7 +262,7 @@ namespace DiscordAppLayer
                 }
             }));
         }
-        
+
         public void UpdateCustomProperties()
         {
             _customProperties.Clear();
@@ -282,8 +283,8 @@ namespace DiscordAppLayer
 
         public void LeaveOrDestroy(Action<bool> onLeft)
         {
-            if(IsConnectedVoice) DisconnectVoice();
-            
+            if (IsConnectedVoice) DisconnectVoice();
+
             var manager = App.LobbyManager;
             if (OwnerId == App.LocalUser.Id)
             {
@@ -291,6 +292,32 @@ namespace DiscordAppLayer
                 manager.DeleteLobby(LobbyId, result => { onLeft?.Invoke(result == Result.Ok); });
             }
             else
+            {
+                manager.DisconnectLobby(LobbyId, result => { onLeft?.Invoke(result == Result.Ok); });
+            }
+        }
+
+        public void SafeLeave(Action<bool> onLeft)
+        {
+            if (IsConnectedVoice) DisconnectVoice();
+
+            var manager = App.LobbyManager;
+            if (OwnerId == App.LocalUser.Id)
+            {
+                //hand over group
+                var anotherUser = _members.Find(u => u.UniqueId != LocalDiscordUser.UniqueId);
+                if (anotherUser != null)
+                {
+                    var passOverTransaction = manager.GetLobbyUpdateTransaction(LobbyId);
+                    passOverTransaction.SetOwner(anotherUser.DiscordUserId);
+                    manager.UpdateLobby(LobbyId, passOverTransaction, (result) => { LeaveLobby(); });
+                    return;
+                }
+            }
+
+            LeaveLobby();
+
+            void LeaveLobby()
             {
                 manager.DisconnectLobby(LobbyId, result => { onLeft?.Invoke(result == Result.Ok); });
             }
@@ -370,8 +397,8 @@ namespace DiscordAppLayer
             {
                 var manager = App.LobbyManager;
                 manager.GetMemberUser(lobbyid, userid);
-                
             }
+
             member.UpdateCustomProperties();
             OnUsersUpdated?.Invoke();
         }
@@ -395,7 +422,7 @@ namespace DiscordAppLayer
             }
 
             _members.Clear();
-            
+
             IsAlive = false;
             OnDestroyed?.Invoke();
         }

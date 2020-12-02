@@ -1,7 +1,11 @@
-﻿using Dialogs;
+﻿using System;
+using AppLayer.NetworkGroups;
+using Cysharp.Threading.Tasks;
+using Dialogs;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Whoo.Data;
 using Screen = UI.Screens.Screen;
 
 namespace Whoo.Screens
@@ -13,30 +17,42 @@ namespace Whoo.Screens
         [Header("Joining")]
         public Button joinButton;
 
+        public LayoutSelectorScreen layoutSelector;
+
+        public RoomSelectorScreen roomSelector;
+
         public Button makeRoomButton;
 
-        public TMP_InputField lobbyIdInput;
-        public TMP_InputField lobbySecretInput;
+        public Button yourRooms;
+
+        public TMP_InputField joinRoomInput;
 
         #endregion
-        
+
         public void Awake()
         {
+            yourRooms.onClick.AddListener(YourRooms);
             joinButton.onClick.AddListener(JoinRoom);
             makeRoomButton.onClick.AddListener(MakeRoom);
+        }
+
+        private void YourRooms()
+        {
+            YourRoomsAsync().Forget();
         }
 
         #region Screen
 
         public override void Setup()
         {
-            lobbyIdInput.text     = string.Empty;
-            lobbySecretInput.text = string.Empty;
+            _loading           = false;
+            joinRoomInput.text = string.Empty;
+            layoutSelector.Hide();
+            roomSelector.Hide();
         }
 
         public override void Refresh()
         {
-            
         }
 
         #endregion
@@ -45,96 +61,139 @@ namespace Whoo.Screens
 
         #region UI Methods
 
+        public async UniTaskVoid YourRoomsAsync()
+        {
+            if (_loading) return;
+            var settings = new RoomSelectorScreen.Settings()
+            {
+                OnSelected = _MakeRoom,
+                ProfileId  = Build.Settings.testerInfo.profileId
+            };
+            roomSelector.Setup(ref settings);
+            roomSelector.Display();
+
+            async UniTaskVoid _MakeRoom(RoomModel roomModel)
+            {
+                _loading = true;
+                await roomModel.EnsureHasZoneInstancedAsync();
+                StrapiRoom room = new StrapiRoom();
+                await room.LoadRoom(roomModel.id);
+                JoinRoomAsync(room).Forget();
+            }
+        }
+
         public void MakeRoom()
         {
             if (_loading) return;
-            var app = AppLayer.AppLayer.Get();
-            if (app.CanCreateGroup)
+            var settings = new LayoutSelectorScreen.Settings() {OnSelected = _MakeRoom};
+            layoutSelector.Setup(ref settings);
+            layoutSelector.Display();
+
+            async UniTaskVoid _MakeRoom(Layout layout)
             {
                 _loading = true;
-                app.CreateNewGroup(5, false, group =>
-                {
-                    _loading = false;
-                    if (group == null) return;
-                    Build.ToRoomScreen(@group, true);
-                });
-            }
-            else
-            {
-                Debug.Log($"Can't create any more groups.");
+                StrapiRoom room = await StrapiRoom.CreateNew(layout, Build.Settings.testerInfo.profileId);
+                JoinRoomAsync(room).Forget();
             }
         }
 
-        public void JoinRoom()
+        private async UniTaskVoid ToRoomScreenAsync(StrapiRoom room, INetworkGroup group, bool didCreate)
         {
-            if (_loading) return;
-            _loading = true;
-            //if (!ExtractLobbyIdFromInput(lobbyIdInput.text, out long lobbyId)) return;
+            var (id, secret) = group.IdAndPassword;
 
-            if (!ExtractSecretFromJoinInput(lobbySecretInput.text, out long groupId, out string secret))
+            var roomCredentials = room.RoomModel.room_credentials;
+            if (roomCredentials?.platform_id != id || roomCredentials?.platform_secret != secret)
             {
-                Dialog.Get().RequestInfo("Invalid Input", "Secret is incorrect.", DialogStyle.Error, null);
+                await room.RoomModel.PutAsync(new RoomModel()
+                {
+                    room_credentials = new PlatformCredentials()
+                    {
+                        platform        = PlatformCredentials.Platform_Discord,
+                        platform_id     = id,
+                        platform_secret = secret
+                    }
+                }, Utils.StrapiModelSerializationDefaults());
+            }
+
+            await room.RoomModel.EnsureHasZoneInstancedAsync();
+
+            Build.ToRoomScreen(room, group, didCreate);
+        }
+
+        private void JoinRoom()
+        {
+            JoinRoomAsync().Forget();
+        }
+
+        public async UniTaskVoid JoinRoomAsync()
+        {
+            //TODO
+            if (_loading) return;
+
+            string roomId    = joinRoomInput.text;
+            var    roomModel = new RoomModel() {id = roomId};
+            try
+            {
+                await (roomModel.GetAsync());
+            }
+            catch
+            {
+                //wrong room id
+                Dialog.Get().
+                       RequestInfo("Unable To Join", "The room id entered is invalid. Please check it again.",
+                           DialogStyle.Info,         null);
                 return;
             }
 
-            var app = AppLayer.AppLayer.Get();
-            if (app.CanJoinGroup)
+            StrapiRoom room = new StrapiRoom();
+            await room.LoadRoom(roomModel.id);
+            JoinRoomAsync(room).Forget();
+        }
+
+        public async UniTaskVoid JoinRoomAsync(StrapiRoom room)
+        {
+            _loading = false;
+
+            INetworkGroup group = await Utils.JoinGroup(room.RoomModel);
+            if (group == null)
             {
-                app.JoinGroup(groupId, secret, group =>
+                StrapiPlatformInfoInvalid().Forget();
+            }
+            else
+            {
+                //successfully joined group
+                ToRoomScreenAsync(room, group, false).Forget();
+            }
+
+            async UniTaskVoid StrapiPlatformInfoInvalid()
+            {
+                var profileId = Build.Settings.testerInfo.profileId;
+                if (room.RoomModel.owner != null && room.RoomModel.owner?.id == profileId)
                 {
-                    _loading = false;
+                    //we are the owner of this room
+                    group = await Utils.CreateGroup((uint) room.RoomModel.layout.capacity);
                     if (group == null)
                     {
-                        Dialog.Get().
-                               RequestInfo("Failed to Join", "Either Room Id or Password is incorrect.",
-                                   DialogStyle.Error,        null);
+                        //unable to create group... todo -- keep trying
+                        Debug.Log("Unable to create platform group.");
+                        _loading = false;
                         return;
-                    } //should be logged by logging service
+                    }
 
-                    Whoo.Build.ToRoomScreen(group, false);
-                });
+                    Debug.Log($"Created new group for strapi room.");
+
+                    ToRoomScreenAsync(room, group, true).Forget();
+                }
+                else
+                {
+                    GoToWaitingLobby();
+                }
             }
-            else
+
+            void GoToWaitingLobby()
             {
-                Debug.Log($"Can't join any more groups.");
+                Build.ToWaitingLobby(room);
             }
-        }
-
-        private bool ExtractLobbyIdFromInput(string text, out long lobbyId)
-        {
-            bool success = long.TryParse(text, out lobbyId);
-            if (!success)
-            {
-                Dialog.Get().
-                       RequestInfo("Invalid Input", "Lobby Id is supposed to be numeric.", DialogStyle.Error, null);
-            }
-
-            return success;
-        }
-
-        private bool ExtractSecretFromJoinInput(string input, out long groupId, out string secret)
-        {
-            groupId = 0;
-            secret = "";
-
-            bool success = input.Length > 0;
-            if (!success)
-            {
-                Dialog.Get().RequestInfo("Invalid Input", "Room identifier is empty.", DialogStyle.Error, null);
-            }
-
-            string[] groupSecret = input.Trim(' ').Split(':');
-            if (groupSecret.Length != 2)
-            {
-                success = false;
-                Dialog.Get().RequestInfo("Invalid Input", "Room identifier is invalid.", DialogStyle.Error, null);
-            }
-            else
-            {
-                long.TryParse(groupSecret[0], out groupId);
-                secret = groupSecret[1];
-            }
-            return success;
         }
 
         #endregion

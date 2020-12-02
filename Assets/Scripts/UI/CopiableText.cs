@@ -2,10 +2,11 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using Whoo;
 
 namespace UI
 {
-    public class CopiableText : MonoBehaviour, IPointerDownHandler
+    public class CopiableText : MonoBehaviour, IPointerDownHandler, ITextContext
     {
         [SerializeField]
         private TextMeshProUGUI textDisplay = null;
@@ -40,13 +41,41 @@ namespace UI
         {
             if (copyWholeFormattedText)
             {
-                GUIUtility.systemCopyBuffer = textDisplay.text;
+                Utils.SetClipboardText(textDisplay.text);
             }
             else
             {
-                GUIUtility.systemCopyBuffer = _currentText;
+                Utils.SetClipboardText(_currentText);
             }
+
             onCopied?.Invoke();
         }
+
+        #region ITextContext
+
+        public string Format
+        {
+            get => textFormat;
+            set => textFormat = value;
+        }
+
+        public void SetText(string text)
+        {
+            Text = text;
+        }
+
+        public string GetText(bool formatted)
+        {
+            if (!formatted)
+            {
+                return _currentText;
+            }
+            else
+            {
+                return textDisplay.text;
+            }
+        }
+
+        #endregion
     }
 }

@@ -1,17 +1,44 @@
-﻿using AppLayer.NetworkGroups;
+﻿using System.Collections.Generic;
+using AppLayer.NetworkGroups;
 using DiscordAppLayer;
-using UI;
 using UnityEngine;
-using UnityEngine.Assertions;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Whoo.Views
 {
-    public abstract class GroupView : MonoBehaviour
+    public abstract class GroupView : MonoBehaviour, IUserListView, IPointerEnterHandler, IPointerExitHandler
     {
         #region Serialized
 
         [SerializeField]
-        private UserListView usersView = null;
+        protected Transform usersContentContainer = null;
+
+        [SerializeField]
+        private Image hoverPreview = default;
+
+        #endregion
+
+        #region IPointerXyzHandler
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (hoverPreview != null) hoverPreview.gameObject.SetActive(true);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (hoverPreview != null) hoverPreview.gameObject.SetActive(false);
+        }
+
+        #endregion
+
+        #region IUserListView
+
+        public abstract string    ListUniqueId         { get; }
+        public          Transform UserContentContainer => usersContentContainer;
+
+        protected static List<IUserListView> UserListViews = new List<IUserListView>();
 
         #endregion
 
@@ -21,21 +48,24 @@ namespace Whoo.Views
 
         public void Setup(INetworkGroup group)
         {
+            if (!UserListViews.Contains(this)) UserListViews.Add(this);
+            DetachListeners();
+
             Group = group;
 
-            DiscordNetworkGroup lobby = group as DiscordNetworkGroup;
-            Assert.IsNotNull(lobby);
+            if (AttachListeners())
+            {
+                if (group is DiscordNetworkGroup lobby)
+                    lobby.OnDisconnectVoice += VoiceDisconnected;
 
-            AttachListeners();
-
-            lobby.OnDisconnectVoice += VoiceDisconnected;
-
-            OnUsersUpdated();
-            OnGroupPropertiesUpdated();
+                OnUsersUpdated();
+                OnGroupPropertiesUpdated();
+            }
         }
 
         public void Clear()
         {
+            UserListViews.Remove(this);
             DetachListeners();
             Group = null;
             Destroy(gameObject);
@@ -77,21 +107,9 @@ namespace Whoo.Views
             Whoo.Build.RefreshRoomScreen();
         }
 
-        protected virtual void OnUsersUpdated()
-        {
-            usersView.KeepOnly(Group.Members);
-            usersView.KeepOnly(UserIsSitting);
+        protected abstract void OnUsersUpdated();
 
-            bool UserIsSitting(IUser user)
-            {
-                return user.CustomProperties.ContainsKey(Constants.Sitting);
-            }
-        }
-
-        protected virtual void OnGroupPropertiesUpdated()
-        {
-            //todo
-        }
+        protected abstract void OnGroupPropertiesUpdated();
 
         #endregion
 

@@ -18,7 +18,7 @@ namespace Whoo.Views
 
         [SerializeField, Header("Hover/Volume")]
         private bool debugLog = false;
-        
+
         [SerializeField]
         private RectTransform onHoverDisplay = null;
 
@@ -35,6 +35,8 @@ namespace Whoo.Views
         public override void Refresh()
         {
             base.Refresh();
+
+            //todo -- replace with custom avatar builder
 
             #region Avatar
 
@@ -56,12 +58,6 @@ namespace Whoo.Views
             UpdateSliderView();
 
             #endregion
-        }
-
-        protected override void CustomPropertiesUpdated()
-        {
-            base.CustomPropertiesUpdated();
-            gameObject.SetActive(User.CustomProperties.ContainsKey(Constants.Sitting));
         }
 
         #region IPointerHandler
@@ -86,7 +82,7 @@ namespace Whoo.Views
 
         private const float updateInterval = 1.0f;
         private       float _lastUpdate    = 0.0f;
-        
+
         public void Update()
         {
             if (Time.time > _lastUpdate + updateInterval)
@@ -112,7 +108,7 @@ namespace Whoo.Views
                 {
                     var volume = (byte) Mathf.Clamp(newValue, 0, 200);
                     app.VoiceManager.SetLocalVolume(user.DiscordUserId, volume);
-                    if(debugLog) Debug.Log($"Volume Set to {volume}");
+                    if (debugLog) Debug.Log($"Volume Set to {volume}");
                 }
             }
 
@@ -125,7 +121,7 @@ namespace Whoo.Views
             {
                 var volume = app.VoiceManager.GetLocalVolume(dUser.DiscordUserId);
                 volumeSlider.value = volume;
-                if(debugLog) Debug.Log($"Volume Get to {volume}");
+                if (debugLog) Debug.Log($"Volume Get to {volume}");
             }
         }
 

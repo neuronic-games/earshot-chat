@@ -10,12 +10,14 @@ namespace Whoo.Views
         [SerializeField]
         protected TextMeshProUGUI displayName;
 
-        public IUser User { get; protected set; }
-        
+        protected WhooRoom _room = null;
+        public    IUser    User { get; protected set; }
+
         #region Registration
 
-        public virtual void RegisterUser(IUser user)
+        public virtual void RegisterUser(IUser user, WhooRoom room)
         {
+            _room = room;
             DetachListeners();
             this.User = user;
             AttachListeners();
@@ -25,6 +27,8 @@ namespace Whoo.Views
         public virtual void DeleteView()
         {
             DetachListeners();
+            _room = null;
+            User  = null;
             Destroy(gameObject);
         }
 
@@ -43,12 +47,11 @@ namespace Whoo.Views
             User.OnCustomPropertiesUpdated += CustomPropertiesUpdated;
             return true;
         }
-        
+
         #endregion
 
         protected virtual void CustomPropertiesUpdated()
         {
-            
         }
 
         public virtual void Refresh()

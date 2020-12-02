@@ -20,6 +20,7 @@ namespace AppLayer.NetworkGroups
 
         void SetOrDeleteCustomProperty(string key, string value);
         void LeaveOrDestroy(Action<bool>      onLeft);
+        void SafeLeave(Action<bool>           onLeft);
 
         #endregion
 

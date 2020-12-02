@@ -1,4 +1,5 @@
-﻿using UI.ContextMenu;
+﻿using Cysharp.Threading.Tasks;
+using UI.ContextMenu;
 
 namespace Whoo.Views
 {
@@ -27,7 +28,7 @@ namespace Whoo.Views
             ContextMenu menu = new ContextMenu();
             menu.SetTitle("Table");
 
-            if (view.Group.LocalUser.IsSitting())
+            if (view.Table.IsLocalUserSitting())
             {
                 menu.RegisterAction("To Room", ToRoom);
             }
@@ -40,7 +41,7 @@ namespace Whoo.Views
             {
                 if (watch.IsRunning)
                 {
-                    if(watch.CanStop)
+                    if (watch.CanStop)
                         menu.RegisterAction("Stop Stopwatch.", watch.StopStopwatch);
                 }
                 else
@@ -63,7 +64,7 @@ namespace Whoo.Views
 
         private void ToRoom()
         {
-            view.Table.Room.SeatLocalUserAtGroup(view.Table.Room.RoomGroup);
+            view.Table.WhooRoom.SeatLocalUserAtTableAsync(null).Forget();
         }
     }
 }

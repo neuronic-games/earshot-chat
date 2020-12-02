@@ -1,9 +1,8 @@
-﻿using AppLayer.NetworkGroups;
-using Dialogs;
-using DiscordAppLayer;
-using TMPro;
-using UI;
+﻿using System;
+using AppLayer.NetworkGroups;
+using UI.Screens;
 using UnityEngine;
+using Whoo.Data;
 using Whoo.Screens;
 using FadeOut = UI.Screens.FadeOut;
 
@@ -17,22 +16,28 @@ namespace Whoo
 
         private RoomScreen roomScreen;
 
+        private WaitingLobbyScreen waitingScreen;
+
         private FadeOut fadeOut;
 
         private static Build        Instance = null;
-        public static  WhooSettings Settings { get; private set; } = null;
+        public static  WhooSettings Settings { get; set; } = null;
+        private static IScreen      _activeScreen;
 
         public void Awake()
         {
             Instance = this;
             Settings = settings;
 
-            startScreen = Instantiate(settings.startScreen, transform);
-            roomScreen  = Instantiate(settings.roomScreen,  transform);
-            fadeOut     = Instantiate(settings.fadeOut,     transform);
+            _activeScreen = null;
+            startScreen   = Instantiate(settings.startScreen,   transform);
+            roomScreen    = Instantiate(settings.roomScreen,    transform);
+            waitingScreen = Instantiate(settings.waitingScreen, transform);
+            fadeOut       = Instantiate(settings.fadeOut,       transform);
 
             startScreen.Hide();
             roomScreen.Hide();
+            waitingScreen.Hide();
             fadeOut.Hide();
 
             ToStartScreen();
@@ -42,26 +47,41 @@ namespace Whoo
 
         public static void ToStartScreen()
         {
-            Instance.roomScreen.Close();
-            Instance.startScreen.Setup();
-            Instance.startScreen.Display();
+            var instance = Instance;
+            _activeScreen?.Close();
+            instance.startScreen.Setup();
+            instance.startScreen.Display();
+            _activeScreen = instance.startScreen;
 
             var fadeSettings = Settings.DefaultFadeSettings;
-            Instance.fadeOut.Setup(ref fadeSettings);
-            Instance.fadeOut.Display();
+            instance.fadeOut.Setup(ref fadeSettings);
+            instance.fadeOut.Display();
+            
+            Fade();
         }
 
-        public static void ToRoomScreen(INetworkGroup networkGroup, bool didCreate)
+        public static void ToRoomScreen(StrapiRoom strapiRoom, INetworkGroup networkGroup, bool didCreate)
         {
-            Instance.startScreen.Hide();
+            var instance = Instance;
+            _activeScreen?.Close();
 
-            var roomSettings = new RoomScreen.RoomSettings() {LobbyGroup = networkGroup, DidCreate = didCreate};
-            Instance.roomScreen.Setup(ref roomSettings);
-            Instance.roomScreen.Display();
+            var roomSettings = new RoomScreen.RoomSettings()
+            {
+                Room       = strapiRoom,
+                LobbyGroup = networkGroup,
+                DidCreate  = didCreate
+            };
+            instance.roomScreen.Setup(ref roomSettings);
+            instance.roomScreen.Display();
+            _activeScreen = instance.roomScreen;
+        }
 
+        private static void Fade()
+        {
+            var instance     = Instance;
             var fadeSettings = Settings.DefaultFadeSettings;
-            Instance.fadeOut.Setup(ref fadeSettings);
-            Instance.fadeOut.Display();
+            instance.fadeOut.Setup(ref fadeSettings);
+            instance.fadeOut.Display();
         }
 
         public static void RefreshRoomScreen()
@@ -70,5 +90,21 @@ namespace Whoo
         }
 
         #endregion
+
+        public static void ToWaitingLobby(StrapiRoom room)
+        {
+            _activeScreen?.Close();
+
+            var lobbySettings = new WaitingLobbyScreen.Settings()
+            {
+                Room = room
+            };
+            var instance = Instance;
+            instance.waitingScreen.Setup(ref lobbySettings);
+            instance.waitingScreen.Display();
+            _activeScreen = instance.waitingScreen;
+            
+            Fade();
+        }
     }
 }

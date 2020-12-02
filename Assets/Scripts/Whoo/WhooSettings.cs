@@ -16,12 +16,20 @@ namespace Whoo
 
         public CreateFlags discordCreateFlags;
 
+        [Header("Tester")]
+        public TesterInfo testerInfo;
+
         [Header("Screens")]
         public RoomScreen roomScreen;
 
         public StartScreen startScreen;
 
+        public WaitingLobbyScreen waitingScreen;
+
         public FadeOut fadeOut;
+
+        [Header("Misc Values")]
+        public float waitingLobbyRefreshInterval = 5.0f;
 
         [Header("Templates")]
         public TableView tableView;
@@ -44,16 +52,21 @@ namespace Whoo
             endAction    = FadeOut.EndAction.DisableObject
         };
 
-        [Header("Tables")]
-        public TableDisplayProperties[] defaultTablesWhenCreate;
-
         [Header("Default Sprites")]
+        public Sprite transparent;
+
         public TableFlowerMenuSprites tableFMenuSprites;
 
         [Header("Avatar Builder")]
         public AvatarSprites maleSprites;
 
         public AvatarSprites femaleSprites;
+    }
+
+    [Serializable]
+    public class TesterInfo
+    {
+        public string profileId = "5fc0e867f07e96041b1275e5";
     }
 
     [Serializable]
@@ -76,12 +89,5 @@ namespace Whoo
         public Sprite[] faceA;
         public Sprite[] faceB;
         public Sprite[] torso;
-    }
-
-    [Serializable]
-    public class TableDisplayProperties
-    {
-        public Rect rect;
-        public int  seats;
     }
 }

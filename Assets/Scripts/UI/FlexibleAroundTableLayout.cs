@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace UI
 {
-    public class SeatingLayout : LayoutGroup
+    public class FlexibleAroundTableLayout : LayoutGroup
     {
         public bool    fitSeats;
         public Vector2 seatSize;

@@ -1,12 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.InteropServices;
 using AppLayer.NetworkGroups;
+using Cysharp.Threading.Tasks;
 using DiscordAppLayer;
-using TMPro;
 using UI;
 using UI.Screens;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
+using Whoo.Data;
 using Whoo.Views;
 
 namespace Whoo.Screens
@@ -18,22 +24,36 @@ namespace Whoo.Screens
         [SerializeField]
         private RoomView roomView = null;
 
-        //private List<TableView> tables = new List<TableView>();
         [Header("Room Screen Properties")]
-        public Button leaveRoomButton = null;
+        [SerializeField]
+        private Button leaveRoomButton = null;
 
-        public Button voiceSettingsButton = null;
+        [FormerlySerializedAs("voiceSettingsButton")]
+        [SerializeField]
+        private Button settingsButton = null;
 
-        public CopiableText lobbyIdDisplay     = null;
-        public CopiableText lobbySecretDisplay = null;
+        [SerializeField]
+        private CopiableText roomId = null;
 
         [Header("Tables")]
-        public RectTransform tableArea = null;
+        [SerializeField]
+        private RawImage roomBackground = null;
 
-        public TextMeshProUGUI tablesLeftText = null;
+        [SerializeField]
+        private RectTransform tableArea = null;
 
         [Header("Settings")]
-        public SettingsScreen settings;
+        [SerializeField]
+        private SettingsScreen settingsScreen;
+
+        #endregion
+
+        #region Properties/Fields
+
+        public WhooRoom WhooRoom { get; protected set; }
+
+        private Dictionary<WhooTable, TableView> _tableViews = new Dictionary<WhooTable, TableView>();
+        private HashSet<WhooTable>               _toRemove   = new HashSet<WhooTable>();
 
         #endregion
 
@@ -41,64 +61,35 @@ namespace Whoo.Screens
 
         public struct RoomSettings : IScreenSettings
         {
+            public StrapiRoom    Room;
             public INetworkGroup LobbyGroup;
             public bool          DidCreate;
         }
 
-        public Room Room { get; protected set; }
-
-        private int _initialLoadingTables = 0;
-
         public override void Setup(ref RoomSettings settings)
         {
+            ResetWhooRoom();
+
             base.Setup(ref settings);
+            Assert.IsNotNull(settings.Room);
+            Assert.IsNotNull(settings.LobbyGroup);
+            WhooRoom = new WhooRoom(settings.Room, settings.LobbyGroup);
 
-            Room?.Dispose();
-            Room = new Room(settings.LobbyGroup);
-            
-            roomView.Setup(Room);
+            WhooRoom.PropertyChanged += OnWhooRoomChanged;
+            UpdateViews();
+            LoadBackgroundImageAsync(WhooRoom.StrapiRoom?.RoomModel?.layout).Forget();
+            roomView.Setup(WhooRoom);
 
-            if (settings.DidCreate)
-            {
-                var defaultTables = Build.Settings.defaultTablesWhenCreate;
-                for (int i = 0; i < defaultTables.Length; i++)
-                {
-                    int iUnchanging = i;
-                    _initialLoadingTables++;
-                    Utils.DelayedAction(() => Room.AddTable(defaultTables[iUnchanging], AddTable),
-                        (iUnchanging + 1) * Constants.GroupCreateRate);
-
-                    void AddTable(Table table)
-                    {
-                        _initialLoadingTables--;
-                        if (table != null) return;
-                        _initialLoadingTables++;
-                        Utils.DelayedAction(() => Room.AddTable(defaultTables[iUnchanging], AddTable),
-                            (iUnchanging + 1) * Constants.GroupCreateRate);
-                    }
-                }
-            }
-            else
-            {
-                _initialLoadingTables = Room.LoadAllTablesFromMetadata();
-            }
-
-            DiscordNetworkGroup lobby = settings.LobbyGroup as DiscordNetworkGroup;
-            Assert.IsNotNull(lobby);
-
-            lobbySecretDisplay.Text = lobby.LobbyId.ToString() + ":" + lobby.Secret;
-            lobbyIdDisplay.Text     = lobby.LobbyId.ToString();
-
-            Debug.Log(lobbySecretDisplay.Text);
+            roomId.Text = currentSettings.Room.RoomModel?.id;
         }
 
         public override void Close()
         {
             Hide();
-            if(Room != null && Room.RoomGroup.IsAlive)
-            {
-                LeaveRoom();
-            }
+
+            ResetWhooRoom();
+
+            Build.ToStartScreen();
         }
 
         /// <summary>
@@ -106,115 +97,114 @@ namespace Whoo.Screens
         /// </summary>
         public override void Refresh()
         {
-            if (Room == null)
-            {
-                Hide();
-            }
-            else if (!Room.RoomGroup.IsAlive)
+            if (WhooRoom == null || !WhooRoom.RoomGroup.IsAlive)
             {
                 Close();
             }
-            else
+        }
+
+        #endregion
+
+        #region Other Methods / Listeners
+
+        private void OnWhooRoomChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (!(sender is WhooRoom room)) return;
+            roomView.Refresh();
+            if (e.PropertyName == nameof(WhooRoom.Tables))
             {
-                int expecting = _initialLoadingTables;
-                if (expecting == 0) expecting = Room.ExpectedTables;
-                tablesLeftText.text = expecting > 0 ? $"Loading Tables: {expecting}" : string.Empty;
                 UpdateViews();
             }
-            
-        }
-
-        #endregion
-
-        #region UI Methods
-
-        private bool _loading = false;
-
-        public void LeaveRoom()
-        {
-            if (_loading) return;
-            _loading = true;
-
-            var lobby = Room.RoomGroup as DiscordNetworkGroup;
-            Assert.IsNotNull(lobby);
-
-            if (lobby.IsConnectedVoice) lobby.DisconnectVoice();
-
-            _loading = false;
-            Room.Dispose();
-            Room = null;
-            Build.ToStartScreen();
-        }
-
-        private void OpenVoiceSettings()
-        {
-            if (DiscordApp.GetDiscordApp(out var discord))
+            else if (e.PropertyName == nameof(WhooRoom.StrapiRoom))
             {
-                var manager = discord.OverlayManager;
-                manager.OpenVoiceSettings(_ => { });
+                LoadBackgroundImageAsync(room.StrapiRoom?.RoomModel?.layout).Forget();
+            }
+        }
+
+        private async UniTaskVoid LoadBackgroundImageAsync(Layout layout)
+        {
+            Texture bg = await Utils.LoadPossibleWhooImage(layout?.image.FirstOrDefault()?.url);
+            if (bg == null) throw new ExternalException("Layout does not supply an image.");
+            //todo -- provide default image or throw user out of room?
+
+            Rect  area       = tableArea.rect;
+            float areaAspect = area.width / area.height;
+            float bgAspect   = bg.width   / (float) bg.height;
+
+            if (true || (bgAspect > areaAspect && bg.width > area.width) || (bgAspect < areaAspect && bg.height > area.height))
+            {
+                tableArea.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, bg.width);
+                tableArea.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical,   bg.height);
+                roomBackground.texture = bg;
             }
             else
             {
-                Debug.Log($"Discord app not found.");
+                roomBackground.ApplyTextureAndFit(bg);
             }
         }
 
-        #endregion
-
-
-        #region Unity callbacks
-
-        public void Awake()
+        public void ResetWhooRoom()
         {
-            leaveRoomButton.onClick.AddListener(LeaveRoom);
-            //voiceSettingsButton.onClick.AddListener(OpenVoiceSettings);
-            voiceSettingsButton.onClick.AddListener(OpenSettingsPanel);
-        }
+            if (WhooRoom != null)
+            {
+                var lobby = WhooRoom.RoomGroup as DiscordNetworkGroup;
+                if (lobby != null)
+                {
+                    if (lobby.IsConnectedVoice) lobby.DisconnectVoice();
+                }
 
-        public void Update()
-        {
-            Refresh();
+                WhooRoom.PropertyChanged -= OnWhooRoomChanged;
+                WhooRoom.Dispose();
+                WhooRoom = null;
+            }
         }
-
-        #endregion
-        
-        private Dictionary<Table, TableView> _tableViews = new Dictionary<Table, TableView>();
-        private HashSet<Table> _toRemove = new HashSet<Table>();
 
         public void UpdateViews()
         {
-            for (var i = 0; i < Room.Tables.Count; i++)
+            for (var i = 0; i < WhooRoom.Tables.Count; i++)
             {
-                Table table = Room.Tables[i];
+                WhooTable table = WhooRoom.Tables[i];
                 if (!_tableViews.TryGetValue(table, out TableView tableView))
                 {
                     tableView = Instantiate(Build.Settings.tableView, tableArea);
                     tableView.Setup(table);
                     _tableViews.Add(table, tableView);
                 }
+
                 tableView.Refresh();
             }
-            
+
             _toRemove.Clear();
             foreach (var kvp in _tableViews)
             {
-                if (kvp.Value == null || !kvp.Key.Group.IsAlive)
+                if (kvp.Value == null || kvp.Key?.ZoneInstance == null)
                 {
                     _toRemove.Add(kvp.Key);
                     kvp.Value.Clear();
                 }
             }
+
             foreach (var table in _toRemove)
             {
                 _tableViews.Remove(table);
             }
-
-            roomView.Refresh();
         }
-        
+
         private void OpenSettingsPanel()
         {
-            settings.Display();
+            settingsScreen.Display();
         }
+
+        #endregion
+
+        #region Unity callbacks
+
+        public void Awake()
+        {
+            leaveRoomButton.onClick.AddListener(ResetWhooRoom);
+            settingsButton.onClick.AddListener(OpenSettingsPanel);
+        }
+
+        #endregion
     }
 }

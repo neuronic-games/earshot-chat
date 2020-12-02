@@ -7,7 +7,7 @@ namespace Whoo.Views
     public class TableTooltip : TooltipContent
     {
         [Header("Config")]
-        public GroupView view;
+        public TableView view;
 
         [Header("Strings")]
         public string notSeated;
@@ -30,16 +30,16 @@ namespace Whoo.Views
         public override string GetTooltipText()
         {
             _sb.Clear();
-            if (view.Group.LocalUser.IsSitting())
+            if (view.Table.IsLocalUserSitting())
             {
                 if (!string.IsNullOrEmpty(isSeated))
                 {
                     _sb.AppendLine(isSeated);
                 }
             }
-            else if (!string.IsNullOrEmpty(notSeated)) 
-                    _sb.AppendLine(notSeated);
-            
+            else if (!string.IsNullOrEmpty(notSeated))
+                _sb.AppendLine(notSeated);
+
             if (!string.IsNullOrEmpty(contextMenu)) _sb.AppendLine(contextMenu);
             return _sb.ToString();
         }

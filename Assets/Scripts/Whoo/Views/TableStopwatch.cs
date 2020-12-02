@@ -58,7 +58,7 @@ namespace Whoo.Views
             string value = string.Empty;
             try
             {
-                if (view.Table.Group.CustomProperties.TryGetValue(Constants.Stopwatch, out value))
+                if (view.Table.Group.CustomProperties.TryGetValue(GroupProps.Stopwatch, out value))
                 {
                     string[] values = value.Split(',');
                     StartedBy = values[0];
@@ -86,13 +86,13 @@ namespace Whoo.Views
 
         public void StartStopwatch()
         {
-            view.Table.Group.SetOrDeleteCustomProperty(Constants.Stopwatch,
+            view.Table.Group.SetOrDeleteCustomProperty(GroupProps.Stopwatch,
                 $"{view.Group.LocalUser.UniqueId},{(int) Utils.EpochToNowSeconds}");
         }
 
         public void StopStopwatch()
         {
-            view.Table.Group.SetOrDeleteCustomProperty(Constants.Stopwatch, null);
+            view.Table.Group.SetOrDeleteCustomProperty(GroupProps.Stopwatch, null);
         }
 
         public void ClearTimer()

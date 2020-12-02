@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace Dialogs
 {
     public class LoadingDialog : MonoBehaviour, IDialog<LoadingDialog.Settings>
@@ -37,7 +41,7 @@ namespace Dialogs
 
 #if UNITY_EDITOR
 
-        [UnityEditor.MenuItem("GameObject/UI/Dialogs/Loading Dialog")]
+        [MenuItem("GameObject/UI/Dialogs/Loading Dialog")]
         private static void CreateInfoDialog()
         {
             var root = new GameObject(nameof(LoadingDialog), new[] {typeof(CanvasRenderer), typeof(RectTransform)});

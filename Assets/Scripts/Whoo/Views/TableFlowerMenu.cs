@@ -14,10 +14,10 @@ namespace Whoo.Views
         [Header("References")]
         [SerializeField]
         private TableView view = default;
-        
+
         [SerializeField]
         private TableStopwatch watch;
-        
+
         [SerializeField]
         private Animator animator = default;
 
@@ -66,13 +66,13 @@ namespace Whoo.Views
             //todo -- checking if item can be created
             TableFlowerMenuSprites sprites = Whoo.Build.Settings.tableFMenuSprites;
 
-            MakeMenuItem(sprites.showInfo,        ShowInfo);
-            MakeMenuItem(sprites.eavesdrop,       Eavesdrop);
-            MakeMenuItem(sprites.startGroupChat,  StartGroupChat);
-            MakeMenuItem(sprites.loadFolder,      LoadFolder);
-            MakeMenuItem(sprites.toggleTags,      ToggleTags);
-            
-            if (watch != null && view.Table.Group.IsOwner)
+            MakeMenuItem(sprites.showInfo,       ShowInfo);
+            MakeMenuItem(sprites.eavesdrop,      Eavesdrop);
+            MakeMenuItem(sprites.startGroupChat, StartGroupChat);
+            MakeMenuItem(sprites.loadFolder,     LoadFolder);
+            MakeMenuItem(sprites.toggleTags,     ToggleTags);
+
+            if (watch != null && view.Table.Group != null && view.Table.Group.IsOwner)
             {
                 MakeMenuItem(sprites.toggleStopwatch, ToggleStopwatch);
                 if (!watch.IsCleared)
@@ -95,7 +95,7 @@ namespace Whoo.Views
         {
             if (watch.IsRunning)
             {
-                if(watch.CanStop)
+                if (watch.CanStop)
                     watch.StopStopwatch();
             }
             else
@@ -130,7 +130,7 @@ namespace Whoo.Views
         }
 
         #endregion
-        
+
         #region Screen
 
         public bool IsDisplayed
@@ -175,7 +175,7 @@ namespace Whoo.Views
         public void Close()
         {
         }
-        
+
         #endregion
     }
 }

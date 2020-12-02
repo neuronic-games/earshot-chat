@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using UI;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Whoo;
@@ -20,20 +14,7 @@ public class AvatarBuilder : MonoBehaviour
     private WhooSettings settings = default;
 
     [Header("UI Views")]
-    [SerializeField]
-    private Image genderBase = default;
-
-    [SerializeField]
-    private Image hair = default;
-
-    [SerializeField]
-    private Image faceA = default;
-
-    [SerializeField]
-    private Image faceB = default;
-
-    [SerializeField]
-    private Image torso = default;
+    public StrapiAvatar avatar;
 
     [Header("UI Controls"), SerializeField]
     private HorizontalSelector genderSelector = default;
@@ -67,6 +48,7 @@ public class AvatarBuilder : MonoBehaviour
 
     private void Setup()
     {
+        if (Whoo.Build.Settings == null) Whoo.Build.Settings = settings;
         SetupUI();
         LoadAvatarAsync(profileId).Forget();
     }
@@ -102,23 +84,23 @@ public class AvatarBuilder : MonoBehaviour
     private void MaleGroupSelected()
     {
         AvatarSprites m = settings.maleSprites;
-        genderBase.overrideSprite = m.baseSprite;
+        avatar.genderBase.overrideSprite = m.baseSprite;
 
-        SetupSelectorAndImagePair(m.hair,  hairSelector,  hair);
-        SetupSelectorAndImagePair(m.torso, torsoSelector, torso);
-        SetupSelectorAndImagePair(m.faceA, faceASelector, faceA);
-        SetupSelectorAndImagePair(m.faceB, faceBSelector, faceB);
+        SetupSelectorAndImagePair(m.hair,  hairSelector,  avatar.hair);
+        SetupSelectorAndImagePair(m.torso, torsoSelector, avatar.torso);
+        SetupSelectorAndImagePair(m.faceA, faceASelector, avatar.faceA);
+        SetupSelectorAndImagePair(m.faceB, faceBSelector, avatar.faceB);
     }
 
     private void FemaleGroupSelected()
     {
         AvatarSprites f = settings.femaleSprites;
-        genderBase.overrideSprite = f.baseSprite;
+        avatar.genderBase.overrideSprite = f.baseSprite;
 
-        SetupSelectorAndImagePair(f.hair,  hairSelector,  hair);
-        SetupSelectorAndImagePair(f.torso, torsoSelector, torso);
-        SetupSelectorAndImagePair(f.faceA, faceASelector, faceA);
-        SetupSelectorAndImagePair(f.faceB, faceBSelector, faceB);
+        SetupSelectorAndImagePair(f.hair,  hairSelector,  avatar.hair);
+        SetupSelectorAndImagePair(f.torso, torsoSelector, avatar.torso);
+        SetupSelectorAndImagePair(f.faceA, faceASelector, avatar.faceA);
+        SetupSelectorAndImagePair(f.faceB, faceBSelector, avatar.faceB);
     }
 
     //todo -- eliminate all the reinstantiation.
@@ -140,48 +122,46 @@ public class AvatarBuilder : MonoBehaviour
 
     public async UniTaskVoid LoadAvatarAsync(string profileid)
     {
-        var profile = await LoadProfile(profileid);
+        Profile profile = new Profile {id = profileid};
+        await profile.GetAsync();
 
-        genderSelector.Select(profile.avatar.male ? 0 : 1);
-        hairSelector.Select(profile.avatar.hair);
-        faceASelector.Select(profile.avatar.faceA);
-        faceBSelector.Select(profile.avatar.faceB);
-        torsoSelector.Select(profile.avatar.torso);
+        RefreshUI(profile);
     }
 
-    private static async UniTask<Profile> LoadProfile(string profileid)
+    private void RefreshUI(Profile profile)
     {
-        var profileEndpoint = StrapiEndpoints.ProfileEndpoint(profileid);
-        string response = (await UnityWebRequest.Get(profileEndpoint).SendWebRequest()).
-                          downloadHandler.text;
-        Profile profile = new Profile();
-        //try-catch
-        JsonUtility.FromJsonOverwrite(response, profile);
-        return profile;
+        avatar.comp = profile.profileAvatar;
+        avatar.LoadAvatar();
+        genderSelector.Select(profile.profileAvatar.male ? 0 : 1);
+        hairSelector.Select(profile.profileAvatar.hair);
+        faceASelector.Select(profile.profileAvatar.faceA);
+        faceBSelector.Select(profile.profileAvatar.faceB);
+        torsoSelector.Select(profile.profileAvatar.torso);
     }
 
     public async UniTaskVoid SaveAvatarAsync(string profileid)
     {
         saveButton.interactable = false;
 
-        var profile = await LoadProfile(profileid);
+        var profile = new Profile {id = profileid};
+        await profile.GetAsync();
 
-        var updateObj = new
+        var updateObj = new Profile
         {
-            avatar = new Profile.Avatar()
+            profileAvatar = new Profile.AvatarComponent()
             {
-                male  = genderSelector.CurrentIndex == 0 ? true : false,
+                male  = genderSelector.CurrentIndex == 0,
                 hair  = hairSelector.CurrentIndex,
                 faceA = faceASelector.CurrentIndex,
                 faceB = faceBSelector.CurrentIndex,
-                torso = torsoSelector.CurrentIndex
-            },
-            id = profile.id
+                torso = torsoSelector.CurrentIndex,
+                id    = profile.profileAvatar.id
+            }
         };
 
-        var profileEndpoint = StrapiEndpoints.ProfileEndpoint(profileid);
-        var response = (await UnityWebRequest.Put(profileEndpoint, JsonUtility.ToJson(updateObj)).SendWebRequest()).
-                       downloadHandler.text;
+        await profile.PutAsync(updateObj);
+
+        RefreshUI(profile);
 
         saveButton.interactable = true;
     }

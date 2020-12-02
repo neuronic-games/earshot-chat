@@ -7,8 +7,9 @@ namespace UI.FlowerMenu
     {
         #region Serialized
 
-        public Image  image;
-        public Button button;
+        public RectTransform root;
+        public Image         image;
+        public Button        button;
 
         #endregion
     }

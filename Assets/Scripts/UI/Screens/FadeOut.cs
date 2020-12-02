@@ -71,7 +71,7 @@ namespace UI.Screens
 
             SetupCurrentSettings();
 
-            @group.alpha          = _currentSettings.startAmount.Value;
+            if (_currentSettings.startAmount != null) @group.alpha = _currentSettings.startAmount.Value;
             @group.blocksRaycasts = interactableOnEnable;
             @group.interactable   = blockRaycastsOnEnable;
         }
