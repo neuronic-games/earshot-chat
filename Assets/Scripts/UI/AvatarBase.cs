@@ -11,19 +11,21 @@ namespace UI
     {
         public RawImage image;
         public Texture  avatar;
-    
+
         [Serializable]
-        public class AvatarAvailableEvent : UnityEvent<Texture> {}
+        public class AvatarAvailableEvent : UnityEvent<Texture>
+        {
+        }
 
         public AvatarAvailableEvent onAvatarAvailable;
 
         public abstract void LoadAvatar();
-    
+
         protected void FetchImage(string url)
         {
             StartCoroutine(_FetchImage(url));
         }
-    
+
         private IEnumerator _FetchImage(string url)
         {
             var webr = UnityWebRequestTexture.GetTexture(url);
@@ -38,11 +40,11 @@ namespace UI
             {
                 avatar = ((DownloadHandlerTexture) webr.downloadHandler).texture;
 
-                if(image != null)
+                if (image != null)
                 {
                     image.texture = avatar;
                 }
-            
+
                 onAvatarAvailable.Invoke(avatar);
             }
         }

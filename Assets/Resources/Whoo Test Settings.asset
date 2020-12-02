@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   discordAppId: 760222636701253652
   discordCreateFlags: 0
+  testerInfo:
+    profileId: 5face66453385c020cc2f50e
   roomScreen: {fileID: 2834008572589149173, guid: f3b4b0849b84fe24fb87e9581568aabc,
     type: 3}
   startScreen: {fileID: 5280672345489207402, guid: 79e88d1afab302c43a0db2a8a580eaea,
@@ -27,21 +29,6 @@ MonoBehaviour:
   startAmount: 1
   endAmount: 0
   duration: 0.75
-  defaultTablesWhenCreate:
-  - rect:
-      serializedVersion: 2
-      x: 300
-      y: 200
-      width: 300
-      height: 125
-    seats: 6
-  - rect:
-      serializedVersion: 2
-      x: 700
-      y: 250
-      width: 100
-      height: 300
-    seats: 6
   transparent: {fileID: 21300000, guid: 207b3202645a0a54d8726067eeb4ddc1, type: 3}
   tableFMenuSprites:
     showInfo: {fileID: 21300000, guid: 2f33819176e9d0148bd5372023d3159c, type: 3}

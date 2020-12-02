@@ -1,10 +1,11 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
+using Cysharp.Threading.Tasks;
 using DiscordAppLayer;
 using UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Whoo.Data;
 
 namespace Whoo.Views
 {
@@ -12,6 +13,9 @@ namespace Whoo.Views
     {
         [SerializeField]
         private SpeakingWidget widget = null;
+
+        [SerializeField]
+        private StrapiAvatar strapiAvatar = null;
 
         [SerializeField]
         private DiscordAvatar avatar = null;
@@ -35,29 +39,44 @@ namespace Whoo.Views
         public override void Refresh()
         {
             base.Refresh();
+            RefreshAsync().Forget();
 
             //todo -- replace with custom avatar builder
 
-            #region Avatar
-
-            if (_triedLoadingAvatar) return;
-            if (User is DiscordUser user)
+            async UniTaskVoid RefreshAsync()
             {
-                _triedLoadingAvatar = true;
-                avatar.LoadAvatar(user.DiscordUserId, user.App.ImageManager);
+                #region Avatar
+
+                if (_triedLoadingAvatar) return;
+
+                #region Volume
+
+                UpdateSliderView();
+
+                #endregion
+
+                if (User.Equals(_room.RoomGroup.LocalUser))
+                {
+                    Profile profile = new Profile()
+                    {
+                        id = Build.Settings.testerInfo.profileId
+                    };
+                    await profile.GetAsync();
+                    if (await strapiAvatar.LoadAvatar(profile.image.FirstOrDefault()?.url)) return;
+
+                    if (User is DiscordUser user)
+                    {
+                        _triedLoadingAvatar = true;
+                        avatar.LoadAvatar(user.DiscordUserId, user.App.ImageManager);
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"User that isn't a discord user attached to {nameof(DiscordUserView)}.");
+                }
+
+                #endregion
             }
-            else
-            {
-                Debug.LogWarning($"User that isn't a discord user attached to {nameof(DiscordUserView)}.");
-            }
-
-            #endregion
-
-            #region Volume
-
-            UpdateSliderView();
-
-            #endregion
         }
 
         #region IPointerHandler
