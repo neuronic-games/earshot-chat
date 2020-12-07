@@ -193,6 +193,7 @@ MonoBehaviour:
   widget: {fileID: 594658683051603182}
   strapiAvatar: {fileID: 7324942339480141643}
   avatar: {fileID: 594658681536661317}
+  colorPanel: {fileID: 1154725717944732977}
   debugLog: 0
   onHoverDisplay: {fileID: 336106401699649896}
   volumeSlider: {fileID: 5614421338176481951}

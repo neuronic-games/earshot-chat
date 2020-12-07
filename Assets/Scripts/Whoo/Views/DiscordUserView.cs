@@ -20,6 +20,9 @@ namespace Whoo.Views
         [SerializeField]
         private DiscordAvatar avatar = null;
 
+        [SerializeField]
+        private GameObject colorPanel = null;
+
         [SerializeField, Header("Hover/Volume")]
         private bool debugLog = false;
 
@@ -111,6 +114,13 @@ namespace Whoo.Views
         }
 
         #region Volume
+
+        // Avatars can have different background colors to indicate groups.
+        // This is defined in the data model.
+        private void SetColor(Color color)
+        {
+            colorPanel.GetComponent<Image>().color = color;
+        }
 
         private void SetupVolumeSlider()
         {
