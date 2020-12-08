@@ -2721,7 +2721,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cebd9ef8cccb4c1bb7d679acb6b7ae06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  profileId: 5fc0e867f07e96041b1275e5
   joinButton: {fileID: 4377879599867979187}
   layoutSelector: {fileID: 2244619473140453695}
   roomSelector: {fileID: 5879422383339314766}
