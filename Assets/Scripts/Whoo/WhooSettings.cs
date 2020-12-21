@@ -20,13 +20,15 @@ namespace Whoo
         public TesterInfo testerInfo;
 
         [Header("Screens")]
+        public AuthenticationScreen authScreen;
+
         public RoomScreen roomScreen;
 
         public StartScreen startScreen;
 
         public WaitingLobbyScreen waitingScreen;
 
-        public FadeOut fadeOut;
+        public GameObject fadeOut;
 
         [Header("Misc Values")]
         public float waitingLobbyRefreshInterval = 5.0f;

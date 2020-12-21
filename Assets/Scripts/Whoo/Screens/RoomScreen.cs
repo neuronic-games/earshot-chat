@@ -66,40 +66,40 @@ namespace Whoo.Screens
             public bool          DidCreate;
         }
 
-        public override void Setup(ref RoomSettings settings)
+        public override async UniTask Setup(RoomSettings settings)
         {
             ResetWhooRoom();
 
-            base.Setup(ref settings);
+            await base.Setup(settings);
             Assert.IsNotNull(settings.Room);
             Assert.IsNotNull(settings.LobbyGroup);
             WhooRoom = new WhooRoom(settings.Room, settings.LobbyGroup);
 
             WhooRoom.PropertyChanged += OnWhooRoomChanged;
             UpdateViews();
-            LoadBackgroundImageAsync(WhooRoom.StrapiRoom?.RoomModel?.layout).Forget();
+            await LoadBackgroundImageAsync(WhooRoom.StrapiRoom?.RoomModel?.layout);
             roomView.Setup(WhooRoom);
 
             roomId.Text = currentSettings.Room.RoomModel?.id;
         }
 
-        public override void Close()
+        public override async UniTask Close()
         {
-            Hide();
+            await Hide();
 
             ResetWhooRoom();
 
-            Build.ToStartScreen();
+            Build.ToStartScreen().Forget();
         }
 
         /// <summary>
         /// Basically an Update method.
         /// </summary>
-        public override void Refresh()
+        public override async UniTask Refresh()
         {
             if (WhooRoom == null || !WhooRoom.RoomGroup.IsAlive)
             {
-                Close();
+                await Close();
             }
         }
 
@@ -121,7 +121,7 @@ namespace Whoo.Screens
             }
         }
 
-        private async UniTaskVoid LoadBackgroundImageAsync(Layout layout)
+        private async UniTask LoadBackgroundImageAsync(Layout layout)
         {
             Texture bg = await Utils.LoadPossibleWhooImage(layout?.image.FirstOrDefault()?.url);
             if (bg == null) throw new ExternalException("Layout does not supply an image.");
@@ -131,7 +131,8 @@ namespace Whoo.Screens
             float areaAspect = area.width / area.height;
             float bgAspect   = bg.width   / (float) bg.height;
 
-            if (true || (bgAspect > areaAspect && bg.width > area.width) || (bgAspect < areaAspect && bg.height > area.height))
+            if (true || (bgAspect > areaAspect && bg.width  > area.width) ||
+                (bgAspect         < areaAspect && bg.height > area.height))
             {
                 tableArea.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, bg.width);
                 tableArea.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical,   bg.height);

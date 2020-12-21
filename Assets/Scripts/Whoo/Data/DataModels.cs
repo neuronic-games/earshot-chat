@@ -429,11 +429,27 @@ namespace Whoo.Data
     [Serializable]
     public class User : StrapiModelCommon
     {
-        public string username = string.Empty;
-        public string email    = string.Empty;
-        public string password = string.Empty;
-        public bool   confirmed;
-        public bool   blocked;
+        public const string PLATFORM_DISCORD = "Discord";
+        public const string PLATFORM_AGORA   = "Agora";
+        public const string PLATFORM_DOLBY   = "Dolby";
+
+        [DefaultValue(null)]
+        public string platform = null;
+
+        [DefaultValue(null)]
+        public string platform_id = null;
+
+        [DefaultValue(null)]
+        public string username = null;
+
+        [DefaultValue(null)]
+        public string email = null;
+
+        [DefaultValue(null)]
+        public string password = null;
+
+        public bool confirmed;
+        public bool blocked;
 
         public static implicit operator User(string id)    => Make<User>(id);
         public override                 string ResourceUrl => Endpoint.Base().CollectionEntry(Collections.User, id);

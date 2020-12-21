@@ -38,15 +38,11 @@ namespace Whoo.Screens
             public Func<Layout, UniTaskVoid> OnSelected;
         }
 
-        public override void Setup(ref Settings settings)
+        public override async UniTask Setup(Settings settings)
         {
             infoText.SetText(string.Empty);
-            base.Setup(ref settings);
-            SetupAsync().Forget();
-        }
+            await base.Setup(settings);
 
-        private async UniTaskVoid SetupAsync()
-        {
             loadingBlocker.SetActive(true);
 
             container.ClearChildren(false);
@@ -71,11 +67,12 @@ namespace Whoo.Screens
 
         public void Awake()
         {
-            hideButton.onClick.AddListener(Hide);
+            hideButton.onClick.AddListener(() => Hide());
         }
 
-        public override void Refresh()
+        public override async UniTask Refresh()
         {
+            
         }
     }
 }

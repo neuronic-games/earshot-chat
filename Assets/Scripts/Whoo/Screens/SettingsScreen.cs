@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using Cysharp.Threading.Tasks;
+using Discord;
 using DiscordAppLayer;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,18 +27,18 @@ namespace Whoo.Screens
 
         #region Screen
 
-        public override void Hide()
+        public override async UniTask Hide()
         {
             animator.Play("Out");
         }
 
-        public override void Display()
+        public override async UniTask Display()
         {
             animator.Play("In");
             Refresh();
         }
 
-        public override void Refresh()
+        public override async UniTask Refresh()
         {
             if (DiscordApp.GetDiscordApp(out DiscordApp app))
             {
@@ -50,7 +51,7 @@ namespace Whoo.Screens
 
         private void Awake()
         {
-            closeButton.onClick.AddListener(Hide);
+            closeButton.onClick.AddListener(() => Hide().Forget());
             selfVolume.minValue = 0;
             selfVolume.maxValue = 200;
             selfVolume.onValueChanged.AddListener(SetLocalVolume);
@@ -63,10 +64,9 @@ namespace Whoo.Screens
             {
                 app.OverlayManager.OpenVoiceSettings(OverlayCallback);
             }
-            
+
             void OverlayCallback(Result result)
             {
-                
             }
         }
 

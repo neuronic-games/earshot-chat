@@ -1,5 +1,6 @@
 ﻿using System;
 using AppLayer.NetworkGroups;
+using Cysharp.Threading.Tasks;
 using UI.Screens;
 using UnityEngine;
 using Whoo.Data;
@@ -12,17 +13,21 @@ namespace Whoo
     {
         public WhooSettings settings;
 
+        private AuthenticationScreen authScreen;
+
         private StartScreen startScreen;
 
         private RoomScreen roomScreen;
 
         private WaitingLobbyScreen waitingScreen;
 
-        private FadeOut fadeOut;
+        private GameObject fadeOut;
 
-        private static Build        Instance = null;
-        public static  WhooSettings Settings { get; set; } = null;
-        private static IScreen      _activeScreen;
+        private static Build                  Instance = null;
+        public static  WhooSettings           Settings { get; set; } = null;
+        public static  IAuthenticatedContext AuthContext;
+
+        private static IScreen _activeScreen;
 
         public void Awake()
         {
@@ -30,81 +35,98 @@ namespace Whoo
             Settings = settings;
 
             _activeScreen = null;
+            authScreen    = Instantiate(settings.authScreen,    transform);
             startScreen   = Instantiate(settings.startScreen,   transform);
             roomScreen    = Instantiate(settings.roomScreen,    transform);
             waitingScreen = Instantiate(settings.waitingScreen, transform);
             fadeOut       = Instantiate(settings.fadeOut,       transform);
 
-            startScreen.Hide();
-            roomScreen.Hide();
-            waitingScreen.Hide();
-            fadeOut.Hide();
+            authScreen.Hide().Forget();
+            startScreen.Hide().Forget();
+            roomScreen.Hide().Forget();
+            waitingScreen.Hide().Forget();
+            fadeOut.SetActive(false);
 
-            ToStartScreen();
+            ToStartScreen().Forget();
         }
 
         #region UI Transitions
 
-        public static void ToStartScreen()
+        public static async UniTask ToStartScreen()
         {
             var instance = Instance;
             _activeScreen?.Close();
-            instance.startScreen.Setup();
-            instance.startScreen.Display();
-            _activeScreen = instance.startScreen;
+            instance.fadeOut.SetActive(true);
 
-            var fadeSettings = Settings.DefaultFadeSettings;
-            instance.fadeOut.Setup(ref fadeSettings);
-            instance.fadeOut.Display();
-            
-            Fade();
-        }
-
-        public static void ToRoomScreen(StrapiRoom strapiRoom, INetworkGroup networkGroup, bool didCreate)
-        {
-            var instance = Instance;
-            _activeScreen?.Close();
-
-            var roomSettings = new RoomScreen.RoomSettings()
+            try
             {
-                Room       = strapiRoom,
-                LobbyGroup = networkGroup,
-                DidCreate  = didCreate
-            };
-            instance.roomScreen.Setup(ref roomSettings);
-            instance.roomScreen.Display();
-            _activeScreen = instance.roomScreen;
+                if (await AuthContext.ContextIsValid())
+                {
+                    await instance.startScreen.Setup();
+                    await instance.startScreen.Display();
+                    _activeScreen = instance.startScreen;
+                }
+                else
+                {
+                    await instance.authScreen.Setup();
+                    await instance.authScreen.Display();
+                    _activeScreen = instance.authScreen;
+                }
+            }
+            finally
+            {
+                instance.fadeOut.SetActive(false);
+            }
         }
 
-        private static void Fade()
+        public static async UniTask ToRoomScreen(StrapiRoom strapiRoom, INetworkGroup networkGroup, bool didCreate)
         {
-            var instance     = Instance;
-            var fadeSettings = Settings.DefaultFadeSettings;
-            instance.fadeOut.Setup(ref fadeSettings);
-            instance.fadeOut.Display();
+            var instance = Instance;
+            _activeScreen?.Close();
+
+            instance.fadeOut.SetActive(true);
+
+            try
+            {
+                var roomSettings = new RoomScreen.RoomSettings()
+                {
+                    Room       = strapiRoom,
+                    LobbyGroup = networkGroup,
+                    DidCreate  = didCreate
+                };
+                await instance.roomScreen.Setup(roomSettings);
+                await instance.roomScreen.Display();
+                _activeScreen = instance.roomScreen;
+            }
+            finally
+            {
+                instance.fadeOut.SetActive(false);
+            }
         }
 
         public static void RefreshRoomScreen()
         {
-            Instance.roomScreen.Refresh();
+            Instance.roomScreen.Refresh().Forget();
         }
 
         #endregion
 
-        public static void ToWaitingLobby(StrapiRoom room)
+        public static async UniTask ToWaitingLobby(StrapiRoom room)
         {
+            var instance = Instance;
             _activeScreen?.Close();
+
+            instance.fadeOut.SetActive(true);
 
             var lobbySettings = new WaitingLobbyScreen.Settings()
             {
                 Room = room
             };
-            var instance = Instance;
-            instance.waitingScreen.Setup(ref lobbySettings);
-            instance.waitingScreen.Display();
+            await instance.waitingScreen.Setup(ref lobbySettings);
+            await instance.waitingScreen.Display();
             _activeScreen = instance.waitingScreen;
             
-            Fade();
+            instance.fadeOut.SetActive(true);
         }
     }
 }

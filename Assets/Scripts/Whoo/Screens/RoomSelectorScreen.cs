@@ -39,29 +39,25 @@ namespace Whoo.Screens
             public string                       ProfileId;
         }
 
-        public override void Setup(ref Settings settings)
+        public override async UniTask Setup(Settings settings)
         {
             infoText.SetText(string.Empty);
-            base.Setup(ref settings);
-            SetupAsync().Forget();
-        }
-
-        private async UniTaskVoid SetupAsync()
-        {
+            await base.Setup(settings);
+            
             loadingBlocker.SetActive(true);
 
             container.ClearChildren(false);
 
             if (string.IsNullOrEmpty(currentSettings.ProfileId))
             {
-                Debug.Log($"{nameof(SetupAsync)}: profile id is empty.");
+                Debug.Log($"{nameof(Setup)}: profile id is empty.");
                 infoText.SetText("Guests can't save rooms.");
                 return;
             }
 
             var roomListEndpoint = Endpoint.Base().
-                                                   Collection(Collections.Room).
-                                                   Equals((RoomModel r) => r.owner.id, currentSettings.ProfileId);
+                                            Collection(Collections.Room).
+                                            Equals((RoomModel r) => r.owner.id, currentSettings.ProfileId);
             List<RoomModel> list = (await Utils.GetJsonObjectAsync<RoomModelList>(
                 roomListEndpoint, true,
                 nameof(RoomModelList.list))).list;
@@ -82,10 +78,10 @@ namespace Whoo.Screens
 
         public void Awake()
         {
-            hideButton.onClick.AddListener(Hide);
+            hideButton.onClick.AddListener(() => Hide());
         }
 
-        public override void Refresh()
+        public override async UniTask Refresh()
         {
         }
     }

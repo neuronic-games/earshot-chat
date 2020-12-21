@@ -25,7 +25,7 @@ namespace Whoo.Screens
         private void BackToStartScreen()
         {
             currentSettings = default;
-            Build.ToStartScreen();
+            Build.ToStartScreen().Forget();
         }
 
         #region Screen
@@ -35,26 +35,16 @@ namespace Whoo.Screens
             public StrapiRoom Room;
         }
 
-        public override void Setup(ref Settings settings)
+        public override async UniTask Setup(Settings settings)
         {
-            base.Setup(ref settings);
-            SetupAsync().Forget();
-        }
-
-        public async UniTaskVoid SetupAsync()
-        {
+            await base.Setup(settings);
             //wow... this next statement
             Texture tex =
                 await Utils.LoadPossibleWhooImage(currentSettings.Room?.RoomModel?.layout?.image.FirstOrDefault()?.url);
             image.ApplyTextureAndFit(tex);
         }
 
-        public override void Refresh()
-        {
-            RefreshAsync().Forget();
-        }
-
-        public async UniTaskVoid RefreshAsync()
+        public override async UniTask Refresh()
         {
             if (string.IsNullOrEmpty(currentSettings.Room?.RoomModel?.id))
             {
@@ -65,7 +55,7 @@ namespace Whoo.Screens
             await currentSettings.Room.RefreshRoom();
             INetworkGroup group = await Utils.JoinGroup(currentSettings.Room?.RoomModel);
             if (group == null) return;
-            Build.ToRoomScreen(currentSettings.Room, group, false);
+            Build.ToRoomScreen(currentSettings.Room, group, false).Forget();
         }
 
         #endregion
@@ -78,7 +68,7 @@ namespace Whoo.Screens
             if (Time.time > _lastRefresh + refreshInterval)
             {
                 _lastRefresh = Time.time;
-                Refresh();
+                Refresh().Forget();
             }
         }
     }

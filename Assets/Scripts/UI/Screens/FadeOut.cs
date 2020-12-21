@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -142,12 +143,12 @@ namespace UI.Screens
 
         #region IScreen
 
-        public override void Refresh()
+        public override async UniTask Refresh()
         {
             StartFadeOut();
         }
 
-        public override void Setup(ref FadeSettings settings)
+        public override async UniTask Setup(FadeSettings settings)
         {
             _isFading = false;
             

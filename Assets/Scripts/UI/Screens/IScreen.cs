@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace UI.Screens
@@ -13,17 +14,17 @@ namespace UI.Screens
 
     public interface IScreen
     {
-        bool IsDisplayed { get; }
-        void Setup();
-        void Display();
-        void Hide();
-        void Refresh();
-        void Close();
+        bool    IsDisplayed { get; }
+        UniTask Setup();
+        UniTask Display();
+        UniTask Hide();
+        UniTask Refresh();
+        UniTask Close();
     }
 
     public interface IScreen<T> : IScreen where T : struct, IScreenSettings
     {
-        void Setup(ref T settings);
+        UniTask Setup(T settings);
     }
 
     [Serializable]
@@ -40,42 +41,42 @@ namespace UI.Screens
             protected set => gameObject.SetActive(value);
         }
 
-        public virtual void Setup()
+        public virtual async UniTask Setup()
         {
         }
 
-        public virtual void Close()
+        public virtual async UniTask Close()
         {
-            if(IsDisplayed) Hide();
+            if (IsDisplayed) Hide();
             currentSettings = default;
         }
 
-        public virtual void Setup(ref TSettings settings)
+        public virtual async UniTask Setup(TSettings settings)
         {
             currentSettings = settings;
         }
 
-        public virtual void Hide()
+        public virtual async UniTask Hide()
         {
             IsDisplayed = false;
         }
 
-        public abstract void Refresh();
+        public abstract UniTask Refresh();
 
         protected TSettings currentSettings = default;
 
-        public virtual void Display()
+        public virtual async UniTask Display()
         {
             IsDisplayed = true;
-            Refresh();
+            await Refresh();
         }
     }
 
     public abstract class Screen : Screen<EmptySettings>
     {
-        public sealed override void Setup(ref EmptySettings settings)
+        public sealed override async UniTask Setup(EmptySettings settings)
         {
-            base.Setup(ref settings);
+            await base.Setup(settings);
         }
     }
 }

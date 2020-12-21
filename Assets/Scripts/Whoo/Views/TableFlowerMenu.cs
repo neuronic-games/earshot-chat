@@ -139,20 +139,20 @@ namespace Whoo.Views
             set { gameObject.SetActive(value); }
         }
 
-        public void Setup()
+        public UniTask Setup()
         {
             CleanMenu();
             BuildMenu();
         }
 
-        public void Display()
+        public UniTask Display()
         {
             if (IsDisplayed) return;
             IsDisplayed = true;
             if (animator != null) animator.Play("In");
         }
 
-        public void Hide()
+        public UniTask Hide()
         {
             if (!IsDisplayed) return;
             HideAsync().Forget();
@@ -163,16 +163,16 @@ namespace Whoo.Views
             if (animator != null)
             {
                 animator.Play("Out");
-                await UniTask.WaitUntil(() => !animator.GetCurrentAnimatorStateInfo(0).IsName("Out"));
+                await (() => Close()).WaitUntil(() => !animator.GetCurrentAnimatorStateInfo(0).IsName("Out"));
                 IsDisplayed = false;
             }
         }
 
-        public void Refresh()
+        public UniTask Refresh()
         {
         }
 
-        public void Close()
+        public UniTask Close()
         {
         }
 

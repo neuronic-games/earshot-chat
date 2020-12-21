@@ -31,27 +31,22 @@ namespace Whoo.Screens
 
         public void Awake()
         {
-            yourRooms.onClick.AddListener(YourRooms);
+            yourRooms.onClick.AddListener(() => DisplayUserRoomsAsync().Forget());
             joinButton.onClick.AddListener(JoinRoom);
             makeRoomButton.onClick.AddListener(MakeRoom);
         }
 
-        private void YourRooms()
-        {
-            YourRoomsAsync().Forget();
-        }
-
         #region Screen
 
-        public override void Setup()
+        public override async UniTask Setup()
         {
             _loading           = false;
             joinRoomInput.text = string.Empty;
-            layoutSelector.Hide();
-            roomSelector.Hide();
+            await layoutSelector.Hide();
+            await roomSelector.Hide();
         }
 
-        public override void Refresh()
+        public override async UniTask Refresh()
         {
         }
 
@@ -61,7 +56,7 @@ namespace Whoo.Screens
 
         #region UI Methods
 
-        public async UniTaskVoid YourRoomsAsync()
+        public async UniTaskVoid DisplayUserRoomsAsync()
         {
             if (_loading) return;
             var settings = new RoomSelectorScreen.Settings()
@@ -69,8 +64,8 @@ namespace Whoo.Screens
                 OnSelected = _MakeRoom,
                 ProfileId  = Build.Settings.testerInfo.profileId
             };
-            roomSelector.Setup(ref settings);
-            roomSelector.Display();
+            await roomSelector.Setup(settings);
+            await roomSelector.Display();
 
             async UniTaskVoid _MakeRoom(RoomModel roomModel)
             {
@@ -117,7 +112,7 @@ namespace Whoo.Screens
 
             await room.RoomModel.EnsureHasZoneInstancedAsync();
 
-            Build.ToRoomScreen(room, group, didCreate);
+            Build.ToRoomScreen(room, group, didCreate).Forget();
         }
 
         private void JoinRoom()
