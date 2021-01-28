@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bec4597675714b0690f60845b18a5cde, type: 3}
+  m_Name: Whoo Test Settings
+  m_EditorClassIdentifier: 
+  discordAppId: 760222636701253652
+  discordCreateFlags: 0
+  testerInfo:
+    profileId: 5face66453385c020cc2f50e
+  roomScreen: {fileID: 2834008572589149173, guid: f3b4b0849b84fe24fb87e9581568aabc,
+    type: 3}
+  startScreen: {fileID: 5280672345489207402, guid: 79e88d1afab302c43a0db2a8a580eaea,
+    type: 3}
+  waitingScreen: {fileID: 3291636326787021054, guid: ec5dda38fdcf8bb4583218dc1b9c8e62,
+    type: 3}
+  fadeOut: {fileID: 1297314241039701540, guid: abcf64efdbcb37c438684ce09d1c839e, type: 3}
+  waitingLobbyRefreshInterval: 5
+  tableView: {fileID: 8465652785150667373, guid: 6c3f7206fb78a6e46a7c35770248b9bd,
+    type: 3}
+  startAmount: 1
+  endAmount: 0
+  duration: 0.75
+  transparent: {fileID: 21300000, guid: 207b3202645a0a54d8726067eeb4ddc1, type: 3}
+  tableFMenuSprites:
+    showInfo: {fileID: 21300000, guid: 2f33819176e9d0148bd5372023d3159c, type: 3}
+    eavesdrop: {fileID: 21300000, guid: e5700f17779c12649ba118f064e59ed3, type: 3}
+    startGroupChat: {fileID: 21300000, guid: 292c44f4cb823dd4490f62a456fc9383, type: 3}
+    loadFolder: {fileID: 21300000, guid: 8fecc31482019904084ddefd576485de, type: 3}
+    toggleTags: {fileID: 21300000, guid: 871be5515a5c09d4caa64c49a34c3b0d, type: 3}
+    toggleStopwatch: {fileID: 21300000, guid: 7150017cfc55ddb4286c62675a0867b2, type: 3}
+    clearTable: {fileID: 21300000, guid: 7150017cfc55ddb4286c62675a0867b2, type: 3}
+  maleSprites:
+    baseSprite: {fileID: 21300000, guid: d46e46de9ff276e419be776ba5a149fb, type: 3}
+    hair:
+    - {fileID: 21300000, guid: 207b3202645a0a54d8726067eeb4ddc1, type: 3}
+    - {fileID: 21300000, guid: 05de54e215a37724c87ecfd55da27a90, type: 3}
+    - {fileID: 21300000, guid: f8c441efb0e34e9429ac3aa7ea686ed4, type: 3}
+    faceA:
+    - {fileID: 21300000, guid: 207b3202645a0a54d8726067eeb4ddc1, type: 3}
+    - {fileID: 21300000, guid: c94b506fa26c1c24a84812eabd56b7ee, type: 3}
+    - {fileID: 21300000, guid: 6505bec38036855448b41e0a8d5c690f, type: 3}
+    faceB:
+    - {fileID: 21300000, guid: 207b3202645a0a54d8726067eeb4ddc1, type: 3}
+    - {fileID: 21300000, guid: 8841003c58fd6904882f965c2405cd46, type: 3}
+    - {fileID: 21300000, guid: a4941ae7173ec3a469709b1c9b799a5f, type: 3}
+    torso:
+    - {fileID: 21300000, guid: 207b3202645a0a54d8726067eeb4ddc1, type: 3}
+  femaleSprites:
+    baseSprite: {fileID: 21300000, guid: d23c1ee35ba200c46b8569f552512174, type: 3}
+    hair:
+    - {fileID: 21300000, guid: 207b3202645a0a54d8726067eeb4ddc1, type: 3}
+    - {fileID: 21300000, guid: ba8e3bbd31546014a851fef92c55d5f2, type: 3}
+    - {fileID: 21300000, guid: fd74b42e849a39840b6ca1cdbaef2385, type: 3}
+    faceA:
+    - {fileID: 21300000, guid: 207b3202645a0a54d8726067eeb4ddc1, type: 3}
+    - {fileID: 21300000, guid: c94b506fa26c1c24a84812eabd56b7ee, type: 3}
+    - {fileID: 21300000, guid: 6505bec38036855448b41e0a8d5c690f, type: 3}
+    faceB:
+    - {fileID: 21300000, guid: 207b3202645a0a54d8726067eeb4ddc1, type: 3}
+    - {fileID: 21300000, guid: 3a10c06a417478d4ea52df4b0b5e83b3, type: 3}
+    torso:
+    - {fileID: 21300000, guid: 207b3202645a0a54d8726067eeb4ddc1, type: 3}
