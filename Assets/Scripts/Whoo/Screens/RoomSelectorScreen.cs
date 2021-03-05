@@ -26,13 +26,6 @@ namespace Whoo.Screens
         [SerializeField]
         private TextContext infoText = default;
 
-        [Serializable]
-        private class RoomModelList : IDebugData
-        {
-            public string          Json { get; set; }
-            public List<RoomModel> list;
-        }
-
         public struct Settings : IScreenSettings
         {
             public Func<RoomModel, UniTaskVoid> OnSelected;
@@ -43,12 +36,12 @@ namespace Whoo.Screens
         {
             infoText.SetText(string.Empty);
             await base.Setup(settings);
-            
+
             loadingBlocker.SetActive(true);
 
             container.ClearChildren(false);
 
-            if (string.IsNullOrEmpty(currentSettings.ProfileId))
+            if (string.IsNullOrEmpty(CurrentSettings.ProfileId))
             {
                 Debug.Log($"{nameof(Setup)}: profile id is empty.");
                 infoText.SetText("Guests can't save rooms.");
@@ -57,20 +50,24 @@ namespace Whoo.Screens
 
             var roomListEndpoint = Endpoint.Base().
                                             Collection(Collections.Room).
-                                            Equals((RoomModel r) => r.owner.id, currentSettings.ProfileId);
-            List<RoomModel> list = (await Utils.GetJsonObjectAsync<RoomModelList>(
-                roomListEndpoint, true,
-                nameof(RoomModelList.list))).list;
-            if (list.Count == 0) infoText.SetText("You have no rooms saved.");
-            for (var i = 0; i < list.Count; i++)
+                                            Equals((RoomModel r) => r.owner.id, CurrentSettings.ProfileId);
+            List<RoomModel> list = (await Utils.GetJsonArrayAsync<RoomModel>(
+                roomListEndpoint, string.Empty)).List;
+
+            if (list == null || list.Count == 0) infoText.SetText("You have no rooms saved.");
+
+            if (list != null)
             {
-                RoomModel        layout  = list[i];
-                RoomModelDisplay display = Instantiate(layoutDisplayTemplate, container);
-                display.LoadLayout(layout, () =>
+                for (var i = 0; i < list.Count; i++)
                 {
-                    currentSettings.OnSelected?.Invoke(layout).Forget();
-                    Hide();
-                });
+                    RoomModel        layout  = list[i];
+                    RoomModelDisplay display = Instantiate(layoutDisplayTemplate, container);
+                    display.LoadLayout(layout, () =>
+                    {
+                        CurrentSettings.OnSelected?.Invoke(layout).Forget();
+                        Hide().Forget();
+                    });
+                }
             }
 
             loadingBlocker.SetActive(false);
@@ -78,11 +75,7 @@ namespace Whoo.Screens
 
         public void Awake()
         {
-            hideButton.onClick.AddListener(() => Hide());
-        }
-
-        public override async UniTask Refresh()
-        {
+            hideButton.onClick.AddListener(() => Hide().Forget());
         }
     }
 }

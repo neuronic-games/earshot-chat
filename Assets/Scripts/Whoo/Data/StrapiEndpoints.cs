@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using UnityEngine;
 
 namespace Whoo.Data
 {
@@ -67,6 +69,16 @@ namespace Whoo.Data
                 Sb.Append('/');
                 Sb.Append(entryId);
                 return this;
+            }
+
+            public override string ToString()
+            {
+                return this;
+            }
+
+            public static implicit operator string(StrapiEndpointBase b)
+            {
+                return (StrapiEndpointBuilt) b;
             }
         }
 
@@ -190,12 +202,12 @@ namespace Whoo.Data
     //enum struct
     public struct Collections
     {
-        public static readonly Collections Room     = new Collections("rooms");
-        public static readonly Collections Occupant = new Collections("room-occupants");
-        public static readonly Collections Layout   = new Collections("layouts");
-        public static readonly Collections Zone     = new Collections("zones");
-        public static readonly Collections Profile  = new Collections("profiles");
-        public static readonly Collections User     = new Collections("users");
+        public static readonly Collections Room    = new Collections("rooms");
+        public static readonly Collections Layout  = new Collections("layouts");
+        public static readonly Collections Zone    = new Collections("zones");
+        public static readonly Collections Profile = new Collections("profiles");
+        public static readonly Collections User    = new Collections("users");
+        public static readonly Collections Role    = new Collections("role");
 
         #region Internals
 

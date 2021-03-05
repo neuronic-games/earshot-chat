@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using AppLayer.NetworkGroups;
 using Cysharp.Threading.Tasks;
-using Dialogs;
 using Newtonsoft.Json;
+using UI.Dialogs;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
@@ -21,12 +20,21 @@ namespace Whoo
     {
         #region Time
 
+        /// <summary>
+        /// The time now from unix epoch represented as a TimeSpan struct.
+        /// </summary>
         public static TimeSpan EpochToNowSpan => (DateTime.UtcNow - new DateTime(1970, 1, 1));
 
+        /// <summary>
+        /// The time now from unix epoch in seconds.
+        /// </summary>
         public static double EpochToNowSeconds => EpochToNowSpan.TotalSeconds;
 
         #endregion
 
+        /// <summary>
+        /// Destroys all children of a given transform.
+        /// </summary>
         public static void ClearChildren(this Transform transform, bool destroyInactive = false)
         {
             for (int i = transform.childCount - 1; i >= 0; i--)
@@ -41,30 +49,89 @@ namespace Whoo
 
         #region Json
 
-        private static JsonSerializerSettings _strapiModelSerializerSettings = new JsonSerializerSettings()
+        private static readonly JsonSerializerSettings s_StrapiModelSerializerSettings = new JsonSerializerSettings()
         {
             DefaultValueHandling = DefaultValueHandling.Ignore,
             NullValueHandling    = NullValueHandling.Ignore
         };
 
-        public static JsonSerializerSettings StrapiModelSerializationDefaults() => _strapiModelSerializerSettings;
+        public static JsonSerializerSettings StrapiModelSerializationDefaults() => s_StrapiModelSerializerSettings;
 
+        /// <summary>
+        /// Wraps a json string that represents a top-level array into an object for deserialization into c# object.
+        /// </summary>
         public static string WrapJsonArrayWithObject(string json, string key) => $"{{ \"{key}\" : {json} }}";
 
-        public static async UniTask<T> GetJsonObjectAsync<T>(string url, bool wrap = false, string key = null)
+        /// <summary>
+        /// Tries to populate an object with the json response from a GET request made to the given url.
+        /// </summary>
+        /// <param name="url">The URL to make a GET request to.</param>
+        /// <param name="wrap">True if the returned json should be wrapped into a top-level object.</param>
+        /// <param name="key">Key of the top-level object, if json is to be wrapped.</param>
+        /// <typeparam name="T">Type of object to create and populate with the json.</typeparam>
+        /// <return>Instance of object, populated based on json response. Never null.</return>
+        public static async UniTask<T> GetJsonObjectAsync<T>(string url, string authHeader = null, bool wrap = false,
+            string                                                  key = null)
             where T : new()
         {
-            string response = (await UnityWebRequest.Get(url).SendWebRequest()).downloadHandler.text;
-            T      result   = new T();
-            JsonConvert.PopulateObject(wrap ? WrapJsonArrayWithObject(response, key) : response, result);
-            if (result is IDebugData debug) debug.Json = response;
-            return result;
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                if (!string.IsNullOrEmpty(authHeader))
+                {
+                    request.SetRequestHeader("Authorization", authHeader);
+                }
+
+                string response = (await request.SendWebRequest()).downloadHandler.text;
+
+                T result = new T();
+                JsonConvert.PopulateObject(wrap ? WrapJsonArrayWithObject(response, key) : response, result);
+                if (result is IDebugData debug) debug.Json = response;
+                return result;
+            }
+        }
+
+        public static async UniTask<JsonArray<T>> GetJsonArrayAsync<T>(string url, string authHeader = null)
+            where T : new()
+        {
+            return await GetJsonObjectAsync<JsonArray<T>>(url, authHeader, true, nameof(JsonArray<T>.List));
+        }
+
+        public static async UniTask<TResponse> PostObjectAsync<TPost, TResponse>(string url, TPost obj,
+            string                                                                      authHeader = null)
+            where TResponse : new()
+        {
+            return await PostObjectAsync<TPost, TResponse>(url,
+                JsonConvert.SerializeObject(obj, Utils.StrapiModelSerializationDefaults()), authHeader);
+        }
+
+        public static async UniTask<TResponse> PostObjectAsync<TPost, TResponse>(string url, string obj,
+            string                                                                      authHeader = null)
+            where TResponse : new()
+        {
+            using (var webRequest = UnityWebRequest.Put(url, obj))
+            {
+                webRequest.SetRequestHeader("Content-Type", "application/json");
+                webRequest.method = UnityWebRequest.kHttpVerbPOST;
+                if (!string.IsNullOrEmpty(authHeader))
+                {
+                    webRequest.SetRequestHeader("Authorization", authHeader);
+                }
+
+                string responseString = (await webRequest.SendWebRequest()).downloadHandler.text;
+
+                var response = new TResponse();
+                JsonConvert.PopulateObject(responseString, response);
+                return response;
+            }
         }
 
         #endregion
 
         #region Strapi
 
+        /// <summary>
+        /// Loads an image from a uri that may possibly be a Strapi Resource uri (of form "/uploads/{id}").
+        /// </summary>
         public static async UniTask<Texture> LoadPossibleWhooImage(string url, bool forceReloadCache = false,
             bool                                                          cancellable = false,
             CancellationToken                                             token       = default)
@@ -74,6 +141,9 @@ namespace Whoo
                 cancellable,                                                                 token);
         }
 
+        /// <summary>
+        /// Loads an image from a url and returns it as a texture. Has internal caching.
+        /// </summary>
         public static async UniTask<Texture> LoadImage(string url, bool forceReloadCache = false,
             bool                                              cancellable = false,
             CancellationToken                                 token       = default)
@@ -110,16 +180,16 @@ namespace Whoo
 
         #region Image Caching
 
+        private static readonly Dictionary<string, Texture2D> s_ImageCache = new Dictionary<string, Texture2D>();
+
         private static void SubmitCachedImage(string url, Texture2D texture2D)
         {
-            _imageCache[url] = texture2D;
+            s_ImageCache[url] = texture2D;
         }
-
-        private static Dictionary<string, Texture2D> _imageCache = new Dictionary<string, Texture2D>();
 
         private static bool TryGetCachedImage(string url, out Texture2D texture2D)
         {
-            return _imageCache.TryGetValue(url, out texture2D);
+            return s_ImageCache.TryGetValue(url, out texture2D);
         }
 
         #endregion
@@ -128,6 +198,9 @@ namespace Whoo
 
         #region UI
 
+        /// <summary>
+        /// Replaces the main texture of a raw image, rescaling the image UVs so that texture fits the image. 
+        /// </summary>
         public static void ApplyTextureAndFit(this RawImage image, Texture texture)
         {
             if (texture == null)
@@ -160,6 +233,23 @@ namespace Whoo
 
             image.texture = texture;
             image.uvRect  = uv;
+        }
+
+        #endregion
+
+        #region Http
+
+        /// <summary>
+        /// Clears an http listener response to an empty 200 OK state.
+        /// </summary>
+        /// <param name="response"></param>
+        public static void ClearTo200OK(this HttpListenerResponse response)
+        {
+            response.Headers.Clear();
+            response.SendChunked = false;
+            response.StatusCode  = 200;
+            response.Headers.Add("Server", String.Empty);
+            response.Headers.Add("Date",   String.Empty);
         }
 
         #endregion
@@ -273,41 +363,6 @@ namespace Whoo
             GUIUtility.systemCopyBuffer = text;
         }
 
-        public class TimedLock
-        {
-            private readonly SemaphoreSlim toLock;
-
-            public TimedLock()
-            {
-                toLock = new SemaphoreSlim(1, 1);
-            }
-
-            public async Task<LockReleaser> Lock(TimeSpan timeout)
-            {
-                if (await toLock.WaitAsync(timeout))
-                {
-                    return new LockReleaser(toLock);
-                }
-
-                throw new TimeoutException();
-            }
-
-            public struct LockReleaser : IDisposable
-            {
-                private readonly SemaphoreSlim toRelease;
-
-                public LockReleaser(SemaphoreSlim toRelease)
-                {
-                    this.toRelease = toRelease;
-                }
-
-                public void Dispose()
-                {
-                    toRelease.Release();
-                }
-            }
-        }
-
         #region KvpExtensions
 
         public static void Deconstruct<TKey, TValue>(
@@ -320,5 +375,17 @@ namespace Whoo
         }
 
         #endregion
+    }
+
+    public struct JsonArray<T> : IDebugData
+    {
+        public List<T> List;
+        public string  Json { get; set; }
+    }
+
+    [Serializable]
+    public struct EmptyResponse
+    {
+        
     }
 }

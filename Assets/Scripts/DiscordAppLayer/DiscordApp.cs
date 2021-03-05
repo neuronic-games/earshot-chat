@@ -22,9 +22,6 @@ namespace DiscordAppLayer
             _discord    = new Discord.Discord(clientId, flags);
             Initialized = true;
 
-            /*
-            _localUser = new LocalDiscordUser(this);*/
-
             Distributor = new EventDistributor(this);
             Distributor.RegisterCallbacks(this);
             Distributor.SubscribeGameSDK();
@@ -154,7 +151,7 @@ namespace DiscordAppLayer
                 return _activityManager;
             }
         }
-        
+
         private ImageManager _imageManager = null;
 
         public ImageManager ImageManager
@@ -212,7 +209,7 @@ namespace DiscordAppLayer
 
         public void OnCurrentUserUpdate()
         {
-            if(!LocalUserSet)
+            if (!LocalUserSet)
             {
                 var user = UserManager.GetCurrentUser();
                 LocalUser = user;
@@ -629,7 +626,7 @@ namespace DiscordAppLayer
         private readonly List<DiscordNetworkGroup> _knownGroups = new List<DiscordNetworkGroup>();
 
         public bool LocalUserSet { get; private set; } = false;
-        public User LocalUser { get; private set; } = default;
+        public User LocalUser    { get; private set; } = default;
 
         public IReadOnlyList<IUser>       KnownUsers        => _knownUsers;
         public IReadOnlyList<DiscordUser> KnownDiscordUsers => _knownUsers;
@@ -758,7 +755,7 @@ namespace DiscordAppLayer
                     if (discord != null) return true;
                 }
 
-                UnityEngine.Debug.Log($"Expected {nameof(DiscordApp)} service. Found {layer.GetType().Name}.");
+                Debug.Log($"Expected {nameof(DiscordApp)} service. Found {layer.GetType().Name}.");
                 return false;
             }
 

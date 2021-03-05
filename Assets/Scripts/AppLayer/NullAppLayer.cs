@@ -70,6 +70,7 @@ namespace AppLayer
             public void SetCustomProperties(IReadOnlyDictionary<string, string> value, Action onImplemented)
             {
                 onImplemented?.Invoke();
+                OnCustomPropertiesUpdated?.Invoke();
             }
 
             public bool Equals(IUser other)
@@ -80,10 +81,12 @@ namespace AppLayer
             public void DeleteCustomProperties(IReadOnlyList<string> properties, Action onImplemented)
             {
                 onImplemented?.Invoke();
+                OnCustomPropertiesUpdated?.Invoke();
             }
 
             public void SetOrDeleteCustomProperty(string key, string value)
             {
+                OnCustomPropertiesUpdated?.Invoke();
             }
 
             public event Action<bool> OnSpeaking;

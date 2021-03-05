@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using AppLayer.NetworkGroups;
 using Cysharp.Threading.Tasks;
 using UI.Screens;
@@ -23,9 +24,9 @@ namespace Whoo
 
         private GameObject fadeOut;
 
-        private static Build                  Instance = null;
-        public static  WhooSettings           Settings { get; set; } = null;
-        public static  IAuthenticatedContext AuthContext;
+        private static Build                       Instance = null;
+        public static  WhooSettings                Settings { get; set; } = null;
+        public static  List<IAuthenticatedContext> AuthContexts = new List<IAuthenticatedContext>();
 
         private static IScreen _activeScreen;
 
@@ -55,12 +56,14 @@ namespace Whoo
         public static async UniTask ToStartScreen()
         {
             var instance = Instance;
-            _activeScreen?.Close();
             instance.fadeOut.SetActive(true);
+
+            if (_activeScreen != null)
+                await _activeScreen.Close();
 
             try
             {
-                if (await AuthContext.ContextIsValid())
+                if (await ContextIsValid())
                 {
                     await instance.startScreen.Setup();
                     await instance.startScreen.Display();
@@ -82,9 +85,10 @@ namespace Whoo
         public static async UniTask ToRoomScreen(StrapiRoom strapiRoom, INetworkGroup networkGroup, bool didCreate)
         {
             var instance = Instance;
-            _activeScreen?.Close();
-
             instance.fadeOut.SetActive(true);
+
+            if (_activeScreen != null)
+                await _activeScreen.Close();
 
             try
             {
@@ -122,11 +126,17 @@ namespace Whoo
             {
                 Room = room
             };
-            await instance.waitingScreen.Setup(ref lobbySettings);
+            await instance.waitingScreen.Setup(lobbySettings);
             await instance.waitingScreen.Display();
             _activeScreen = instance.waitingScreen;
-            
+
             instance.fadeOut.SetActive(true);
+        }
+
+        public static async UniTask<bool> ContextIsValid()
+        {
+            var auth = AuthContexts.Find(ctx => ctx is StrapiAuthenticatedUser);
+            return auth != null && await auth.IsValid();
         }
     }
 }

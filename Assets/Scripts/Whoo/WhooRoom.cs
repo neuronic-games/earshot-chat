@@ -6,6 +6,7 @@ using AppLayer.Voice;
 using Cysharp.Threading.Tasks;
 using UI;
 using UnityEngine;
+using Whoo.Daemons;
 using Whoo.Data;
 
 namespace Whoo
@@ -16,9 +17,10 @@ namespace Whoo
     /// </summary>
     public class WhooRoom : NotifyPropertyChanged, IDisposable
     {
-        public readonly StrapiRoom      StrapiRoom;
-        public readonly INetworkGroup   RoomGroup;
-        public readonly List<WhooTable> Tables;
+        public readonly StrapiRoom       StrapiRoom;
+        public readonly INetworkGroup    RoomGroup;
+        public readonly List<WhooTable>  Tables;
+        public          List<DaemonBase> Daemons;
 
         public WhooTable this[int i]
         {
@@ -35,18 +37,38 @@ namespace Whoo
 
         public INetworkGroup CurrentSitting { get; private set; }
 
+        #region Setup
+
         public WhooRoom(StrapiRoom room, INetworkGroup group)
         {
             StrapiRoom = room;
             RoomGroup  = group;
             Tables     = new List<WhooTable>();
+            Daemons    = new List<DaemonBase>();
 
             SeatLocalUserAtTableAsync(null).Forget();
 
             LoadAllTables();
 
+            LoadNecessaryDaemons().Forget();
+
             room.OnRoomRefreshed -= OnRoomRefreshed;
             room.OnRoomRefreshed += OnRoomRefreshed;
+        }
+
+        private async UniTaskVoid LoadNecessaryDaemons()
+        {
+            OccupantManagerDaemon occupantManager = new OccupantManagerDaemon(this);
+            if (await occupantManager.CanAttach())
+            {
+                occupantManager.Run();
+                Daemons.Add(occupantManager);
+            }
+
+            NetworkMessageParserDaemon msgParser = new NetworkMessageParserDaemon(this);
+            if (await msgParser.CanAttach())
+            {
+            }
         }
 
         private void OnRoomRefreshed(RoomModel rm)
@@ -73,9 +95,16 @@ namespace Whoo
             OnPropertyChanged(nameof(Tables));
         }
 
+        #endregion
+
         #region Misc
 
         private bool _loading;
+
+        public void UpdateDaemons()
+        {
+            Daemons.ForEach(d => d.Update());
+        }
 
         public async UniTask SeatLocalUserAtTableAsync(WhooTable table)
         {
@@ -126,11 +155,11 @@ namespace Whoo
                         return new Failable<INetworkGroup>()
                         {
                             Value   = g,
-                            Success = g != null
+                            HasValue = g != null
                         };
                     });
 
-                    if (!failableTable.Success)
+                    if (!failableTable.HasValue)
                     {
                         Debug.LogError($"{nameof(SeatLocalUserAtTableAsync)}: Unable to create new group.");
                         return;
@@ -160,7 +189,7 @@ namespace Whoo
                                                         }
                                                     }).
                                                     ToArray()
-                    }, Utils.StrapiModelSerializationDefaults());
+                    }, string.Empty, Utils.StrapiModelSerializationDefaults());
                 }
 
                 CurrentSitting = tableGroup;
@@ -186,11 +215,15 @@ namespace Whoo
         public void Dispose()
         {
             if (_disposed) return;
-            _disposed = true;
-            RoomGroup.LeaveOrDestroy(null);
+            _disposed                  =  true;
             StrapiRoom.OnRoomRefreshed -= OnRoomRefreshed;
+            Daemons.ForEach(d => d.Dispose());
+            
             Tables.ForEach(t => t.Dispose());
             Tables.Clear();
+            
+            RoomGroup.LeaveOrDestroy(null);
+            
             OnPropertyChanged(nameof(Tables));
             OnPropertyChanged(nameof(StrapiRoom));
         }

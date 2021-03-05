@@ -37,6 +37,8 @@ namespace DiscordAppLayer
 
             _channel = new VoiceChannel(InvokeDisconnect);
 
+            ConnectNetwork();
+
             Subscribe();
 
             UpdateCustomProperties();
@@ -327,11 +329,22 @@ namespace DiscordAppLayer
 
         #region Events
 
-        public event Action OnDestroyed;
-        public event Action OnUsersUpdated;
-        public event Action OnGroupPropertiesUpdated;
+        public event Action    OnDestroyed;
+        public event Action    OnUsersUpdated;
+        public event Action    OnGroupPropertiesUpdated;
+        public event Broadcast OnBroadcastReceived;
 
         #endregion
+
+        public void ConnectNetwork()
+        {
+            App.LobbyManager.ConnectNetwork(LobbyId);
+        }
+
+        public void DisconnectNetwork()
+        {
+            App.LobbyManager.DisconnectNetwork(LobbyId);
+        }
 
         #endregion
 
@@ -430,7 +443,7 @@ namespace DiscordAppLayer
         public void OnLobbyMessage(long lobbyid, long userid, byte[] data)
         {
             if (lobbyid != LobbyId) return;
-            //todo
+            OnBroadcastReceived?.Invoke(userid, data);
         }
 
         #endregion

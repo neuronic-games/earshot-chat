@@ -1,0 +1,6 @@
+﻿This file describes the current authorization flow and setup (current) for Whoo.
+
+1. If discord app layer active, display option to login with discord. 
+2. Display option to register with username/password.
+3. Display option to login with username/password.
+Future:

@@ -33,6 +33,8 @@ namespace Whoo
         [Header("Misc Values")]
         public float waitingLobbyRefreshInterval = 5.0f;
 
+        public float daemonUpdateInterval = 10.0f;
+
         [Header("Templates")]
         public TableView tableView;
 
@@ -48,10 +50,10 @@ namespace Whoo
 
         public FadeOut.FadeSettings DefaultFadeSettings => new FadeOut.FadeSettings()
         {
-            startAmount  = startAmount,
-            endAmount    = endAmount,
-            fadeDuration = duration,
-            endAction    = FadeOut.EndAction.DisableObject
+            StartAmount  = startAmount,
+            EndAmount    = endAmount,
+            FadeDuration = duration,
+            EndAction    = FadeOut.EndAction.DisableObject
         };
 
         [Header("Default Sprites")]

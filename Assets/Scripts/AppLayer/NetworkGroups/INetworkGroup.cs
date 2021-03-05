@@ -26,10 +26,13 @@ namespace AppLayer.NetworkGroups
 
         #region Events
 
-        event Action OnDestroyed;
-        event Action OnUsersUpdated;
-        event Action OnGroupPropertiesUpdated;
+        event Action    OnDestroyed;
+        event Action    OnUsersUpdated;
+        event Action    OnGroupPropertiesUpdated;
+        event Broadcast OnBroadcastReceived;
 
         #endregion
     }
+
+    public delegate void Broadcast(long sender, byte[] data);
 }

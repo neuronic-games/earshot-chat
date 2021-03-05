@@ -1,8 +1,8 @@
 ﻿using System;
 using AppLayer.NetworkGroups;
 using Cysharp.Threading.Tasks;
-using Dialogs;
 using TMPro;
+using UI.Dialogs;
 using UnityEngine;
 using UnityEngine.UI;
 using Whoo.Data;
@@ -46,10 +46,6 @@ namespace Whoo.Screens
             await roomSelector.Hide();
         }
 
-        public override async UniTask Refresh()
-        {
-        }
-
         #endregion
 
         private bool _loading = false;
@@ -81,8 +77,8 @@ namespace Whoo.Screens
         {
             if (_loading) return;
             var settings = new LayoutSelectorScreen.Settings() {OnSelected = _MakeRoom};
-            layoutSelector.Setup(ref settings);
-            layoutSelector.Display();
+            layoutSelector.Setup(settings).Forget();
+            layoutSelector.Display().Forget();
 
             async UniTaskVoid _MakeRoom(Layout layout)
             {
@@ -107,7 +103,7 @@ namespace Whoo.Screens
                         platform_id     = id,
                         platform_secret = secret
                     }
-                }, Utils.StrapiModelSerializationDefaults());
+                }, string.Empty, Utils.StrapiModelSerializationDefaults());
             }
 
             await room.RoomModel.EnsureHasZoneInstancedAsync();
@@ -187,7 +183,7 @@ namespace Whoo.Screens
 
             void GoToWaitingLobby()
             {
-                Build.ToWaitingLobby(room);
+                Build.ToWaitingLobby(room).Forget();
             }
         }
 

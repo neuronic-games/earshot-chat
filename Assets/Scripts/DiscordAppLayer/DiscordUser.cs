@@ -23,11 +23,11 @@ namespace DiscordAppLayer
         public          string              UniqueId        { get; protected set; }
         public          string              Name            { get; protected set; }
 
-        protected readonly Dictionary<string, string> _customProperties = new Dictionary<string, string>();
+        protected readonly Dictionary<string, string> s_CustomProperties = new Dictionary<string, string>();
 
         public IReadOnlyDictionary<string, string> CustomProperties
         {
-            get => _customProperties;
+            get => s_CustomProperties;
             set => SetCustomProperties(value, null);
         }
 
@@ -167,7 +167,9 @@ namespace DiscordAppLayer
 
         #region IEquatable<DiscordUser>
 
+#pragma warning disable 659
         public override bool Equals(object obj)
+#pragma warning restore 659
         {
             return this.Equals(obj as DiscordUser);
         }
@@ -179,7 +181,7 @@ namespace DiscordAppLayer
 
         public bool Equals(DiscordUser other)
         {
-            if (object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(this, other)) return true;
             if (other == null) return false;
             if (other.DiscordUserId == DiscordUserId)
             {
@@ -206,7 +208,7 @@ namespace DiscordAppLayer
 
         public virtual void UpdateCustomProperties()
         {
-            _customProperties.Clear();
+            s_CustomProperties.Clear();
 
             var manager   = App.LobbyManager;
             int metaCount = manager.MemberMetadataCount(DiscordGroup.LobbyId, DiscordUserId);
@@ -216,7 +218,7 @@ namespace DiscordAppLayer
                 string key   = manager.GetMemberMetadataKey(DiscordGroup.LobbyId, DiscordUserId, i);
                 string value = manager.GetMemberMetadataValue(DiscordGroup.LobbyId, DiscordUserId, key);
 
-                _customProperties[key] = value;
+                s_CustomProperties[key] = value;
             }
 
             OnCustomPropertiesUpdated?.Invoke();

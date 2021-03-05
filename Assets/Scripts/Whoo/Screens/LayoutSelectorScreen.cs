@@ -26,13 +26,6 @@ namespace Whoo.Screens
         [SerializeField]
         private TextContext infoText = default;
 
-        [Serializable]
-        private class LayoutList : IDebugData
-        {
-            public string       Json { get; set; }
-            public List<Layout> list;
-        }
-
         public struct Settings : IScreenSettings
         {
             public Func<Layout, UniTaskVoid> OnSelected;
@@ -47,19 +40,23 @@ namespace Whoo.Screens
 
             container.ClearChildren(false);
 
-            List<Layout> list = (await Utils.GetJsonObjectAsync<LayoutList>(
-                Endpoint.Base().Collection(Collections.Layout).All(), true,
-                nameof(LayoutList.list))).list;
-            if (list.Count == 0) infoText.SetText("No layouts are available at this moment.");
-            for (var i = 0; i < list.Count; i++)
+            string       uri  = Endpoint.Base().Collection(Collections.Layout).All();
+            List<Layout> list = (await Utils.GetJsonArrayAsync<Layout>(uri)).List;
+
+            if (list == null || list.Count == 0) infoText.SetText("No layouts are available at this moment.");
+
+            if (list != null)
             {
-                Layout        layout  = list[i];
-                LayoutDisplay display = Instantiate(layoutDisplayTemplate, container);
-                display.LoadLayout(layout, () =>
+                for (var i = 0; i < list.Count; i++)
                 {
-                    currentSettings.OnSelected?.Invoke(layout).Forget();
-                    Hide();
-                });
+                    Layout        layout  = list[i];
+                    LayoutDisplay display = Instantiate(layoutDisplayTemplate, container);
+                    display.LoadLayout(layout, () =>
+                    {
+                        CurrentSettings.OnSelected?.Invoke(layout).Forget();
+                        Hide().Forget();
+                    });
+                }
             }
 
             loadingBlocker.SetActive(false);
@@ -67,12 +64,7 @@ namespace Whoo.Screens
 
         public void Awake()
         {
-            hideButton.onClick.AddListener(() => Hide());
-        }
-
-        public override async UniTask Refresh()
-        {
-            
+            hideButton.onClick.AddListener(() => Hide().Forget());
         }
     }
 }

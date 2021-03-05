@@ -10,14 +10,12 @@ namespace Whoo.Data
 
         public RoomModel      RoomModel { get; private set; }
         public List<Zone>     Zones     { get; set; }
-        public List<Occupant> Occupants { get; set; }
         public bool           Ready     { get; private set; }
 
         private string _roomId = string.Empty;
 
         public event Action<RoomModel>      OnRoomRefreshed;
         public event Action<List<Zone>>     OnZonesRefreshed;
-        public event Action<List<Occupant>> OnOccupantsRefreshed;
 
         public StrapiRoom()
         {
@@ -69,17 +67,6 @@ namespace Whoo.Data
             Ready = true;
         }
 
-        public async UniTask RefreshOccupants()
-        {
-            Ready = false;
-
-            Occupants = await RoomModel.GetAllOccupantsAsync();
-
-            OnOccupantsRefreshed?.Invoke(Occupants);
-
-            Ready = true;
-        }
-
         #endregion
 
         public static async UniTask<StrapiRoom> CreateNew(Layout layout, string profileId)
@@ -90,7 +77,7 @@ namespace Whoo.Data
                 layout = layout.id,
                 owner  = profileId,
                 name   = "My Room"
-            }, Utils.StrapiModelSerializationDefaults());
+            }, string.Empty, Utils.StrapiModelSerializationDefaults());
             await model.EnsureHasZoneInstancedAsync();
             StrapiRoom room = new StrapiRoom();
             await room.LoadRoom(model.id);

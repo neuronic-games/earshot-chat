@@ -4,10 +4,11 @@ using UI.FlowerMenu;
 using UI.Screens;
 using UnityEngine;
 using UnityEngine.Events;
+using Screen = UI.Screens.Screen;
 
 namespace Whoo.Views
 {
-    public class TableFlowerMenu : MonoBehaviour, IScreen
+    public class TableFlowerMenu : Screen
     {
         #region Serialized
 
@@ -44,7 +45,7 @@ namespace Whoo.Views
 
         public void OnEnable()
         {
-            Setup();
+            Setup().Forget();
         }
 
         #region Menu Building
@@ -133,47 +134,39 @@ namespace Whoo.Views
 
         #region Screen
 
-        public bool IsDisplayed
+        public override bool IsDisplayed
         {
             get { return gameObject.activeSelf; }
-            set { gameObject.SetActive(value); }
+            protected set { gameObject.SetActive(value); }
         }
 
-        public UniTask Setup()
+        public override async UniTask Setup()
         {
             CleanMenu();
             BuildMenu();
+            await UniTask.CompletedTask; //supresses warning
         }
 
-        public UniTask Display()
+        public override async UniTask Display()
         {
             if (IsDisplayed) return;
             IsDisplayed = true;
-            if (animator != null) animator.Play("In");
-        }
-
-        public UniTask Hide()
-        {
-            if (!IsDisplayed) return;
-            HideAsync().Forget();
-        }
-
-        public async UniTaskVoid HideAsync()
-        {
             if (animator != null)
             {
-                animator.Play("Out");
-                await (() => Close()).WaitUntil(() => !animator.GetCurrentAnimatorStateInfo(0).IsName("Out"));
-                IsDisplayed = false;
+                animator.Play("In");
+                await UniTask.WaitUntil(() => !animator.GetCurrentAnimatorStateInfo(0).IsName("In"));
             }
         }
 
-        public UniTask Refresh()
+        public override async UniTask Hide()
         {
-        }
-
-        public UniTask Close()
-        {
+            if (!IsDisplayed) return;
+            if (animator != null)
+            {
+                animator.Play("Out");
+                await UniTask.WaitUntil(() => !animator.GetCurrentAnimatorStateInfo(0).IsName("Out"));
+                IsDisplayed = false;
+            }
         }
 
         #endregion

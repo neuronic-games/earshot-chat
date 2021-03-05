@@ -80,7 +80,7 @@ namespace Whoo.Screens
             await LoadBackgroundImageAsync(WhooRoom.StrapiRoom?.RoomModel?.layout);
             roomView.Setup(WhooRoom);
 
-            roomId.Text = currentSettings.Room.RoomModel?.id;
+            roomId.Text = CurrentSettings.Room.RoomModel?.id;
         }
 
         public override async UniTask Close()
@@ -100,6 +100,10 @@ namespace Whoo.Screens
             if (WhooRoom == null || !WhooRoom.RoomGroup.IsAlive)
             {
                 await Close();
+            }
+            else
+            {
+                WhooRoom.UpdateDaemons();
             }
         }
 
@@ -148,8 +152,7 @@ namespace Whoo.Screens
         {
             if (WhooRoom != null)
             {
-                var lobby = WhooRoom.RoomGroup as DiscordNetworkGroup;
-                if (lobby != null)
+                if (WhooRoom.RoomGroup is DiscordNetworkGroup lobby)
                 {
                     if (lobby.IsConnectedVoice) lobby.DisconnectVoice();
                 }
@@ -193,7 +196,7 @@ namespace Whoo.Screens
 
         private void OpenSettingsPanel()
         {
-            settingsScreen.Display();
+            settingsScreen.Display().Forget();
         }
 
         #endregion
@@ -204,6 +207,17 @@ namespace Whoo.Screens
         {
             leaveRoomButton.onClick.AddListener(ResetWhooRoom);
             settingsButton.onClick.AddListener(OpenSettingsPanel);
+        }
+
+        private float _lastRefresh;
+
+        public void Update()
+        {
+            if (Time.realtimeSinceStartup > _lastRefresh + Build.Settings.daemonUpdateInterval)
+            {
+                _lastRefresh = Time.realtimeSinceStartup;
+                Refresh().Forget();
+            }
         }
 
         #endregion

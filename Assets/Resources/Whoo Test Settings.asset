@@ -16,14 +16,17 @@ MonoBehaviour:
   discordCreateFlags: 0
   testerInfo:
     profileId: 5face66453385c020cc2f50e
+  authScreen: {fileID: 5980174413271695491, guid: d80b336c0cf5f624ea9bb196780996d9,
+    type: 3}
   roomScreen: {fileID: 2834008572589149173, guid: f3b4b0849b84fe24fb87e9581568aabc,
     type: 3}
   startScreen: {fileID: 5280672345489207402, guid: 79e88d1afab302c43a0db2a8a580eaea,
     type: 3}
   waitingScreen: {fileID: 3291636326787021054, guid: ec5dda38fdcf8bb4583218dc1b9c8e62,
     type: 3}
-  fadeOut: {fileID: 1297314241039701540, guid: abcf64efdbcb37c438684ce09d1c839e, type: 3}
+  fadeOut: {fileID: 1055808763244132934, guid: 31547f49eeeb82e4087bb8cc05894195, type: 3}
   waitingLobbyRefreshInterval: 5
+  daemonUpdateInterval: 10
   tableView: {fileID: 8465652785150667373, guid: 6c3f7206fb78a6e46a7c35770248b9bd,
     type: 3}
   startAmount: 1

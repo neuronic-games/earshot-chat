@@ -24,7 +24,7 @@ namespace Whoo.Screens
 
         private void BackToStartScreen()
         {
-            currentSettings = default;
+            CurrentSettings = default;
             Build.ToStartScreen().Forget();
         }
 
@@ -40,22 +40,22 @@ namespace Whoo.Screens
             await base.Setup(settings);
             //wow... this next statement
             Texture tex =
-                await Utils.LoadPossibleWhooImage(currentSettings.Room?.RoomModel?.layout?.image.FirstOrDefault()?.url);
+                await Utils.LoadPossibleWhooImage(CurrentSettings.Room?.RoomModel?.layout?.image.FirstOrDefault()?.url);
             image.ApplyTextureAndFit(tex);
         }
 
         public override async UniTask Refresh()
         {
-            if (string.IsNullOrEmpty(currentSettings.Room?.RoomModel?.id))
+            if (string.IsNullOrEmpty(CurrentSettings.Room?.RoomModel?.id))
             {
                 BackToStartScreen();
                 return;
             }
 
-            await currentSettings.Room.RefreshRoom();
-            INetworkGroup group = await Utils.JoinGroup(currentSettings.Room?.RoomModel);
+            await CurrentSettings.Room.RefreshRoom();
+            INetworkGroup group = await Utils.JoinGroup(CurrentSettings.Room?.RoomModel);
             if (group == null) return;
-            Build.ToRoomScreen(currentSettings.Room, group, false).Forget();
+            Build.ToRoomScreen(CurrentSettings.Room, group, false).Forget();
         }
 
         #endregion

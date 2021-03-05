@@ -30,12 +30,13 @@ namespace Whoo.Screens
         public override async UniTask Hide()
         {
             animator.Play("Out");
+            await UniTask.CompletedTask; //supresses warning
         }
 
         public override async UniTask Display()
         {
             animator.Play("In");
-            Refresh();
+            await Refresh();
         }
 
         public override async UniTask Refresh()
@@ -45,6 +46,8 @@ namespace Whoo.Screens
                 float volume = app.VoiceManager.GetLocalVolume(app.LocalUser.Id);
                 selfVolume.value = volume;
             }
+
+            await UniTask.CompletedTask; //suppresses warning
         }
 
         #endregion

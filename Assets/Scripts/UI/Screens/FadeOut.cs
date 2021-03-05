@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace UI.Screens
 {
@@ -39,8 +40,9 @@ namespace UI.Screens
             InvokeEvent         = 1 << 3
         }
 
+        [FormerlySerializedAs("endAction")]
         [SerializeField]
-        private EndAction endAction = EndAction.DisableObject;
+        private EndAction defaultEndAction = EndAction.DisableObject;
 
         [SerializeField]
         private UnityEvent invokeAction = null;
@@ -57,7 +59,7 @@ namespace UI.Screens
 
         public void OnEnable()
         {
-            if(fadeOnEnable) StartFadeOut();
+            if (fadeOnEnable) StartFadeOut();
         }
 
         public void Update()
@@ -72,37 +74,37 @@ namespace UI.Screens
 
             SetupCurrentSettings();
 
-            if (_currentSettings.startAmount != null) @group.alpha = _currentSettings.startAmount.Value;
+            if (_currentSettings.StartAmount != null) @group.alpha = _currentSettings.StartAmount.Value;
             @group.blocksRaycasts = interactableOnEnable;
             @group.interactable   = blockRaycastsOnEnable;
         }
 
         private void SetupCurrentSettings()
         {
-            _currentSettings.startAmount  = _currentSettings.startAmount  ?? startAmount;
-            _currentSettings.endAmount    = _currentSettings.endAmount    ?? endAmount;
-            _currentSettings.fadeDuration = _currentSettings.fadeDuration ?? duration;
-            _currentSettings.endAction    = _currentSettings.endAction    ?? endAction;
+            _currentSettings.StartAmount  = _currentSettings.StartAmount  ?? startAmount;
+            _currentSettings.EndAmount    = _currentSettings.EndAmount    ?? endAmount;
+            _currentSettings.FadeDuration = _currentSettings.FadeDuration ?? duration;
+            _currentSettings.EndAction    = _currentSettings.EndAction    ?? defaultEndAction;
         }
 
         private void FadeUpdate()
         {
             if (!_isFading) return;
-            float animFactor = (Time.time - _fadeStart) / (_currentSettings.fadeDuration.Value);
+            float animFactor = (Time.time - _fadeStart) / (_currentSettings.FadeDuration ?? 1f);
             if (animFactor >= 1.0f)
             {
                 TakeAction();
-                Hide();
+                Hide().Forget();
             }
 
-            @group.alpha = Mathf.Lerp(_currentSettings.startAmount.Value, _currentSettings.endAmount.Value,
+            @group.alpha = Mathf.Lerp(_currentSettings.StartAmount ?? 1f, _currentSettings.EndAmount ?? 0f,
                 Mathf.Clamp01(animFactor));
         }
 
         private void TakeAction()
         {
             _isFading = false;
-            var _endAction = _currentSettings.endAction.Value;
+            var _endAction = _currentSettings.EndAction ?? defaultEndAction;
             if (_endAction.HasFlag(EndAction.DisableObject))
             {
                 gameObject.SetActive(false);
@@ -123,8 +125,9 @@ namespace UI.Screens
                 @group.blocksRaycasts = false;
                 @group.interactable   = false;
             }
-            _currentSettings.onEnd?.Invoke();
-            _currentSettings.onEnd = null;
+
+            _currentSettings.OnEnd?.Invoke();
+            _currentSettings.OnEnd = null;
         }
 
         #region Screen Settings
@@ -132,29 +135,26 @@ namespace UI.Screens
         [Serializable]
         public struct FadeSettings : IScreenSettings
         {
-            public float?     startAmount;
-            public float?     endAmount;
-            public float?     fadeDuration;
-            public EndAction? endAction;
-            public Action onEnd;
+            public float?     StartAmount;
+            public float?     EndAmount;
+            public float?     FadeDuration;
+            public EndAction? EndAction;
+            public Action     OnEnd;
         }
 
         #endregion
 
         #region IScreen
 
-        public override async UniTask Refresh()
-        {
-            StartFadeOut();
-        }
-
         public override async UniTask Setup(FadeSettings settings)
         {
             _isFading = false;
-            
+
             _currentSettings = settings;
 
             SetupCurrentSettings();
+
+            await UniTask.CompletedTask; // suppresses warning
         }
 
         #endregion

@@ -22,7 +22,7 @@ namespace UI.Screens
         UniTask Close();
     }
 
-    public interface IScreen<T> : IScreen where T : struct, IScreenSettings
+    public interface IScreen<in T> : IScreen where T : struct, IScreenSettings
     {
         UniTask Setup(T settings);
     }
@@ -43,27 +43,33 @@ namespace UI.Screens
 
         public virtual async UniTask Setup()
         {
+            await UniTask.CompletedTask;
         }
 
         public virtual async UniTask Close()
         {
-            if (IsDisplayed) Hide();
-            currentSettings = default;
+            if (IsDisplayed) await Hide();
+            CurrentSettings = default;
         }
 
         public virtual async UniTask Setup(TSettings settings)
         {
-            currentSettings = settings;
+            CurrentSettings = settings;
+            await UniTask.CompletedTask;
         }
 
         public virtual async UniTask Hide()
         {
             IsDisplayed = false;
+            await UniTask.CompletedTask;
         }
 
-        public abstract UniTask Refresh();
+        public virtual async UniTask Refresh()
+        {
+            await UniTask.CompletedTask;
+        }
 
-        protected TSettings currentSettings = default;
+        protected TSettings CurrentSettings = default;
 
         public virtual async UniTask Display()
         {

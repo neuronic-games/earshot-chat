@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using AppLayer.NetworkGroups;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
@@ -10,25 +11,25 @@ namespace Whoo.Views
         [SerializeField]
         protected TextMeshProUGUI displayName;
 
-        protected WhooRoom _room = null;
+        protected WhooRoom Room;
         public    IUser    User { get; protected set; }
 
         #region Registration
 
         public virtual void RegisterUser(IUser user, WhooRoom room)
         {
-            _room = room;
+            Room = room;
             DetachListeners();
             this.User = user;
             AttachListeners();
-            Refresh();
+            Refresh().Forget();
         }
 
         public virtual void DeleteView()
         {
             DetachListeners();
-            _room = null;
-            User  = null;
+            Room = null;
+            User = null;
             Destroy(gameObject);
         }
 
@@ -54,9 +55,10 @@ namespace Whoo.Views
         {
         }
 
-        public virtual void Refresh()
+        public virtual async UniTask Refresh()
         {
             displayName.text = User.Name;
+            await UniTask.CompletedTask; //suppresses warning
         }
 
         protected abstract void Speaking(bool speaking);

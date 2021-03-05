@@ -4,9 +4,25 @@ using Cysharp.Threading.Tasks;
 
 public struct Failable<T>
 {
-    public bool Success;
-    public T    Value;
+    public bool   HasValue;
+    public T      Value;
+    public string PrettyError;
+
+    public Failable(T value)
+    {
+        Value       = value;
+        HasValue    = true;
+        PrettyError = null;
+    }
+
+    public Failable(string prettyError)
+    {
+        Value       = default;
+        HasValue    = false;
+        PrettyError = prettyError;
+    }
 }
+
 
 /// <summary>
 /// Implements an exponential backoff (0, 1, 2, 4, ... seconds) strategy using async.
@@ -48,7 +64,7 @@ public struct ExponentialBackoff<T>
                 result = await service.Invoke();
             }
 
-            if (result.Success) return result;
+            if (result.HasValue) return result;
 
             //4th try will be 7 seconds
             wait *= 2;

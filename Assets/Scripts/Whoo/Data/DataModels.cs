@@ -11,6 +11,11 @@ namespace Whoo.Data
 {
     #region Commons
 
+    /// <summary>
+    /// All strapi results are nested up-to a certain depth. After this depth, only the id and not the full data of a field is returned.
+    /// This base class is required to mirror this property when deserilizing json.
+    /// It will either contain the full object or just its id, and this can be read from an enum property.
+    /// </summary>
     public abstract class ObjectOrId
     {
         [JsonIgnore]
@@ -26,6 +31,9 @@ namespace Whoo.Data
             IdOnly
         }
 
+        /// <summary>
+        /// This method is used in child classes to easily declare an implicit string operator. 
+        /// </summary>
         protected static T Make<T>(string id, T value = default) where T : ObjectOrId, new()
         {
             return new T()
@@ -37,7 +45,7 @@ namespace Whoo.Data
     }
 
     /// <summary>
-    /// Common properties for strapi objects.
+    /// Common properties for everything strapi.
     /// </summary>
     [Serializable]
     public abstract class StrapiCommon : ObjectOrId
@@ -64,12 +72,18 @@ namespace Whoo.Data
         public string createdAt = string.Empty;
     }
 
+    /// <summary>
+    /// Base model for all strapi COMPONENTS.
+    /// </summary>
     [Serializable]
     public abstract class StrapiComponentCommon : StrapiCommon
     {
         public abstract string __component { get; }
     }
 
+    /// <summary>
+    /// Base model for all strapi MODEL objects, such as those in collections.
+    /// </summary>
     [Serializable]
     public abstract class StrapiModelCommon : StrapiCommon, IDebugData
     {
@@ -79,28 +93,38 @@ namespace Whoo.Data
         [JsonIgnore]
         public abstract string ResourceUrl { get; }
 
-        public virtual async UniTask GetAsync()
+        public virtual async UniTask GetAsync(string jwt = null)
         {
-            string endp            = ResourceUrl;
-            var    unityWebRequest = await UnityWebRequest.Get(endp).SendWebRequest();
-            string response        = unityWebRequest.downloadHandler.text;
-            unityWebRequest.Dispose();
-            //try-catch
-            JsonConvert.PopulateObject(response, this);
-            Json = response;
+            using (UnityWebRequest request = UnityWebRequest.Get(ResourceUrl))
+            {
+                if (!string.IsNullOrEmpty(jwt))
+                {
+                    request.SetRequestHeader("Authorization", $"Bearer {jwt}");
+                }
+
+                var response = (await request.SendWebRequest()).downloadHandler.text;
+                JsonConvert.PopulateObject(response, this);
+                Json = response;
+            }
         }
 
-        public virtual async UniTask PutAsync(object updateObj, JsonSerializerSettings settings = null)
+        public virtual async UniTask PutAsync(object updateObj, string jwt = null,
+            JsonSerializerSettings settings = null)
         {
-            string endp       = ResourceUrl;
             string updateJson = JsonConvert.SerializeObject(updateObj, settings);
-            var    webRequest = UnityWebRequest.Put(endp, updateJson);
-            webRequest.SetRequestHeader("Content-Type", "application/json");
-            string response = (await webRequest.SendWebRequest()).
-                              downloadHandler.text;
-            webRequest.Dispose();
-            JsonConvert.PopulateObject(response, this, settings);
-            Json = response;
+            using (UnityWebRequest request = UnityWebRequest.Put(ResourceUrl, updateJson))
+            {
+                request.SetRequestHeader("Content-Type", "application/json");
+                if (!string.IsNullOrEmpty(jwt))
+                {
+                    request.SetRequestHeader("Authorization", $"Bearer {jwt}");
+                }
+
+                string response = (await request.SendWebRequest()).
+                                  downloadHandler.text;
+                JsonConvert.PopulateObject(response, this, settings);
+                Json = response;
+            }
         }
 
         public virtual async UniTask PutAllAsync()
@@ -108,20 +132,30 @@ namespace Whoo.Data
             await PutAsync(this);
         }
 
-        public virtual async UniTask PostAsync(object newObj, JsonSerializerSettings settings = null)
+        public virtual async UniTask PostAsync(object newObj, string jwt = null, JsonSerializerSettings settings = null)
         {
-            string endp       = ResourceUrl;
-            var    newJson    = JsonConvert.SerializeObject(newObj, settings);
-            var    webRequest = UnityWebRequest.Put(endp, newJson);
-            webRequest.SetRequestHeader("Content-Type", "application/json");
-            webRequest.method = UnityWebRequest.kHttpVerbPOST;
-            string response = (await webRequest.SendWebRequest()).
-                              downloadHandler.text;
-            JsonConvert.PopulateObject(response, this, settings);
-            Json = response;
+            var newJson = JsonConvert.SerializeObject(newObj, settings);
+
+            using (UnityWebRequest request = UnityWebRequest.Put(ResourceUrl, newJson))
+            {
+                request.SetRequestHeader("Content-Type", "application/json");
+                request.method = UnityWebRequest.kHttpVerbPOST;
+                if (!string.IsNullOrEmpty(jwt))
+                {
+                    request.SetRequestHeader("Authorization", $"Bearer {jwt}");
+                }
+
+                string response = (await request.SendWebRequest()).
+                                  downloadHandler.text;
+                JsonConvert.PopulateObject(response, this, settings);
+                Json = response;
+            }
         }
     }
 
+    /// <summary>
+    /// Flat, actual data of image.
+    /// </summary>
     [Serializable]
     public class ImageCommon
     {
@@ -147,6 +181,9 @@ namespace Whoo.Data
         public string url = string.Empty;
     }
 
+    /// <summary>
+    /// Common data for user last-modified/created-by entries in other components.
+    /// </summary>
     [Serializable]
     public class UserCommon : ObjectOrId
     {
@@ -175,8 +212,11 @@ namespace Whoo.Data
         public static implicit operator UserCommon(string id) => Make<UserCommon>(id);
     }
 
+    /// <summary>
+    /// Contains strapi object form of uploaded images, including automatic thumbnails.
+    /// </summary>
     [Serializable]
-    public class ImageData : ImageCommon
+    public class StrapiImage : ImageCommon
     {
         #region Definitions
 
@@ -223,48 +263,7 @@ namespace Whoo.Data
 
     #endregion
 
-    /// <summary>
-    /// Room layouts define how read-only properties for various pre-built rooms.
-    /// </summary>
-    [Serializable]
-    public class Layout : StrapiModelCommon
-    {
-        #region Definitions
-
-        #endregion
-
-        public ImageData[] image = null;
-
-        //room properties
-        [DefaultValue(-1)]
-        public int capacity = -1;
-
-        public UserCommon created_by = null;
-        public UserCommon updated_by = null;
-
-        #region Methods
-
-        public static implicit operator Layout(string id) => Make<Layout>(id);
-
-        public override string ResourceUrl => Endpoint.Base().CollectionEntry(Collections.Layout, id);
-
-        public async UniTask<List<Zone>> GetAllZonesAsync()
-        {
-            string   endpoint = Endpoint.Base().Collection(Collections.Zone).Equals("layout.id", id);
-            string   response = (await UnityWebRequest.Get(endpoint).SendWebRequest()).downloadHandler.text;
-            ZoneList list     = new ZoneList();
-            JsonConvert.PopulateObject(Utils.WrapJsonArrayWithObject(response, nameof(ZoneList.list)), list);
-            return list.list;
-        }
-
-        [Serializable]
-        private class ZoneList
-        {
-            public List<Zone> list;
-        }
-
-        #endregion
-    }
+    #region Components
 
     [Serializable]
     public class PlatformCredentials : StrapiComponentCommon
@@ -297,8 +296,69 @@ namespace Whoo.Data
         public static implicit operator ZoneInstance(string id) => Make<ZoneInstance>(id);
     }
 
+    [Serializable]
+    public class Occupant : StrapiComponentCommon
+    {
+        public Profile profile = null;
+
+        public bool moderator = false;
+
+        public int seat_id = -1;
+
+        public static implicit operator Occupant(string id) => Make<Occupant>(id);
+        public override                 string __component  => "runtime.occupant";
+    }
+
+    #endregion
+
+    #region Models
+
     /// <summary>
-    /// The platform-specific room instance used for realtime network/voice. 
+    /// Room layouts define how read-only properties for various pre-built rooms.
+    /// </summary>
+    [Serializable]
+    public class Layout : StrapiModelCommon
+    {
+        #region Definitions
+
+        #endregion
+
+        public StrapiImage[] image = null;
+
+        //room properties
+        [DefaultValue(-1)]
+        public int capacity = -1;
+
+        public UserCommon created_by = null;
+        public UserCommon updated_by = null;
+
+        #region Methods
+
+        public static implicit operator Layout(string id) => Make<Layout>(id);
+
+        public override string ResourceUrl => Endpoint.Base().CollectionEntry(Collections.Layout, id);
+
+        public async UniTask<List<Zone>> GetAllZonesAsync()
+        {
+            string   endpoint = Endpoint.Base().Collection(Collections.Zone).Equals("layout.id", id);
+            string   response = (await UnityWebRequest.Get(endpoint).SendWebRequest()).downloadHandler.text;
+            ZoneList list     = new ZoneList();
+            JsonConvert.PopulateObject(Utils.WrapJsonArrayWithObject(response, nameof(ZoneList.list)), list);
+            return list.list;
+        }
+
+        [Serializable]
+        private class ZoneList
+        {
+            public List<Zone> list;
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// The platform-specific room INSTANCE used for realtime network/voice.
+    /// This is the top-level data/control of each room.
     /// </summary>
     [Serializable]
     public class RoomModel : StrapiModelCommon
@@ -307,26 +367,14 @@ namespace Whoo.Data
 
         public ZoneInstance[] zone_instances = null;
 
+        public List<Occupant> occupants = null;
+
         public Layout  layout = null;
         public Profile owner  = null;
 
         public override string ResourceUrl => Endpoint.Base().CollectionEntry(Collections.Room, id);
 
         public static implicit operator RoomModel(string id) => Make<RoomModel>(id);
-
-        public async UniTask<List<Occupant>> GetAllOccupantsAsync()
-        {
-            string       endpoint = Endpoint.Base().Collection(Collections.Occupant).Equals("room.id", id);
-            OccupantList list = await Utils.GetJsonObjectAsync<OccupantList>(endpoint, true, nameof(OccupantList.list));
-            return list.list;
-        }
-
-        [Serializable]
-        private class OccupantList : IDebugData
-        {
-            public string         Json { get; set; } = string.Empty;
-            public List<Occupant> list = null;
-        }
 
         public async UniTask EnsureHasZoneInstancedAsync()
         {
@@ -371,7 +419,7 @@ namespace Whoo.Data
         public UserCommon created_by = null;
         public UserCommon updated_by = null;
 
-        public ImageData[] image = null;
+        public StrapiImage[] image = null;
 
         [DefaultValue(-1)]
         public int x = -1;
@@ -407,6 +455,14 @@ namespace Whoo.Data
     [Serializable]
     public class Profile : StrapiModelCommon
     {
+        public StrapiImage[]   image         = Array.Empty<StrapiImage>();
+        public AvatarComponent profileAvatar = null;
+
+        [DefaultValue("")]
+        public string platform_unique_id = string.Empty;
+
+        #region Class Definitions / Methods
+
         [Serializable]
         public class AvatarComponent : StrapiComponentCommon
         {
@@ -419,15 +475,15 @@ namespace Whoo.Data
             public override string __component => "profile.avatar";
         }
 
-        public                          ImageData[]     image         = Array.Empty<ImageData>();
-        public                          AvatarComponent profileAvatar = null;
         public static implicit operator Profile(string id) => Make<Profile>(id);
 
         public override string ResourceUrl => Endpoint.Base().CollectionEntry(Collections.Profile, id);
+
+        #endregion
     }
 
     [Serializable]
-    public class User : StrapiModelCommon
+    public class StrapiUser : StrapiModelCommon
     {
         public const string PLATFORM_DISCORD = "Discord";
         public const string PLATFORM_AGORA   = "Agora";
@@ -448,27 +504,78 @@ namespace Whoo.Data
         [DefaultValue(null)]
         public string password = null;
 
+        public Role role = null;
+
+        public Profile selected_profile = null;
+
+        //TODO -- selected profile  
+
+        public string resetPasswordToken;
+
         public bool confirmed;
+
         public bool blocked;
 
-        public static implicit operator User(string id)    => Make<User>(id);
-        public override                 string ResourceUrl => Endpoint.Base().CollectionEntry(Collections.User, id);
+        public static implicit operator StrapiUser(string id) => Make<StrapiUser>(id);
+        public override                 string ResourceUrl    => Endpoint.Base().CollectionEntry(Collections.User, id);
+    }
+
+    public class Role : StrapiModelCommon
+    {
+        #region Serialized
+
+        [DefaultValue("")]
+        public string description = "";
+
+        [DefaultValue("")]
+        public string type = "";
+
+        [DefaultValue("")]
+        public new string name = "";
+
+        #endregion
+
+        #region Operators/Props
+
+        public static implicit operator Role(string id)    => Make<Role>(id);
+        public override                 string ResourceUrl => Endpoint.Base().CollectionEntry(Collections.Role, id);
+
+        #endregion
+    }
+
+    #endregion
+
+    #region Other
+
+    /// <summary>
+    /// Authentication response from strapi auth routes (login, register, oauth2).
+    /// Contains own user profile and jwt token.
+    /// </summary>
+    [Serializable]
+    public class AuthResponse
+    {
+        public StrapiUser user;
+        public string     jwt;
     }
 
     [Serializable]
-    public class Occupant : StrapiModelCommon
+    public class StrapiError
     {
-        [DefaultValue("")]
-        public string room = string.Empty;
+        public class MessageList
+        {
+            public List<Message> messages;
+        }
 
-        public Profile profile = null;
+        public class Message
+        {
+            public string id;
+            public string message;
+        }
 
-        public bool moderator = false;
-
-        [DefaultValue("")]
-        public string color = string.Empty;
-
-        public static implicit operator Occupant(string id) => Make<Occupant>(id);
-        public override                 string ResourceUrl => Endpoint.Base().CollectionEntry(Collections.Occupant, id);
+        public int           statusCode;
+        public string        error;
+        public MessageList[] message;
     }
+
+    #endregion
 }
