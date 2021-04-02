@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 
 namespace UI.UtilityElements
 {
-    public class HoldEvent : MonoBehaviour, IClickDownHandler, IClickUpHandler
+    public class HoldEvent : MonoBehaviour, ICustomClickDownHandler, IClickUpHandler
     {
         public enum ComparisonOp
         {

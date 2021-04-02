@@ -81,6 +81,10 @@ namespace Whoo
                     string      errorMessage = error.message.FirstOrDefault()?.messages.FirstOrDefault()?.message;
                     return new Failable<AuthResponse>(errorMessage);
                 }
+                else
+                {
+                    Debug.Log($"Unknown error occured: {webreq.Error}");
+                }
             }
 
             return default;
@@ -213,7 +217,7 @@ namespace Whoo
 
                 var (cancelled, context) = await listener.GetContextAsync().
                                                           AsUniTask().
-                                                          WithCancellation(authCToken.Token).
+                                                          AttachExternalCancellation(authCToken.Token).
                                                           SuppressCancellationThrow();
 
                 if (cancelled) return default;

@@ -5,27 +5,28 @@ using Whoo;
 
 namespace UI.UtilityElements
 {
-    public interface IClickDownHandler
+    public interface ICustomClickDownHandler
     {
         void LeftClick(PointerEventData   ptrData);
         void RightClick(PointerEventData  ptrData);
         void MiddleClick(PointerEventData ptrData);
     }
+    
     public class ClickDownDistributor : MonoBehaviour, IPointerDownHandler
     {
-        private List<IClickDownHandler> handlers = new List<IClickDownHandler>();
+        private List<ICustomClickDownHandler> handlers = new List<ICustomClickDownHandler>();
 
         public void Awake()
         {
             transform.parent.GetComponentsInChildren(handlers);
         }
 
-        public void Register(IClickDownHandler handler)
+        public void Register(ICustomClickDownHandler handler)
         {
             if (!handlers.Contains(handler)) handlers.Add(handler);
         }
 
-        public void Unregister(IClickDownHandler handler)
+        public void Unregister(ICustomClickDownHandler handler)
         {
             handlers.Remove(handler);
         }

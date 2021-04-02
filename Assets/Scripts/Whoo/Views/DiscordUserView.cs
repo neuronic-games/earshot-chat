@@ -39,47 +39,43 @@ namespace Whoo.Views
 
         private bool _triedLoadingAvatar = false;
 
-        public override void Refresh()
+        public async override UniTask Refresh()
         {
-            base.Refresh();
-            RefreshAsync().Forget();
+            await base.Refresh();
 
             //todo -- replace with custom avatar builder
 
-            async UniTaskVoid RefreshAsync()
+            #region Avatar
+
+            if (_triedLoadingAvatar) return;
+
+            #region Volume
+
+            UpdateSliderView();
+
+            #endregion
+
+            if (User.Equals(Room.RoomGroup.LocalUser))
             {
-                #region Avatar
-
-                if (_triedLoadingAvatar) return;
-
-                #region Volume
-
-                UpdateSliderView();
-
-                #endregion
-
-                if (User.Equals(_room.RoomGroup.LocalUser))
+                Profile profile = new Profile()
                 {
-                    Profile profile = new Profile()
-                    {
-                        id = Build.Settings.testerInfo.profileId
-                    };
-                    await profile.GetAsync();
-                    if (await strapiAvatar.LoadAvatar(profile.image.FirstOrDefault()?.url)) return;
+                    id = Build.Settings.testerInfo.profileId
+                };
+                await profile.GetAsync();
+                if (await strapiAvatar.LoadAvatar(profile.image.FirstOrDefault()?.url)) return;
 
-                    if (User is DiscordUser user)
-                    {
-                        _triedLoadingAvatar = true;
-                        avatar.LoadAvatar(user.DiscordUserId, user.App.ImageManager);
-                    }
-                }
-                else
+                if (User is DiscordUser user)
                 {
-                    Debug.LogWarning($"User that isn't a discord user attached to {nameof(DiscordUserView)}.");
+                    _triedLoadingAvatar = true;
+                    avatar.LoadAvatar(user.DiscordUserId, user.App.ImageManager);
                 }
-
-                #endregion
             }
+            else
+            {
+                Debug.LogWarning($"User that isn't a discord user attached to {nameof(DiscordUserView)}.");
+            }
+
+            #endregion
         }
 
         #region IPointerHandler

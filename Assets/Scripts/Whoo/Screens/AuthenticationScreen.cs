@@ -56,9 +56,9 @@ namespace Whoo.Screens
 
         private void Awake()
         {
-            loginWithDiscord.onClick.AddListener(() => LoginWithDiscord().Forget());
-            loginUsername.onClick.AddListener(() => LoginWithUsername().Forget());
-            registerUsername.onClick.AddListener(() => RegisterWithUsername().Forget());
+            loginWithDiscord.onClick.AddListener(() => LoginWithDiscord());
+            loginUsername.onClick.AddListener(() => LoginWithUsername());
+            registerUsername.onClick.AddListener(() => RegisterWithUsername());
         }
 
         public void Update()

@@ -56,7 +56,7 @@ public struct ExponentialBackoff<T>
             if (withCancellation)
             {
                 (cancelled, result) =
-                    await service.Invoke().WithCancellation(src.Token).SuppressCancellationThrow();
+                    await service.Invoke().AttachExternalCancellation(src.Token).SuppressCancellationThrow();
                 if (cancelled) return new Failable<T>();
             }
             else
@@ -72,7 +72,7 @@ public struct ExponentialBackoff<T>
             var delay = UniTask.Delay(TimeSpan.FromSeconds(wait));
             if (withCancellation)
             {
-                cancelled = await delay.WithCancellation(src.Token).SuppressCancellationThrow();
+                cancelled = await delay.AttachExternalCancellation(src.Token).SuppressCancellationThrow();
                 if (cancelled) return new Failable<T>();
             }
             else

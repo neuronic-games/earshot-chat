@@ -4,7 +4,6 @@ using System.ComponentModel;
 using AppLayer.NetworkGroups;
 using Cysharp.Threading.Tasks;
 using UI;
-using UI.UtilityElements;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
@@ -66,8 +65,7 @@ namespace Whoo.Views
         }
 
         #endregion
-
-
+        
         private void AssignUserViewsToProperContainers(INetworkGroup @group)
         {
             foreach (var (user, view) in _views)
