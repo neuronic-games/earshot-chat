@@ -377,7 +377,7 @@ namespace Whoo
         #endregion
     }
 
-    public struct JsonArray<T> : IDebugData
+    public class JsonArray<T> : IDebugData
     {
         public List<T> List;
         public string  Json { get; set; }
