@@ -57,6 +57,9 @@ namespace Whoo
         {
             var instance = Instance;
             instance.fadeOut.SetActive(true);
+            
+            if(_activeScreen == instance.startScreen)
+                return;
 
             if (_activeScreen != null)
                 await _activeScreen.Close();

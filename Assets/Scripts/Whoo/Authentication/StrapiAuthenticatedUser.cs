@@ -19,8 +19,7 @@ namespace Whoo
             return await UniTask.FromResult(!string.IsNullOrEmpty(Jwt)); //todo - mock api request
         }
 
-        public AuthTypes AuthType { get; set; }
-
+        public AuthTypes AuthType => AuthTypes.StrapiUsername;
         public async UniTask<bool> Detach()
         {
             StrapiUser = null;

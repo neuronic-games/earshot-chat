@@ -61,7 +61,8 @@ namespace Whoo
 
         public static async UniTask<Failable<AuthResponse>> LoginWithIdentifier(string usernameOrEmail, string password)
         {
-            string api = Endpoint.Base() + "auth/local";
+            //string api = Endpoint.Base() + "auth/local";
+            string api = "https://strapi.meetwhoo.com/auth/local";
 
             try
             {
@@ -93,7 +94,8 @@ namespace Whoo
         public static async UniTask<Failable<AuthResponse>> RegisterWithUsernameEmail(string username, string email,
             string                                                                           password)
         {
-            string api = Endpoint.Base() + "auth/local/register";
+            //string api = Endpoint.Base() + "auth/local/register";
+            string api = "https://strapi.meetwhoo.com/auth/local/register";
 
             try
             {
