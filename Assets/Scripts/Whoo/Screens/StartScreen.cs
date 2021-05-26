@@ -88,7 +88,7 @@ namespace Whoo.Screens
             }
         }
 
-        private async UniTaskVoid ToRoomScreenAsync(StrapiRoom room, INetworkGroup group, bool didCreate)
+        /*private async UniTaskVoid ToRoomScreenAsync(StrapiRoom room, INetworkGroup group, bool didCreate)
         {
             var (id, secret) = group.IdAndPassword;
 
@@ -105,6 +105,29 @@ namespace Whoo.Screens
                     }
                 }, string.Empty, Utils.StrapiModelSerializationDefaults());
             }
+
+            await room.RoomModel.EnsureHasZoneInstancedAsync();
+
+            Build.ToRoomScreen(room, group, didCreate).Forget();
+        }*/
+        
+        private async UniTaskVoid ToRoomScreenAsync(StrapiRoom room, bool didCreate, INetworkGroup group = null)
+        {
+            /*var (id, secret) = group.IdAndPassword;
+
+            var roomCredentials = room.RoomModel.room_credentials;
+            if (roomCredentials?.platform_id != id || roomCredentials?.platform_secret != secret)
+            {
+                await room.RoomModel.PutAsync(new RoomModel()
+                {
+                    room_credentials = new PlatformCredentials()
+                    {
+                        platform        = PlatformCredentials.Platform_Discord,
+                        platform_id     = id,
+                        platform_secret = secret
+                    }
+                }, string.Empty, Utils.StrapiModelSerializationDefaults());
+            }*/
 
             await room.RoomModel.EnsureHasZoneInstancedAsync();
 
@@ -145,18 +168,20 @@ namespace Whoo.Screens
         {
             _loading = false;
 
-            INetworkGroup group = await Utils.JoinGroup(room.RoomModel);
-            if (group == null)
-            {
-                StrapiPlatformInfoInvalid().Forget();
-            }
-            else
-            {
+            // todo: do we need this INetworkGroup since a user (maybe) should be added to a group when a zone is selected
+            //INetworkGroup group = await Utils.JoinGroup(room.RoomModel);
+            
+            // if (group == null)
+            // {
+            //     StrapiPlatformInfoInvalid().Forget();
+            // }
+            // else
+            // {
                 //successfully joined group
-                ToRoomScreenAsync(room, group, false).Forget();
-            }
+                ToRoomScreenAsync(room, false).Forget();
+            //}
 
-            async UniTaskVoid StrapiPlatformInfoInvalid()
+            /*async UniTaskVoid StrapiPlatformInfoInvalid()
             {
                 var profileId = Build.Settings.testerInfo.profileId;
                 if (room.RoomModel.owner != null && room.RoomModel.owner?.id == profileId)
@@ -176,10 +201,10 @@ namespace Whoo.Screens
                     ToRoomScreenAsync(room, group, true).Forget();
                 }
                 else
-                {
+                {*/
                     GoToWaitingLobby();
-                }
-            }
+                //}
+            //}
 
             void GoToWaitingLobby()
             {

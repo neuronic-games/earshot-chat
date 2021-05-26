@@ -318,14 +318,19 @@ namespace Whoo
             }
         }
 
+        // public static async UniTask<INetworkGroup> JoinGroup(RoomModel room)
+        // {
+        //     if (string.IsNullOrEmpty(room?.owner?.id))
+        //     {
+        //         Debug.LogWarning($"Room has no profile attached.");
+        //         return null;
+        //     }
+        //
+        //     return await Utils.JoinGroup(room.room_credentials);
+        // }
+        
         public static async UniTask<INetworkGroup> JoinGroup(RoomModel room)
         {
-            if (string.IsNullOrEmpty(room?.owner?.id))
-            {
-                Debug.LogWarning($"Room has no profile attached.");
-                return null;
-            }
-
             return await Utils.JoinGroup(room.room_credentials);
         }
 

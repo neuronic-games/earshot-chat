@@ -131,11 +131,12 @@ namespace Whoo
 
             async UniTask WrappedMethod()
             {
-                var roomUser = RoomGroup.LocalUser;
+                //var roomUser = RoomGroup.LocalUser;
                 LeaveCurrentGroup();
                 if (table == null)
                 {
-                    RoomGroup.SetOrDeleteCustomProperty(GroupProps.TableUserIsSittingAt(roomUser.UniqueId), null);
+                    //RoomGroup.SetOrDeleteCustomProperty(GroupProps.TableUserIsSittingAt(roomUser.UniqueId), null);
+                    RoomGroup.SetOrDeleteCustomProperty(GroupProps.TableUserIsSittingAt(String.Empty), null);
                     if (RoomGroup is IVoiceChannel roomVChannel) roomVChannel.ConnectVoice(null, null);
                     return;
                 }
@@ -193,7 +194,8 @@ namespace Whoo
                 }
 
                 CurrentSitting = tableGroup;
-                RoomGroup.SetOrDeleteCustomProperty(GroupProps.TableUserIsSittingAt(roomUser.UniqueId),
+                //RoomGroup.SetOrDeleteCustomProperty(GroupProps.TableUserIsSittingAt(roomUser.UniqueId),
+                RoomGroup.SetOrDeleteCustomProperty(GroupProps.TableUserIsSittingAt(String.Empty),
                     zone.id);
                 if (tableGroup is IVoiceChannel tableChannel) tableChannel.ConnectVoice(null, null);
 

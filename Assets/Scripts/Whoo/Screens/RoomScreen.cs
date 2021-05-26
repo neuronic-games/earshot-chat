@@ -72,7 +72,7 @@ namespace Whoo.Screens
 
             await base.Setup(settings);
             Assert.IsNotNull(settings.Room);
-            Assert.IsNotNull(settings.LobbyGroup);
+            //Assert.IsNotNull(settings.LobbyGroup);
             WhooRoom = new WhooRoom(settings.Room, settings.LobbyGroup);
 
             WhooRoom.PropertyChanged += OnWhooRoomChanged;
@@ -97,7 +97,7 @@ namespace Whoo.Screens
         /// </summary>
         public override async UniTask Refresh()
         {
-            if (WhooRoom == null || !WhooRoom.RoomGroup.IsAlive)
+            if (WhooRoom == null)// || !WhooRoom.RoomGroup.IsAlive)
             {
                 await Close();
             }
