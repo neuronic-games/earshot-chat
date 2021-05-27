@@ -336,7 +336,7 @@ namespace Whoo
 
         public static async Task<INetworkGroup> JoinGroup(PlatformCredentials roomCreds)
         {
-            if (roomCreds == null || string.IsNullOrEmpty(roomCreds.platform_id) ||
+            /*if (roomCreds == null || string.IsNullOrEmpty(roomCreds.platform_id) ||
                 string.IsNullOrEmpty(roomCreds.platform_secret))
             {
                 return null;
@@ -346,9 +346,9 @@ namespace Whoo
             {
                 Debug.Log($"'{roomCreds.platform_id}' is not parseable to type long.");
                 return null;
-            }
+            }*/
 
-            return await Utils.JoinGroup(groupId, roomCreds.platform_secret);
+            return await Utils.JoinGroup(0, roomCreds.platform_secret);
         }
 
         public static string GetTableMetaDataKey(int i) => $"Table{i}";

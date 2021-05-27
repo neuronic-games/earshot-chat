@@ -131,15 +131,15 @@ namespace Whoo
 
             async UniTask WrappedMethod()
             {
-                //var roomUser = RoomGroup.LocalUser;
+                var roomUser = RoomGroup?.LocalUser;
                 LeaveCurrentGroup();
-                if (table == null)
+                /*if (table == null)
                 {
                     //RoomGroup.SetOrDeleteCustomProperty(GroupProps.TableUserIsSittingAt(roomUser.UniqueId), null);
-                    RoomGroup.SetOrDeleteCustomProperty(GroupProps.TableUserIsSittingAt(String.Empty), null);
+                    RoomGroup?.SetOrDeleteCustomProperty(GroupProps.TableUserIsSittingAt(String.Empty), null);
                     if (RoomGroup is IVoiceChannel roomVChannel) roomVChannel.ConnectVoice(null, null);
                     return;
-                }
+                }*/
 
                 var tableGroup = await Utils.JoinGroup(table.ZoneInstance.credentials);
                 var zone       = table.ZoneInstance.zone;
