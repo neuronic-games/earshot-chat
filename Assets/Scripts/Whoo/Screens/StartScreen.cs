@@ -166,6 +166,9 @@ namespace Whoo.Screens
 
         public async UniTaskVoid JoinRoomAsync(StrapiRoom room)
         {
+            
+            
+            
             _loading = false;
 
             // todo: do we need this INetworkGroup since a user (maybe) should be added to a group when a zone is selected
@@ -202,7 +205,7 @@ namespace Whoo.Screens
                 }
                 else
                 {*/
-                    GoToWaitingLobby();
+                    //GoToWaitingLobby();
                 //}
             //}
 
