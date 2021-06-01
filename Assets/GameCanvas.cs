@@ -7,14 +7,14 @@ using UnityEngine;
 
 public class GameCanvas : NetworkBehaviour
 {
-    public Action Clap;
+    public Action<bool> Clap;
 
     
 
 
     public void HandleClap()
     {
-        Clap?.Invoke();
+        Clap?.Invoke(true);
     }
 
     

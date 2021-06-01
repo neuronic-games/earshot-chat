@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using UnityEngine;
 using MLAPI;
 using MLAPI.NetworkVariable;
@@ -35,29 +36,20 @@ public class Player : NetworkBehaviour
             MovePlayer();
         }
 
-        clapIcon.SetActive(claping.Value);
-        
+        clapIcon.SetActive(claping.Value); 
     }
     
     private void OnEnable()
     {
         gameCanvas.Clap += ToggleClapping;
-        claping.OnValueChanged += ClapingChanged;
     }
 
     private void OnDisable()
     {
         gameCanvas.Clap -= ToggleClapping;
-        claping.OnValueChanged -= ClapingChanged;
     }
     
-    private void ClapingChanged(bool oldValue, bool newValue)
-    {
-        if (IsLocalPlayer)
-        {
-            
-        }
-    }
+    
 
     void MovePlayer()
     {
@@ -66,11 +58,24 @@ public class Player : NetworkBehaviour
         cc.SimpleMove(move * 5f);
     }
 
-    private void ToggleClapping()
+    private void ToggleClapping(bool playerIsClaping)
     {
         if (IsLocalPlayer)
         {
-            claping.Value = true;
+            claping.Value = playerIsClaping;
         }
+
+        if (playerIsClaping)
+        {
+            StartCoroutine(TurnClapIconOff());
+            // start claping animation
+        }
+    }
+
+    IEnumerator TurnClapIconOff()
+    {
+        yield return new WaitForSeconds(10f);
+        claping.Value = false;
+        clapIcon.SetActive(claping.Value);
     }
 }

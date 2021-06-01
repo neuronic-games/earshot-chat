@@ -8,7 +8,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scene/Main Test Scene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
-  - enabled: 1
+  - enabled: 0
     path: Assets/Mumble-Unity/Example.unity
     guid: d5790a4593162bc43972b2ce320e1f5d
+  - enabled: 1
+    path: Assets/Scene/MLAPI test.unity
+    guid: 01702255470f9c642b03d2bd502f29d1
   m_configObjects: {}
