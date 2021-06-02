@@ -218,7 +218,7 @@ namespace Whoo.Screens
         
         private void Start()
         {
-            netSpawner.InstantiateAvatarServerRpc(parent);
+            netSpawner.InstantiateAvatar(parent);
             Debug.Log("Instantiate an avatar");
         }
 

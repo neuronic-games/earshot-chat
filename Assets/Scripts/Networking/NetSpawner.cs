@@ -7,12 +7,19 @@ namespace Networking
     public class NetSpawner : NetworkBehaviour
     {
         [SerializeField] private GameObject avatar;
+        private Transform incomeParent;
+
+        public void InstantiateAvatar(Transform parent)
+        {
+            incomeParent = parent;
+            InstantiateAvatarServerRpc();
+        }
         
         [ServerRpc]
-        public void InstantiateAvatarServerRpc(Transform parent)
+        private void InstantiateAvatarServerRpc()
         {
             GameObject go = Instantiate(avatar, Vector3.zero, Quaternion.identity);
-            go.transform.SetParent(parent);
+            go.transform.SetParent(incomeParent);
             go.GetComponent<NetworkObject>().SpawnAsPlayerObject(NetworkManager.Singleton.LocalClientId);
         }
     }
