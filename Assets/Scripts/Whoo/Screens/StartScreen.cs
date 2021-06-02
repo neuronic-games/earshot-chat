@@ -3,6 +3,7 @@ using System.Diagnostics;
 using AppLayer.NetworkGroups;
 using Cysharp.Threading.Tasks;
 using MLAPI;
+using MLAPI.Configuration;
 using TMPro;
 using UI.Dialogs;
 using UnityEngine;
@@ -17,11 +18,7 @@ namespace Whoo.Screens
     {
         #region Serializable
 
-        
-
-        [Header("Joining")]
-        
-        public Button joinButton;
+        [Header("Joining")] public Button joinButton;
 
         public LayoutSelectorScreen layoutSelector;
 
@@ -38,17 +35,17 @@ namespace Whoo.Screens
         public void Awake()
         {
             yourRooms.onClick.AddListener(() => DisplayUserRoomsAsync().Forget());
+
             joinButton.onClick.AddListener(JoinRoom);
             makeRoomButton.onClick.AddListener(MakeRoom);
         }
 
-        
 
         #region Screen
 
         public override async UniTask Setup()
         {
-            _loading           = false;
+            _loading = false;
             joinRoomInput.text = string.Empty;
             await layoutSelector.Hide();
             await roomSelector.Hide();
@@ -66,7 +63,7 @@ namespace Whoo.Screens
             var settings = new RoomSelectorScreen.Settings()
             {
                 OnSelected = _MakeRoom,
-                ProfileId  = Build.Settings.testerInfo.profileId
+                ProfileId = Build.Settings.testerInfo.profileId
             };
             await roomSelector.Setup(settings);
             await roomSelector.Display();
@@ -83,6 +80,9 @@ namespace Whoo.Screens
 
         public void MakeRoom()
         {
+            NetworkManager.Singleton.StartHost(null, null, false, null, null);
+
+
             if (_loading) return;
             var settings = new LayoutSelectorScreen.Settings() {OnSelected = _MakeRoom};
             layoutSelector.Setup(settings).Forget();
@@ -93,8 +93,6 @@ namespace Whoo.Screens
                 _loading = true;
                 StrapiRoom room = await StrapiRoom.CreateNew(layout, Build.Settings.testerInfo.profileId);
                 JoinRoomAsync(room).Forget();
-                
-                
             }
         }
 
@@ -120,7 +118,7 @@ namespace Whoo.Screens
 
             Build.ToRoomScreen(room, group, didCreate).Forget();
         }*/
-        
+
         private async UniTaskVoid ToRoomScreenAsync(StrapiRoom room, bool didCreate, INetworkGroup group = null)
         {
             /*var (id, secret) = group.IdAndPassword;
@@ -146,6 +144,7 @@ namespace Whoo.Screens
 
         private void JoinRoom()
         {
+            NetworkManager.Singleton.StartClient();
             JoinRoomAsync().Forget();
         }
 
@@ -154,44 +153,41 @@ namespace Whoo.Screens
             //TODO
             if (_loading) return;
 
-            string roomId    = joinRoomInput.text;
-            var    roomModel = new RoomModel() {id = roomId};
-            try
-            {
-                await (roomModel.GetAsync());
-            }
-            catch
-            {
-                //wrong room id
-                Dialog.Get().
-                       RequestInfo("Unable To Join", "The room id entered is invalid. Please check it again.",
-                           DialogStyle.Info,         null);
-                return;
-            }
-
+            // todo vz: consider to grab IP:port from url in the provided text field if the latter is provided
+            // string roomId = joinRoomInput.text;
+            // var roomModel = new RoomModel() {id = roomId};
+            // try
+            // {
+            //     await (roomModel.GetAsync());
+            // }
+            // catch
+            // {
+            //     //wrong room id
+            //     Dialog.Get().RequestInfo("Unable To Join", "The room id entered is invalid. Please check it again.",
+            //         DialogStyle.Info, null);
+            //     return;
+            // }
+            //
             StrapiRoom room = new StrapiRoom();
-            await room.LoadRoom(roomModel.id);
+            // await room.LoadRoom(roomModel.id);
             JoinRoomAsync(room).Forget();
         }
 
         public async UniTaskVoid JoinRoomAsync(StrapiRoom room)
         {
-            
-            
-            
             _loading = false;
 
             // todo: do we need this INetworkGroup since a user (maybe) should be added to a group when a zone is selected
             //INetworkGroup group = await Utils.JoinGroup(room.RoomModel);
-            
+
             // if (group == null)
             // {
             //     StrapiPlatformInfoInvalid().Forget();
             // }
             // else
             // {
-                //successfully joined group
-                ToRoomScreenAsync(room, false).Forget();
+            //successfully joined group
+            ToRoomScreenAsync(room, false).Forget();
             //}
 
             /*async UniTaskVoid StrapiPlatformInfoInvalid()
@@ -215,8 +211,8 @@ namespace Whoo.Screens
                 }
                 else
                 {*/
-                    //GoToWaitingLobby();
-                //}
+            //GoToWaitingLobby();
+            //}
             //}
 
             void GoToWaitingLobby()

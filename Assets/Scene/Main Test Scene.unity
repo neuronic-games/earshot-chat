@@ -1046,7 +1046,7 @@ MonoBehaviour:
     NetworkPrefabs:
     - Prefab: {fileID: 594658681373426315, guid: f52494fecdd223e469f7bee86dfec405,
         type: 3}
-      PlayerPrefab: 1
+      PlayerPrefab: 0
     PlayerPrefabHash:
       id: 0
     CreatePlayerPrefab: 1
@@ -1075,9 +1075,7 @@ MonoBehaviour:
   references:
     version: 1
     00000000:
-      type: {class: NullableBoolSerializable, ns: MLAPI.Configuration, asm: Unity.Multiplayer.MLAPI.Runtime}
-      data:
-        Value: 14800709582101272679
+      type: {class: , ns: , asm: }
 --- !u!4 &793440254
 Transform:
   m_ObjectHideFlags: 0
@@ -3465,7 +3463,7 @@ PrefabInstance:
     - target: {fileID: 242485765928095156, guid: ead51f3c1a14a6f47b9b74ad956f720f,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 67.165
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 242485765928095156, guid: ead51f3c1a14a6f47b9b74ad956f720f,
         type: 3}
@@ -3674,12 +3672,12 @@ PrefabInstance:
     - target: {fileID: 8234512799558291795, guid: e95d98da61ac5004fa33cfeda33e4bb0,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8234512799558291795, guid: e95d98da61ac5004fa33cfeda33e4bb0,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8234512799558291795, guid: e95d98da61ac5004fa33cfeda33e4bb0,
         type: 3}
