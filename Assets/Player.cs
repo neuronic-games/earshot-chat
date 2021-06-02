@@ -75,7 +75,6 @@ public class Player : NetworkBehaviour
     IEnumerator TurnClapIconOff()
     {
         yield return new WaitForSeconds(10f);
-        claping.Value = false;
-        clapIcon.SetActive(claping.Value);
+        ToggleClapping(false);
     }
 }
