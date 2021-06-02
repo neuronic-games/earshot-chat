@@ -141,7 +141,7 @@ namespace Whoo
                     return;
                 }*/
 
-                var tableGroup = await Utils.JoinGroup(table.ZoneInstance.credentials);
+                var tableGroup = await Utils.JoinGroup(table?.ZoneInstance.credentials);
                 var zone       = table.ZoneInstance.zone;
                 //todo -- keep history of tables last joined.
                 if (tableGroup == null)

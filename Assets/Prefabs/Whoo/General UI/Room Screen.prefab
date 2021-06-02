@@ -261,6 +261,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df17183451da4fdcbeef970edea47128, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  avatar: {fileID: 594658681373426315, guid: f52494fecdd223e469f7bee86dfec405, type: 3}
+  parent: {fileID: 2834008574121606534}
   roomView: {fileID: 6391234117961770180}
   leaveRoomButton: {fileID: 2834008572398103212}
   settingsButton: {fileID: 2834008574223166630}
@@ -301,7 +303,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2834008573038083475
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1253,7 +1255,7 @@ MonoBehaviour:
   fadeOnEnable: 1
   interactableOnEnable: 1
   blockRaycastsOnEnable: 1
-  endAction: 1
+  defaultEndAction: 1
   invokeAction:
     m_PersistentCalls:
       m_Calls: []
@@ -1563,7 +1565,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

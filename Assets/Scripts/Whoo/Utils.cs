@@ -348,7 +348,7 @@ namespace Whoo
                 return null;
             }*/
 
-            return await Utils.JoinGroup(0, roomCreds.platform_secret);
+            return await Utils.JoinGroup(0, roomCreds?.platform_secret);
         }
 
         public static string GetTableMetaDataKey(int i) => $"Table{i}";

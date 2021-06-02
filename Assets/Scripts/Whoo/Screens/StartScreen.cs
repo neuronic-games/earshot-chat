@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Diagnostics;
 using AppLayer.NetworkGroups;
 using Cysharp.Threading.Tasks;
+using MLAPI;
 using TMPro;
 using UI.Dialogs;
 using UnityEngine;
 using UnityEngine.UI;
 using Whoo.Data;
+using Debug = UnityEngine.Debug;
 using Screen = UI.Screens.Screen;
 
 namespace Whoo.Screens
@@ -14,7 +17,10 @@ namespace Whoo.Screens
     {
         #region Serializable
 
+        
+
         [Header("Joining")]
+        
         public Button joinButton;
 
         public LayoutSelectorScreen layoutSelector;
@@ -35,6 +41,8 @@ namespace Whoo.Screens
             joinButton.onClick.AddListener(JoinRoom);
             makeRoomButton.onClick.AddListener(MakeRoom);
         }
+
+        
 
         #region Screen
 
@@ -85,6 +93,8 @@ namespace Whoo.Screens
                 _loading = true;
                 StrapiRoom room = await StrapiRoom.CreateNew(layout, Build.Settings.testerInfo.profileId);
                 JoinRoomAsync(room).Forget();
+                
+                
             }
         }
 
