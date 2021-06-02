@@ -154,22 +154,22 @@ namespace Whoo.Screens
             if (_loading) return;
 
             // todo vz: consider to grab IP:port from url in the provided text field if the latter is provided
-            // string roomId = joinRoomInput.text;
-            // var roomModel = new RoomModel() {id = roomId};
-            // try
-            // {
-            //     await (roomModel.GetAsync());
-            // }
-            // catch
-            // {
-            //     //wrong room id
-            //     Dialog.Get().RequestInfo("Unable To Join", "The room id entered is invalid. Please check it again.",
-            //         DialogStyle.Info, null);
-            //     return;
-            // }
-            //
+            string roomId = joinRoomInput.text;
+            var roomModel = new RoomModel() {id = roomId};
+            try
+            {
+                await (roomModel.GetAsync());
+            }
+            catch
+            {
+                //wrong room id
+                Dialog.Get().RequestInfo("Unable To Join", "The room id entered is invalid. Please check it again.",
+                    DialogStyle.Info, null);
+                return;
+            }
+            
             StrapiRoom room = new StrapiRoom();
-            // await room.LoadRoom(roomModel.id);
+            await room.LoadRoom(roomModel.id);
             JoinRoomAsync(room).Forget();
         }
 

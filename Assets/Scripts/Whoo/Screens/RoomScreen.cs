@@ -7,6 +7,8 @@ using AppLayer.NetworkGroups;
 using Cysharp.Threading.Tasks;
 using DiscordAppLayer;
 using MLAPI;
+using MLAPI.Messaging;
+using Networking;
 using UI;
 using UI.Screens;
 using UnityEngine;
@@ -22,8 +24,8 @@ namespace Whoo.Screens
     {
         #region Serialized
 
-        [SerializeField] private GameObject avatar;
         [SerializeField] private Transform parent;
+        private NetSpawner netSpawner;
         
         [SerializeField]
         private RoomView roomView = null;
@@ -211,13 +213,12 @@ namespace Whoo.Screens
         {
             leaveRoomButton.onClick.AddListener(ResetWhooRoom);
             settingsButton.onClick.AddListener(OpenSettingsPanel);
+            netSpawner = FindObjectOfType<NetSpawner>();
         }
         
         private void Start()
         {
-            GameObject go = Instantiate(avatar, Vector3.zero, Quaternion.identity);
-            go.transform.SetParent(parent);
-            go.GetComponent<NetworkObject>().Spawn();
+            netSpawner.InstantiateAvatarServerRpc(parent);
             Debug.Log("Instantiate an avatar");
         }
 

@@ -80,7 +80,7 @@ namespace Whoo.Data
             }, string.Empty, Utils.StrapiModelSerializationDefaults());
             await model.EnsureHasZoneInstancedAsync();
             StrapiRoom room = new StrapiRoom();
-            await room.LoadRoom(model.id);
+            await room.LoadRoom(model.id); //todo vz: grab this id
             return room;
         }
     }
