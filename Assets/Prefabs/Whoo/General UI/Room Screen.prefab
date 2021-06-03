@@ -261,7 +261,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df17183451da4fdcbeef970edea47128, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  avatar: {fileID: 594658681373426315, guid: f52494fecdd223e469f7bee86dfec405, type: 3}
   parent: {fileID: 2834008574121606534}
   roomView: {fileID: 6391234117961770180}
   leaveRoomButton: {fileID: 2834008572398103212}
@@ -1330,7 +1329,7 @@ MonoBehaviour:
   m_ChildAlignment: 1
   m_Spacing: 20
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 0
+  m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 1
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0

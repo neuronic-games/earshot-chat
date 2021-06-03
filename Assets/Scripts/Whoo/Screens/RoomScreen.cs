@@ -60,6 +60,7 @@ namespace Whoo.Screens
 
         private Dictionary<WhooTable, TableView> _tableViews = new Dictionary<WhooTable, TableView>();
         private HashSet<WhooTable>               _toRemove   = new HashSet<WhooTable>();
+        
 
         #endregion
 
@@ -213,13 +214,13 @@ namespace Whoo.Screens
         {
             leaveRoomButton.onClick.AddListener(ResetWhooRoom);
             settingsButton.onClick.AddListener(OpenSettingsPanel);
+            
             netSpawner = FindObjectOfType<NetSpawner>();
         }
         
         private void Start()
         {
-            netSpawner.InstantiateAvatar(parent);
-            Debug.Log("Instantiate an avatar");
+            //netSpawner.FindAvatars(parent);
         }
 
         private float _lastRefresh;

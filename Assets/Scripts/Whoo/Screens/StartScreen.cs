@@ -80,7 +80,7 @@ namespace Whoo.Screens
 
         public void MakeRoom()
         {
-            NetworkManager.Singleton.StartHost(null, null, false, null, null);
+            NetworkManager.Singleton.StartHost();
 
 
             if (_loading) return;

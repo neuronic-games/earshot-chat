@@ -908,6 +908,7 @@ GameObject:
   m_Component:
   - component: {fileID: 629119374}
   - component: {fileID: 629119373}
+  - component: {fileID: 629119375}
   m_Layer: 0
   m_Name: NetSpawner
   m_TagString: Untagged
@@ -927,7 +928,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b29e707aff644380aaa1dfb5fe0f79a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  avatar: {fileID: 594658681373426315, guid: f52494fecdd223e469f7bee86dfec405, type: 3}
 --- !u!4 &629119374
 Transform:
   m_ObjectHideFlags: 0
@@ -942,6 +942,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &629119375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 629119372}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NetworkInstanceId: 0
+  PrefabHash: 4136996048911424614
+  PrefabHashGenerator: NetSpawner
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
 --- !u!224 &635023245 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 242485765080155933, guid: ead51f3c1a14a6f47b9b74ad956f720f,
@@ -1088,12 +1105,12 @@ MonoBehaviour:
     - Main Test Scene
     AllowRuntimeSceneChanges: 0
     NetworkPrefabs:
-    - Prefab: {fileID: 594658681373426315, guid: f52494fecdd223e469f7bee86dfec405,
+    - Prefab: {fileID: 4134997720950783392, guid: d6784af0f6b2f3843abba5bc7e6aa01c,
         type: 3}
       PlayerPrefab: 1
     PlayerPrefabHash:
       id: 0
-    CreatePlayerPrefab: 0
+    CreatePlayerPrefab: 1
     ReceiveTickrate: 64
     NetworkTickIntervalSec: 0.05
     MaxReceiveEventsPerTickRate: 500
@@ -1121,7 +1138,7 @@ MonoBehaviour:
     00000000:
       type: {class: NullableBoolSerializable, ns: MLAPI.Configuration, asm: Unity.Multiplayer.MLAPI.Runtime}
       data:
-        Value: 14800709582101272679
+        Value: 17923214653976870421
 --- !u!4 &793440254
 Transform:
   m_ObjectHideFlags: 0
@@ -3718,12 +3735,12 @@ PrefabInstance:
     - target: {fileID: 8234512799558291795, guid: e95d98da61ac5004fa33cfeda33e4bb0,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8234512799558291795, guid: e95d98da61ac5004fa33cfeda33e4bb0,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8234512799558291795, guid: e95d98da61ac5004fa33cfeda33e4bb0,
         type: 3}

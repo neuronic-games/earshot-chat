@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace Whoo.Data
 {
@@ -81,6 +82,7 @@ namespace Whoo.Data
             await model.EnsureHasZoneInstancedAsync();
             StrapiRoom room = new StrapiRoom();
             await room.LoadRoom(model.id); //todo vz: grab this id
+            Debug.Log("Room ID: " + model.id);
             return room;
         }
     }
