@@ -4,6 +4,7 @@ using AppLayer.NetworkGroups;
 using Cysharp.Threading.Tasks;
 using MLAPI;
 using MLAPI.Configuration;
+using Networking;
 using TMPro;
 using UI.Dialogs;
 using UnityEngine;
@@ -80,7 +81,7 @@ namespace Whoo.Screens
 
         public void MakeRoom()
         {
-            NetworkManager.Singleton.StartHost();
+            
 
 
             if (_loading) return;
@@ -91,6 +92,7 @@ namespace Whoo.Screens
             async UniTaskVoid _MakeRoom(Layout layout)
             {
                 _loading = true;
+                NetLauncher.StartHost();
                 StrapiRoom room = await StrapiRoom.CreateNew(layout, Build.Settings.testerInfo.profileId);
                 JoinRoomAsync(room).Forget();
             }
@@ -144,7 +146,7 @@ namespace Whoo.Screens
 
         private void JoinRoom()
         {
-            NetworkManager.Singleton.StartClient();
+            NetLauncher.StartClient();
             JoinRoomAsync().Forget();
         }
 
