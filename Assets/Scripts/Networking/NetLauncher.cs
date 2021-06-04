@@ -20,7 +20,8 @@ namespace Networking
         {
             if (IsOwner)
             {
-                // find a player and deactivate it
+                var clientId = NetworkManager.Singleton.LocalClientId;
+                NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject.SetActive(false);
             }
         }
     }

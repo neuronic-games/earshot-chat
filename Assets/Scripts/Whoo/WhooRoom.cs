@@ -146,8 +146,8 @@ namespace Whoo
                 //todo -- keep history of tables last joined.
                 if (tableGroup == null)
                 {
-                    var capacity = zone.proximity
-                        ? table.WhooRoom.StrapiRoom.RoomModel.layout.capacity
+                    var capacity = /*zone.proximity*/ true 
+                        ? table?.WhooRoom.StrapiRoom.RoomModel.layout.capacity
                         : zone.seats.Count * 2;
 
                     var failableTable = await new ExponentialBackoff<INetworkGroup>().Try(async () =>
