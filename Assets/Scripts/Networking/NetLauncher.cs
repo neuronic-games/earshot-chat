@@ -1,27 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using MLAPI;
+using UnityEngine;
 
 namespace Networking
 {
     public class NetLauncher : NetworkBehaviour
     {
-        private static readonly List<AvatarPlayer> _avatarPlayers = new List<AvatarPlayer>();
+        public static readonly List<AvatarPlayer> AvatarPlayers = new List<AvatarPlayer>();
+    
+        private void Awake()
+        {
+            throw new NotImplementedException();
+        }
 
-        public Action<List<AvatarPlayer>> AddedAvatarPlayer;
-        
-        public static void StartHost()
+        public void StartHost()
         {
             NetworkManager.Singleton.StartHost();
             //SetPlayerInactive();
-            //AddPlayerToList();
+            AddPlayerToList();
         }
 
-        public static void StartClient()
+        public void StartClient()
         {
             NetworkManager.Singleton.StartClient();
             //SetPlayerInactive();
-            //AddPlayerToList();
+            AddPlayerToList();
         }
 
         private void SetPlayerInactive()
@@ -37,8 +41,7 @@ namespace Networking
         {
             var clientId = NetworkManager.Singleton.LocalClientId;
             var avatarPlayerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject.GetComponent<AvatarPlayer>();
-            _avatarPlayers.Add(avatarPlayerObject);
-            AddedAvatarPlayer?.Invoke(_avatarPlayers);
+            AvatarPlayers.Add(avatarPlayerObject);
         }
     }
 }

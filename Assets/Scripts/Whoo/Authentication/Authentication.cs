@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Networking;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -72,6 +73,7 @@ namespace Whoo
                         identifier = usernameOrEmail,
                         password   = password
                     });
+                UserDTO.Username = response.user.username;
                 return new Failable<AuthResponse>(response);
             }
             catch (UnityWebRequestException webreq)

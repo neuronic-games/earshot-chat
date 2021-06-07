@@ -179,6 +179,7 @@ GameObject:
   - component: {fileID: 2834008572589149171}
   - component: {fileID: 2834008572589149173}
   - component: {fileID: 4988778231290550373}
+  - component: {fileID: 6759719322807505458}
   m_Layer: 5
   m_Name: Room Screen
   m_TagString: Untagged
@@ -284,6 +285,21 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
   m_EffectDistance: {x: 3, y: 3}
   m_UseGraphicAlpha: 1
+--- !u!114 &6759719322807505458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2834008572589149169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3819b14beade41aea03a5275fab816b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  avatarViewPrefab: {fileID: 4387873851068781925, guid: f5ab215abc94609428cd1635846e7fbb,
+    type: 3}
+  parent: {fileID: 2834008574121606534}
 --- !u!1 &2834008573038083472
 GameObject:
   m_ObjectHideFlags: 0
@@ -658,8 +674,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 5, y: 0}
-  m_SizeDelta: {x: 100, y: -40}
+  m_AnchoredPosition: {x: 5, y: 7}
+  m_SizeDelta: {x: 100, y: -26}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &2834008573640990515
 CanvasRenderer:
