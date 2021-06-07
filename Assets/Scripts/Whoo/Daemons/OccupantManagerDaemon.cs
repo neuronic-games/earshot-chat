@@ -50,6 +50,8 @@ namespace Whoo.Daemons
             // 1. To keep without modification
             // 2. To remove from occupants (left in group)
             // 3. To add to occupants (newly joined)
+            
+            Debug.Log(Room.RoomGroup.Members.Count);
             for (var i = 0; i < Room.RoomGroup.Members.Count; i++)
             {
                 var member   = Room.RoomGroup.Members[i];

@@ -1,7 +1,14 @@
-﻿namespace Networking
+﻿using Discord;
+
+namespace Networking
 {
     public class UserDTO
     {
-        public static string Username { get; set; }
+        public string Username { get; set; }
+
+        public UserDTO(string username)
+        {
+            Username = username;
+        }
     }
 }

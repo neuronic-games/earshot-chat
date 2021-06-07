@@ -1,61 +1,52 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using MLAPI;
 using MLAPI.Messaging;
+using MLAPI.NetworkVariable;
+using MLAPI.NetworkVariable.Collections;
+using MumbleProto;
 using UnityEngine;
+using Whoo;
 
 namespace Networking
 {
-    public class NetSpawner : NetworkBehaviour
+    public class NetSpawner : NetworkBehaviour // todo vz consider to rename this class 
     {
-        //[SerializeField] private GameObject avatar;
-        private GameObject avatarObject;
-        private List<UserAvatar> _avatars = new List<UserAvatar>();
-        private Transform _contentParent;
+        private List<UserDTO> _userDtos = new List<UserDTO>();
 
-        public void InstantiateAvatar(Transform parent)
+        public List<UserDTO> UserDtos => _userDtos;  // is not being synchronized    
+        public NetworkVariableString NameOfNewUser 
+            = new NetworkVariableString(new NetworkVariableSettings() { WritePermission = NetworkVariablePermission.Everyone },"username");
+
+        private void OnEnable()
         {
-           // avatarObject = Instantiate(avatar, Vector3.zero, Quaternion.identity);
-            avatarObject.transform.SetParent(parent);
-            //InstantiateAvatarServerRpc();
+            NameOfNewUser.OnValueChanged += AddToList;
         }
 
-        public void FindAvatars(Transform parent)
+        private void OnDisable()
         {
-            _contentParent = parent;
-            _avatars = FindObjectsOfType<UserAvatar>().ToList();
-            PopulateLobby();
+            NameOfNewUser.OnValueChanged -= AddToList;
         }
 
-        [ServerRpc]
-        private void PopulateLobbyServerRpc()
+        public void ChangeNetworkVarUsername()
         {
-            if (IsServer)
-            {
-                foreach (var avatar in _avatars)
-                {
-                    avatar.gameObject.transform.SetParent(_contentParent, false);
-                }
-            }
+           NameOfNewUser.Value = Authentication.UserDTO.Username;
         }
-        
-        private void PopulateLobby()
+
+
+        void AddToList(string p, string n)
         {
-            foreach (var avatar in _avatars)
-            {
-                if (IsOwner)
-                {
-                    avatar.gameObject.transform.SetParent(_contentParent);
-                }
-                
-            }
+            Debug.Log("Next " + n);
             
+             _userDtos.Add(new UserDTO(n));
+             foreach (var userDTO in _userDtos)
+             {
+                 Debug.Log("From List: " + userDTO.Username);
+             }
+             
+             
         }
 
-        [ServerRpc]
-        private void InstantiateAvatarServerRpc()
-        {
-            avatarObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(NetworkManager.Singleton.LocalClientId);
-        }
     }
 }

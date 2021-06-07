@@ -32,6 +32,7 @@ namespace Whoo.Screens
         public TMP_InputField joinRoomInput;
 
         private NetLauncher _netLauncher;
+        private NetSpawner _netSpawner;
 
         #endregion
 
@@ -42,6 +43,7 @@ namespace Whoo.Screens
             joinButton.onClick.AddListener(JoinRoom);
             makeRoomButton.onClick.AddListener(MakeRoom);
             _netLauncher = FindObjectOfType<NetLauncher>();
+            _netSpawner = FindObjectOfType<NetSpawner>();
         }
 
 
@@ -96,6 +98,7 @@ namespace Whoo.Screens
             {
                 _loading = true;
                 _netLauncher.StartHost();
+                _netSpawner.ChangeNetworkVarUsername();
                 StrapiRoom room = await StrapiRoom.CreateNew(layout, Build.Settings.testerInfo.profileId);
                 JoinRoomAsync(room).Forget();
             }
@@ -150,6 +153,7 @@ namespace Whoo.Screens
         private void JoinRoom()
         {
             _netLauncher.StartClient();
+            _netSpawner.ChangeNetworkVarUsername();
             JoinRoomAsync().Forget();
         }
 

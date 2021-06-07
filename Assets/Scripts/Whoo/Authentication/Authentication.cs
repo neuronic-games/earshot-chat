@@ -56,12 +56,14 @@ namespace Whoo
             public double timestamp;
         }
 
+        public static UserDTO UserDTO { get; set; }
         #endregion
 
         #region Public Methods
 
         public static async UniTask<Failable<AuthResponse>> LoginWithIdentifier(string usernameOrEmail, string password)
         {
+            
             //string api = Endpoint.Base() + "auth/local";
             string api = "https://strapi.meetwhoo.com/auth/local";
 
@@ -73,7 +75,10 @@ namespace Whoo
                         identifier = usernameOrEmail,
                         password   = password
                     });
-                UserDTO.Username = response.user.username;
+                
+                
+                UserDTO = new UserDTO(response.user.username);
+                
                 return new Failable<AuthResponse>(response);
             }
             catch (UnityWebRequestException webreq)

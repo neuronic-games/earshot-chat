@@ -25,7 +25,7 @@ namespace Whoo.Screens
         #region Serialized
 
         [SerializeField] private Transform parent;
-        private NetSpawner netSpawner;
+        //private NetSpawner netSpawner;
         
         [SerializeField]
         private RoomView roomView = null;
@@ -215,7 +215,7 @@ namespace Whoo.Screens
             leaveRoomButton.onClick.AddListener(ResetWhooRoom);
             settingsButton.onClick.AddListener(OpenSettingsPanel);
             
-            netSpawner = FindObjectOfType<NetSpawner>();
+            //netSpawner = FindObjectOfType<NetSpawner>();
         }
         
         private void Start()

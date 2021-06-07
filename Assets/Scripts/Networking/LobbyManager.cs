@@ -13,20 +13,31 @@ namespace Networking
         
         private Text _name;
         private GameObject _avatarImage;
+        private NetSpawner _netSpawner;
 
         private void Start()
         {
+            _netSpawner = FindObjectOfType<NetSpawner>();
             PopulateLobby();
         }
 
         private void PopulateLobby()
         {
-            Debug.Log("Avatar players count " + NetLauncher.AvatarPlayers.Count);
-            var avatarViewObject = Instantiate(avatarViewPrefab, Vector3.zero, Quaternion.identity);
-           
-            avatarViewObject.transform.SetParent(parent); 
-            var tmp = avatarViewObject.GetComponentInChildren<TextMeshProUGUI>();
-            tmp.text = UserDTO.Username;
+            Debug.Log(_netSpawner.UserDtos.Count);
+            foreach (var userDTO in _netSpawner.UserDtos)
+            {
+                Debug.Log(userDTO.Username);
+                var avatarViewObject = Instantiate(avatarViewPrefab, Vector3.zero, Quaternion.identity);
+
+                avatarViewObject.transform.SetParent(parent);
+                var tmp = avatarViewObject.GetComponentInChildren<TextMeshProUGUI>();
+                tmp.text = userDTO.Username;
+            }
+            
+            
+            
+            
+            
         }
     }
 }

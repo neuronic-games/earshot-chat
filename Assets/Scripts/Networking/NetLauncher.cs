@@ -9,23 +9,18 @@ namespace Networking
     {
         public static readonly List<AvatarPlayer> AvatarPlayers = new List<AvatarPlayer>();
     
-        private void Awake()
-        {
-            throw new NotImplementedException();
-        }
-
         public void StartHost()
         {
             NetworkManager.Singleton.StartHost();
             //SetPlayerInactive();
-            AddPlayerToList();
+            //AddPlayerToList();
         }
 
         public void StartClient()
         {
             NetworkManager.Singleton.StartClient();
             //SetPlayerInactive();
-            AddPlayerToList();
+            //AddPlayerToList();
         }
 
         private void SetPlayerInactive()
@@ -37,11 +32,11 @@ namespace Networking
             }
         }
 
-        private void AddPlayerToList()
-        {
-            var clientId = NetworkManager.Singleton.LocalClientId;
-            var avatarPlayerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject.GetComponent<AvatarPlayer>();
-            AvatarPlayers.Add(avatarPlayerObject);
-        }
+        // private void AddPlayerToList()
+        // {
+        //     var clientId = NetworkManager.Singleton.LocalClientId;
+        //     var avatarPlayerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject.GetComponent<AvatarPlayer>();
+        //     AvatarPlayers.Add(avatarPlayerObject);
+        // }
     }
 }
