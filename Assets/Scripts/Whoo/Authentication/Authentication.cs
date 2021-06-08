@@ -113,6 +113,9 @@ namespace Whoo
                         email    = email,
                         username = username
                     });
+                
+                UserDTO = new UserDTO(response.user.username);
+
                 return new Failable<AuthResponse>(response);
             }
             catch (UnityWebRequestException webreq)
