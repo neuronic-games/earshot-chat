@@ -4,7 +4,7 @@ namespace Networking
 {
     public class UserDTO
     {
-        public string Username { get; set; }
+        public string Username { get; private set; }
 
         public UserDTO(string username)
         {

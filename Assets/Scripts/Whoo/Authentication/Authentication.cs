@@ -56,7 +56,7 @@ namespace Whoo
             public double timestamp;
         }
 
-        public static UserDTO UserDTO { get; set; }
+        public static UserDTO UserDTO { get; private set; }
         #endregion
 
         #region Public Methods

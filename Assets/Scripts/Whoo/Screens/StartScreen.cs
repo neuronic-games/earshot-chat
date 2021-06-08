@@ -98,7 +98,6 @@ namespace Whoo.Screens
             {
                 _loading = true;
                 _netLauncher.StartHost();
-                _netSpawner.ChangeNetworkVarUsername();
                 StrapiRoom room = await StrapiRoom.CreateNew(layout, Build.Settings.testerInfo.profileId);
                 JoinRoomAsync(room).Forget();
             }
@@ -153,7 +152,6 @@ namespace Whoo.Screens
         private void JoinRoom()
         {
             _netLauncher.StartClient();
-            _netSpawner.ChangeNetworkVarUsername();
             JoinRoomAsync().Forget();
         }
 

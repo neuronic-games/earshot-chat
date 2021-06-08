@@ -23,8 +23,8 @@ namespace Networking
 
         private void PopulateLobby()
         {
-            Debug.Log(_netSpawner.UserDtos.Count);
-            foreach (var userDTO in _netSpawner.UserDtos)
+            Debug.Log(_netSpawner.CurrentUsers.Count);
+            foreach (var userDTO in _netSpawner.CurrentUsers)
             {
                 Debug.Log(userDTO.Username);
                 var avatarViewObject = Instantiate(avatarViewPrefab, Vector3.zero, Quaternion.identity);
