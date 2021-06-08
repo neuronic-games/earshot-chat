@@ -16,8 +16,6 @@ namespace Networking
 
         private TextMeshPro tmp;
 
-        public string UserName => userName.Value;
-
         private void Awake()
         {
             tmp = gameObject.GetComponentInChildren<TextMeshPro>();
@@ -29,6 +27,7 @@ namespace Networking
                 return;
             var currentUserName = Authentication.UserDTO.Username;
             userName.Value = currentUserName;
+            
         }
 
         private void Update()
