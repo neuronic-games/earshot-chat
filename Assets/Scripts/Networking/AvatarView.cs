@@ -1,6 +1,8 @@
-﻿namespace Networking
+﻿using UnityEngine;
+
+namespace Networking
 {
-    public class AvatarView
+    public class AvatarView : MonoBehaviour
     {
         
     }

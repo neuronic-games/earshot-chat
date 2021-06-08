@@ -16,6 +16,8 @@ namespace Networking
 
         private TextMeshPro tmp;
 
+        public string UserName => userName.Value;
+
         private void Awake()
         {
             tmp = gameObject.GetComponentInChildren<TextMeshPro>();
