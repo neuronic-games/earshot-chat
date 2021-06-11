@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: AvatarVariants
   m_EditorClassIdentifier: 
   AvatarVariants:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 21300000, guid: 95cfee633f6900043a4a0d79b32e4305, type: 3}
+  - {fileID: 21300000, guid: 4b438fabc05d8664480817d0e204da4b, type: 3}
+  - {fileID: 21300000, guid: 2ead3135ac187944a872fa8f59c7761f, type: 3}
+  - {fileID: 21300000, guid: 3e0833c2b4a4401419b3b8e2becfeaa1, type: 3}

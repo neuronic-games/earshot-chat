@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using Cysharp.Threading.Tasks;
 using DiscordAppLayer;
+using Networking;
 using Newtonsoft.Json;
 using TMPro;
 using UI.Dialogs;
@@ -47,8 +48,8 @@ namespace Whoo.Screens
 
         [SerializeField]
         private GameObject loadingBlocker;
-        
-        [SerializeField] 
+
+        [SerializeField] private AvatarManager avatarManager;
 
         public string defaultErrorTitle = "Oops!";
 
