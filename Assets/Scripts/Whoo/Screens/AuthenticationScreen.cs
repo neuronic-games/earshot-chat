@@ -47,6 +47,8 @@ namespace Whoo.Screens
 
         [SerializeField]
         private GameObject loadingBlocker;
+        
+        [SerializeField] 
 
         public string defaultErrorTitle = "Oops!";
 
