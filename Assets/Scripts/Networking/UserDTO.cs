@@ -1,14 +1,13 @@
 ﻿using Discord;
+using UnityEngine;
 
 namespace Networking
 {
-    public class UserDTO
+    public static class UserDTO
     {
-        public string Username { get; private set; }
+        public static string Username { get; set; }
+        public static Sprite AvatarSprite { get; set; }
 
-        public UserDTO(string username)
-        {
-            Username = username;
-        }
+        
     }
 }

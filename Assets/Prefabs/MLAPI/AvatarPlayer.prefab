@@ -306,6 +306,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8afc694de7924454e97f158e17a997fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  iconSprite: {fileID: 4134997721402072293}
 --- !u!61 &2162192276318251420
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -376,7 +377,7 @@ GameObject:
   - component: {fileID: 4134997721402072292}
   - component: {fileID: 4134997721402072293}
   m_Layer: 0
-  m_Name: Image
+  m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

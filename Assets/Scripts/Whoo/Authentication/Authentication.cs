@@ -56,7 +56,6 @@ namespace Whoo
             public double timestamp;
         }
 
-        public static UserDTO UserDTO { get; private set; }
         #endregion
 
         #region Public Methods
@@ -77,7 +76,7 @@ namespace Whoo
                     });
                 
                 
-                UserDTO = new UserDTO(response.user.username);
+                UserDTO.Username = response.user.username;
                 
                 return new Failable<AuthResponse>(response);
             }
@@ -114,7 +113,7 @@ namespace Whoo
                         username = username
                     });
                 
-                UserDTO = new UserDTO(response.user.username);
+                UserDTO.Username = response.user.username;
 
                 return new Failable<AuthResponse>(response);
             }

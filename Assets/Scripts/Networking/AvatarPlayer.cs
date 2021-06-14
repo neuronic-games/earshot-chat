@@ -10,6 +10,8 @@ namespace Networking
 {
     public class AvatarPlayer : NetworkBehaviour
     {
+        [SerializeField] private SpriteRenderer iconSprite;
+            
         private NetworkVariableString userName =
             new NetworkVariableString(
                 new NetworkVariableSettings() {WritePermission = NetworkVariablePermission.OwnerOnly}, "username");
@@ -25,9 +27,14 @@ namespace Networking
         {
             if (!IsLocalPlayer)
                 return;
-            var currentUserName = Authentication.UserDTO.Username;
+            var currentUserName = UserDTO.Username;
             userName.Value = currentUserName;
-            
+            SetAvatarSprite();
+        }
+
+        private void SetAvatarSprite()
+        {
+            iconSprite.sprite = UserDTO.AvatarSprite;
         }
 
         private void Update()

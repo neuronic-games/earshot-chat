@@ -17,8 +17,9 @@ namespace Networking
         private void ChooseAvatar()
         {
             Debug.Log("clicked over avatar");
-            var image = GetComponent<Image>().sprite.name;
-            Debug.Log(image);
+            var image = GetComponent<Image>().sprite;
+            UserDTO.AvatarSprite = image;
+            Debug.Log(image.name);
         }
     }
 }
