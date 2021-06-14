@@ -306,6 +306,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8afc694de7924454e97f158e17a997fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  avatarCollection: {fileID: 11400000, guid: b060a60d2b313984c8cce1f691b3b7d2, type: 2}
   iconSprite: {fileID: 4134997721402072293}
 --- !u!61 &2162192276318251420
 BoxCollider2D:

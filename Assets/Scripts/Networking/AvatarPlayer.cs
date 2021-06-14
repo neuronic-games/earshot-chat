@@ -1,23 +1,27 @@
-﻿using System;
+﻿using System.Linq;
 using MLAPI;
 using MLAPI.NetworkVariable;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
-using Whoo;
 
 namespace Networking
 {
     public class AvatarPlayer : NetworkBehaviour
     {
+        
+        [SerializeField] private AvatarCollection avatarCollection;
         [SerializeField] private SpriteRenderer iconSprite;
-            
+        
         private NetworkVariableString userName =
             new NetworkVariableString(
                 new NetworkVariableSettings() {WritePermission = NetworkVariablePermission.OwnerOnly}, "username");
+ 
+        private NetworkVariableString avatarIconName =
+            new NetworkVariableString(
+                new NetworkVariableSettings() {WritePermission = NetworkVariablePermission.OwnerOnly}, "avatarname");
 
         private TextMeshPro tmp;
-
+        
         private void Awake()
         {
             tmp = gameObject.GetComponentInChildren<TextMeshPro>();
@@ -29,12 +33,13 @@ namespace Networking
                 return;
             var currentUserName = UserDTO.Username;
             userName.Value = currentUserName;
-            SetAvatarSprite();
+            avatarIconName.Value = UserDTO.AvatarSprite.name;
         }
 
         private void SetAvatarSprite()
         {
-            iconSprite.sprite = UserDTO.AvatarSprite;
+            Sprite sprite = avatarCollection.AvatarVariants.FirstOrDefault(a => a.name == avatarIconName.Value);
+            iconSprite.sprite = sprite;
         }
 
         private void Update()
@@ -46,6 +51,7 @@ namespace Networking
             }
 
             tmp.text = userName.Value;
+            SetAvatarSprite();
         }
     }
 }

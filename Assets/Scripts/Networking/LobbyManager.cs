@@ -70,7 +70,16 @@ namespace Networking
                 Debug.Log(playerName);
                  var tmp = avatarViewObject.GetComponentInChildren<TextMeshProUGUI>();
                 tmp.text = playerName;
+
+                var icon = GetPlayerIcon(player);
+                var image = avatarViewObject.GetComponent<AvatarViewInLobby>().IconImage;
+                image.sprite = icon.sprite;
             }
+        }
+
+        private SpriteRenderer GetPlayerIcon(AvatarPlayer player)
+        {
+            return null;
         }
 
         private string GetPlayerName(GameObject player)
