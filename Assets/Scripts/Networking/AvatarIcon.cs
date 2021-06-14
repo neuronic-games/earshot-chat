@@ -25,9 +25,10 @@ namespace Networking
             Debug.Log("clicked over avatar");
             var image = iconImage.sprite;
             UserDTO.AvatarSprite = image;
-            Debug.Log(image.name);
-            
-            
+            Debug.Log("image name - " + image.name);
+
+            var color = background.color;
+            UserDTO.BackgroundColor = color;
         }
     }
 }

@@ -21,12 +21,8 @@ namespace Networking
             foreach (var icon in avatarCollection.AvatarVariants)
             {
                 var iconObject = InstantiateAvatarIcon();
-
                 SetAvatarIcon(iconObject, icon);
-
-                var randomBgColor = ChooseRandomBgColor();
-
-                SetBackgroundColor(iconObject, randomBgColor);
+                SetBackgroundColor(iconObject);
             }
         }
 
@@ -37,13 +33,13 @@ namespace Networking
             return iconObject;
         }
 
-        private static void SetBackgroundColor(GameObject iconObject, Color randomBgColor)
+        private void SetBackgroundColor(GameObject iconObject)
         {
             var backGround = iconObject.GetComponent<AvatarIcon>().Background;
-            backGround.color = randomBgColor;
+            backGround.color = RandomBgColor();
         }
 
-        private Color ChooseRandomBgColor()
+        private Color RandomBgColor()
         {
             var r = Random.Range(0, 1f);
             var b = Random.Range(0, 1f);
