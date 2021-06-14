@@ -9,8 +9,10 @@ namespace Networking
     public class AvatarIcon : MonoBehaviour
     {
         [SerializeField] private Image iconImage;
+        [SerializeField] private Image background;
 
         public Image IconImage => iconImage;
+        public Image Background => background;
         
         private void Awake()
         {
