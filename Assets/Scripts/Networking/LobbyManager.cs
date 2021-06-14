@@ -52,7 +52,7 @@ namespace Networking
 
         private void ClearLobby()
         {
-            var avatars = FindObjectsOfType<AvatarView>();
+            var avatars = FindObjectsOfType<AvatarViewInLobby>();
             foreach (var avatarView in avatars)
             {
                 Destroy(avatarView.gameObject);

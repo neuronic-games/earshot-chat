@@ -49,8 +49,6 @@ namespace Whoo.Screens
         [SerializeField]
         private GameObject loadingBlocker;
 
-        [SerializeField] private AvatarManager avatarManager;
-
         public string defaultErrorTitle = "Oops!";
 
         private float _lastRefresh;

@@ -2,7 +2,7 @@
 
 namespace Networking
 {
-    public class AvatarView : MonoBehaviour
+    public class AvatarViewInLobby : MonoBehaviour
     {
         
     }

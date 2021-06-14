@@ -2487,65 +2487,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1536019011
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1536019013}
-  - component: {fileID: 1536019012}
-  m_Layer: 0
-  m_Name: MumbleService
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1536019012
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1536019011}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 594c5da6ca7dd09499a08c60e9a82ad8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MyMumbleAudioPlayerPrefab: {fileID: 1000010552747926, guid: e2813462ff342414d86d257135fde76e,
-    type: 3}
-  MyMumbleAudioPlayerPositionedPrefab: {fileID: 0}
-  MyMumbleMic: {fileID: 0}
-  DebuggingVariables:
-    UseRandomUsername: 0
-    UseLocalLoopback: 0
-    UseSyntheticSource: 0
-    EnableEditorIOGraph: 0
-  ConnectAsyncronously: 1
-  SendPosition: 0
-  HostName: 127.0.0.1
-  Port: 80
-  Username: test
-  Password: voicechatvz
-  ChannelToJoin: 
---- !u!4 &1536019013
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1536019011}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.4834404, y: 1.8885922, z: -0.52254474}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 8
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1541380110
 GameObject:
   m_ObjectHideFlags: 0
@@ -3836,12 +3777,12 @@ PrefabInstance:
     - target: {fileID: 8234512799558291795, guid: e95d98da61ac5004fa33cfeda33e4bb0,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8234512799558291795, guid: e95d98da61ac5004fa33cfeda33e4bb0,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8234512799558291795, guid: e95d98da61ac5004fa33cfeda33e4bb0,
         type: 3}
