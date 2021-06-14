@@ -21,6 +21,8 @@ namespace Networking
                 new NetworkVariableSettings() {WritePermission = NetworkVariablePermission.OwnerOnly}, "avatarname");
 
         private TextMeshPro tmp;
+
+        public Sprite AvatarSprite => iconSprite.sprite;
         
         private void Awake()
         {
@@ -36,11 +38,7 @@ namespace Networking
             avatarIconName.Value = UserDTO.AvatarSprite.name;
         }
 
-        private void SetAvatarSprite()
-        {
-            Sprite sprite = avatarCollection.AvatarVariants.FirstOrDefault(a => a.name == avatarIconName.Value);
-            iconSprite.sprite = sprite;
-        }
+        
 
         private void Update()
         {
@@ -52,6 +50,12 @@ namespace Networking
 
             tmp.text = userName.Value;
             SetAvatarSprite();
+        }
+        
+        private void SetAvatarSprite()
+        {
+            Sprite sprite = avatarCollection.AvatarVariants.FirstOrDefault(a => a.name == avatarIconName.Value);
+            iconSprite.sprite = sprite;
         }
     }
 }

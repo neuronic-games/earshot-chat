@@ -72,14 +72,14 @@ namespace Networking
                 tmp.text = playerName;
 
                 var icon = GetPlayerIcon(player);
-                var image = avatarViewObject.GetComponent<AvatarViewInLobby>().IconImage;
-                image.sprite = icon.sprite;
+                var image = avatarViewObject.GetComponent<AvatarViewInLobby>().IconSprite;
+                image.sprite = icon;
             }
         }
 
-        private SpriteRenderer GetPlayerIcon(AvatarPlayer player)
+        private Sprite GetPlayerIcon(AvatarPlayer player)
         {
-            return null;
+            return player.AvatarSprite;
         }
 
         private string GetPlayerName(GameObject player)

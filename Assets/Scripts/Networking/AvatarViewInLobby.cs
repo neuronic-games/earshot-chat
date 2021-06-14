@@ -5,7 +5,9 @@ namespace Networking
 {
     public class AvatarViewInLobby : MonoBehaviour
     {
-        public Image IconImage { get; set; }
-        
+        [SerializeField] private Image iconImage;
+
+        public Image IconSprite => iconImage;
+
     }
 }
