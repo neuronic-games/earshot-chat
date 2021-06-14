@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
 namespace Networking
 {
@@ -23,7 +19,7 @@ namespace Networking
             {
                 var iconObject = Instantiate(avatarIconPrefab, Vector3.zero, Quaternion.identity);
                 iconObject.transform.SetParent(avatarsParent);
-                var image =  iconObject.GetComponent<Image>();
+                var image =  iconObject.GetComponent<AvatarIcon>().IconImage;
                 image.sprite = icon;
             }
         }
