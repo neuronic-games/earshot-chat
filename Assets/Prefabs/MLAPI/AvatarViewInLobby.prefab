@@ -209,6 +209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dea813dc45ca48aa83548cd81c25bc2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  userName: {fileID: 7847759711312720603}
   iconImage: {fileID: 8624920829940369291}
   bgColor: {fileID: 4240754093193542063}
 --- !u!1 &5755801191476398661
