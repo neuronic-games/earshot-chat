@@ -32,7 +32,6 @@ namespace Whoo.Screens
         public TMP_InputField joinRoomInput;
 
         private NetLauncher _netLauncher;
-        private NetSpawner _netSpawner;
 
         #endregion
 
@@ -43,7 +42,6 @@ namespace Whoo.Screens
             joinButton.onClick.AddListener(JoinRoom);
             makeRoomButton.onClick.AddListener(MakeRoom);
             _netLauncher = FindObjectOfType<NetLauncher>();
-            _netSpawner = FindObjectOfType<NetSpawner>();
         }
 
 
