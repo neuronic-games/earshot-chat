@@ -67,14 +67,22 @@ namespace Networking
                 avatarViewObject.transform.SetParent(parent);
 
                 var playerName = GetPlayerName(player.gameObject);
-                Debug.Log(playerName);
-                 var tmp = avatarViewObject.GetComponentInChildren<TextMeshProUGUI>();
+                var tmp = avatarViewObject.GetComponentInChildren<TextMeshProUGUI>();//lobbyAvatarName
                 tmp.text = playerName;
 
-                var icon = GetPlayerIcon(player);
-                var image = avatarViewObject.GetComponent<AvatarViewInLobby>().IconSprite;
+                var icon = GetPlayerIcon(player);//playerIcon
+                var image = avatarViewObject.GetComponent<AvatarViewInLobby>().IconSprite; //lobbyAvatarIcon
                 image.sprite = icon;
+
+                var bgColor = GetPlayerBgColor(player);//playerBackground
+                var bg = avatarViewObject.GetComponent<AvatarViewInLobby>().BgColor;//lobbyAvatarBackground
+                bg.color = bgColor;
             }
+        }
+
+        private Color GetPlayerBgColor(AvatarPlayer player)
+        {
+            return player.BackgroundColor;
         }
 
         private Sprite GetPlayerIcon(AvatarPlayer player)

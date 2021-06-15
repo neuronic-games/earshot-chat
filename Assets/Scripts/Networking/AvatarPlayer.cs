@@ -28,6 +28,7 @@ namespace Networking
         private TextMeshPro tmp;
 
         public Sprite AvatarSprite => iconSprite.sprite;
+        public Color BackgroundColor => background.color;
         
         private void Awake()
         {

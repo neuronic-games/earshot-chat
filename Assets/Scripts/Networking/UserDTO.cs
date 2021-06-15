@@ -1,5 +1,4 @@
-﻿using Discord;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Networking
 {
@@ -8,7 +7,5 @@ namespace Networking
         public static string Username { get; set; }
         public static Sprite AvatarSprite { get; set; }
         public static Color BackgroundColor { get; set; }
-
-        
     }
 }

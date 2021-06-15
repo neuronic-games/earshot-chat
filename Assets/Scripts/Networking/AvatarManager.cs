@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Networking
@@ -13,7 +12,6 @@ namespace Networking
         private void Start()
         {
             PopulateAvatarIcons();
-            
         }
 
         private void PopulateAvatarIcons()
