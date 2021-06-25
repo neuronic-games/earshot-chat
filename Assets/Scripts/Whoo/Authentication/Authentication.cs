@@ -232,8 +232,8 @@ namespace Whoo
                     Post("https://discord.com/api/oauth2/token", new Dictionary<string, string>()
                     {
                         {"client_id", "757347194410893432"},
-                        {"client_secret", "DcarCXTKGiCzv7KXgRe992FnzR"},
-                        {"redirect_uri", "http%3A%2F%2Flocalhost%3A1337%2Fconnect%2Fdiscord%2Fcallback"},
+                        {"client_secret", "DcarCXTKGiCzv7KXgRe992FnzR"},                        
+                        {"redirect_uri", "http://localhost:54991/auth/discord/callback/"},
                         {"code", context.Request.QueryString["code"]},
                         {"scope", string.Join(" ", scopes)},
                         {"grant_type", "authorization_code"},
