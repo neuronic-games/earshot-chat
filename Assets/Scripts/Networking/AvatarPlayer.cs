@@ -26,7 +26,6 @@ namespace Networking
                 new NetworkVariableSettings() {WritePermission = NetworkVariablePermission.OwnerOnly}, Color.cyan);
         
         private TextMeshPro tmp;
-        private RaycastHit2D hit;
 
         public Sprite AvatarSprite => iconSprite.sprite;
         public Color BackgroundColor => background.color;
@@ -52,8 +51,6 @@ namespace Networking
             {
                 var move = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"),0);
                 transform.position += move * 5f * Time.deltaTime;
-
-                SetAvatarPlayerPosition();
             }
 
             SetUserName();
@@ -75,15 +72,6 @@ namespace Networking
         {
             Sprite sprite = avatarCollection.AvatarVariants.FirstOrDefault(a => a.name == avatarIconName.Value);
             iconSprite.sprite = sprite;
-        }
-
-        private void SetAvatarPlayerPosition()
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                transform.position = new Vector3(transform.position.x, transform.position.y, 0);
-            }
         }
     }
 }
