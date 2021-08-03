@@ -179,6 +179,7 @@ GameObject:
   - component: {fileID: 2834008572589149171}
   - component: {fileID: 2834008572589149173}
   - component: {fileID: 4988778231290550373}
+  - component: {fileID: 2460403573709707775}
   m_Layer: 5
   m_Name: Room Screen
   m_TagString: Untagged
@@ -283,6 +284,19 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
   m_EffectDistance: {x: 3, y: 3}
   m_UseGraphicAlpha: 1
+--- !u!114 &2460403573709707775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2834008572589149169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6e085dd3f48840a98cd9804b4249d5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  strapiUserViews: []
 --- !u!1 &2834008573038083472
 GameObject:
   m_ObjectHideFlags: 0
@@ -1253,7 +1267,7 @@ MonoBehaviour:
   fadeOnEnable: 1
   interactableOnEnable: 1
   blockRaycastsOnEnable: 1
-  endAction: 1
+  defaultEndAction: 1
   invokeAction:
     m_PersistentCalls:
       m_Calls: []

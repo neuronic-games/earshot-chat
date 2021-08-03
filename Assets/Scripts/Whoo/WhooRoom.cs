@@ -132,7 +132,7 @@ namespace Whoo
             async UniTask WrappedMethod()
             {
                 var roomUser = RoomGroup.LocalUser;
-                LeaveCurrentGroup();
+                //LeaveCurrentGroup();
                 if (table == null)
                 {
                     RoomGroup.SetOrDeleteCustomProperty(GroupProps.TableUserIsSittingAt(roomUser.UniqueId), null);
@@ -140,7 +140,7 @@ namespace Whoo
                     return;
                 }
 
-                var tableGroup = await Utils.JoinGroup(table.ZoneInstance.credentials);
+                var tableGroup = RoomGroup;//await Utils.JoinGroup(table.ZoneInstance.credentials);
                 var zone       = table.ZoneInstance.zone;
                 //todo -- keep history of tables last joined.
                 if (tableGroup == null)
@@ -151,7 +151,7 @@ namespace Whoo
 
                     var failableTable = await new ExponentialBackoff<INetworkGroup>().Try(async () =>
                     {
-                        var g = await Utils.CreateGroup((uint) capacity);
+                        var g = RoomGroup;//await Utils.CreateGroup((uint) capacity);
                         return new Failable<INetworkGroup>()
                         {
                             Value   = g,
@@ -197,12 +197,12 @@ namespace Whoo
                     zone.id);
                 if (tableGroup is IVoiceChannel tableChannel) tableChannel.ConnectVoice(null, null);
 
-                void LeaveCurrentGroup()
+                /*void LeaveCurrentGroup()
                 {
                     if (CurrentSitting == null || CurrentSitting == RoomGroup) return;
                     CurrentSitting.SafeLeave(null);
                     CurrentSitting = null;
-                }
+                }*/
             }
         }
 
