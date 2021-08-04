@@ -14,6 +14,8 @@ namespace Whoo.Views
 {
     public class TableView : GroupView
     {
+        public Action<string> userChangedPosition;
+
         #region Serialized
 
         [Header("Positioning")]
@@ -218,6 +220,7 @@ namespace Whoo.Views
         public void SeatHere()
         {
             Table.SeatUserHere();
+            userChangedPosition?.Invoke(Table.ZoneInstance.id);
         }
 
         #endregion

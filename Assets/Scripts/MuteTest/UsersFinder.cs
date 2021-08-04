@@ -1,32 +1,41 @@
 ﻿using UnityEngine;
+using Whoo;
 using Whoo.Views;
-using System.Collections.Generic;
 
 public class UsersFinder : MonoBehaviour
 {
     [SerializeField] private StrapiUserView[] strapiUserViews;
+    [SerializeField] private TableView[] tableViews;
 
-    private RoomView roomView; //roomView.WhooRoom.Tables      
-
-    private List<UserView> usersWithoutOwner;
+    private RoomView roomView; //roomView.WhooRoom.Tables
 
     private void Awake()
     {
         roomView = FindObjectOfType<RoomView>();
-        roomView.userAdded += FindAndSortUsers;
+        roomView.userAdded += FindUsers;
     }
 
-    private void FindAndSortUsers()
+    private void Start()
+    {
+        FindUsers();
+        tableViews = FindObjectsOfType<TableView>();
+        for (int i = 0; i < tableViews.Length; i++)
+        {
+            tableViews[i].userChangedPosition += SortUsers;
+        }
+    }
+
+    private void FindUsers()
     {
         strapiUserViews = FindObjectsOfType<StrapiUserView>();
+    }
 
-        for (int i = 0; i < strapiUserViews.Length; i++)
+    private void SortUsers(string seatTableId)
+    {
+        for (int strapiUsers = 0; strapiUsers < strapiUserViews.Length; strapiUsers++)
         {
-            usersWithoutOwner.Add(strapiUserViews[i]);
-
-            foreach (char id in roomView.Group.LocalUser.UniqueId)
+            for (int tables = 0; tables < roomView.WhooRoom.Tables.Count; tables++)
             {
-
             }
         }
     }
