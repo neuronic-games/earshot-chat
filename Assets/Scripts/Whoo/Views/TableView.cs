@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using UI;
 using UI.FlowerMenu;
 using UnityEngine;
 using UnityEngine.Events;
@@ -14,7 +13,7 @@ namespace Whoo.Views
 {
     public class TableView : GroupView
     {
-        public Action<string> userChangedPosition;
+        public Action<WhooTable, GameObject> userChangedPosition;
 
         #region Serialized
 
@@ -220,7 +219,7 @@ namespace Whoo.Views
         public void SeatHere()
         {
             Table.SeatUserHere();
-            userChangedPosition?.Invoke(Table.ZoneInstance.id);
+            userChangedPosition?.Invoke(Table, this.gameObject);
         }
 
         #endregion

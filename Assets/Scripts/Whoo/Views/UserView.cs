@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using AppLayer.NetworkGroups;
 using Cysharp.Threading.Tasks;
@@ -16,6 +17,20 @@ namespace Whoo.Views
         protected WhooRoom Room;
         public    IUser    User { get; protected set; }
 
+        public class UsersInRoom
+        {
+            public IUser User;
+            public WhooRoom Room;
+
+            public void SetValues(IUser User, WhooRoom Room)
+            {
+                this.User = User;
+                this.Room = Room;
+            }
+        }
+
+        public List<UsersInRoom> usersInRoomList = new List<UsersInRoom>();
+
         #region Registration
 
         public virtual void RegisterUser(IUser user, WhooRoom room)
@@ -23,6 +38,9 @@ namespace Whoo.Views
             Room = room;
             DetachListeners();
             this.User = user;
+            UsersInRoom usersInRoom = new UsersInRoom();
+            usersInRoom.SetValues(user, room);
+            usersInRoomList.Add(usersInRoom);
             AttachListeners();
             Refresh().Forget();
         }

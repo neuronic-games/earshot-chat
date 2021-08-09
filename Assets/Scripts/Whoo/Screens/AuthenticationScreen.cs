@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DiscordAppLayer;
-using Newtonsoft.Json;
 using TMPro;
 using UI.Dialogs;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Whoo.Data;

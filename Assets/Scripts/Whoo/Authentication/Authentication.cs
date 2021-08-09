@@ -130,8 +130,9 @@ namespace Whoo
                 var response = await Utils.GetJsonObjectAsync<AuthResponse>(url);
                 return new Failable<AuthResponse>(response);
             }
-            catch (UnityWebRequestException)
+            catch (UnityWebRequestException ex)
             {
+                Debug.Log("ERROR" + ":" + ex);
                 return default;
             }
         }
@@ -213,7 +214,7 @@ namespace Whoo
                 listener.Start();
                 //Application.OpenURL(Endpoint.Base() + "connect/discord");
                 Application.OpenURL(
-                    "https://discord.com/api/oauth2/authorize?client_id=757347194410893432&redirect_uri=http%3A%2F%2Flocalhost%3A54991%2Fauth%2Fdiscord%2Fcallback&response_type=code&scope=identify%20email&prompt=none");
+                    "https://discord.com/api/oauth2/authorize?client_id=870234515296120872&redirect_uri=http%3A%2F%2Flocalhost%3A54991%2Fauth%2Fdiscord%2Fcallback%2F&response_type=code&scope=identify%20email");
 
                 var (cancelled, context) = await listener.GetContextAsync().
                                                           AsUniTask().
@@ -231,8 +232,8 @@ namespace Whoo
                 unityWebRequest = UnityWebRequest.
                     Post("https://discord.com/api/oauth2/token", new Dictionary<string, string>()
                     {
-                        {"client_id", "757347194410893432"},
-                        {"client_secret", "DcarCXTKGiCzv7KXgRe992FnzR"},                        
+                        {"client_id", "870234515296120872"},
+                        {"client_secret", "xqFOoQ5KxLFDWubfBig1uMoJXZ53ufS1"},                        
                         {"redirect_uri", "http://localhost:54991/auth/discord/callback/"},
                         {"code", context.Request.QueryString["code"]},
                         {"scope", string.Join(" ", scopes)},

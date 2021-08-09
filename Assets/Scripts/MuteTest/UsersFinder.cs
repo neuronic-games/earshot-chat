@@ -1,41 +1,50 @@
 ﻿using UnityEngine;
 using Whoo;
 using Whoo.Views;
+using DiscordAppLayer;
+using System;
 
 public class UsersFinder : MonoBehaviour
 {
-    [SerializeField] private StrapiUserView[] strapiUserViews;
+    [SerializeField] private StrapiUserView[] userViews;
     [SerializeField] private TableView[] tableViews;
-
-    private RoomView roomView; //roomView.WhooRoom.Tables
-
-    private void Awake()
-    {
-        roomView = FindObjectOfType<RoomView>();
-        roomView.userAdded += FindUsers;
-    }
+    [SerializeField] private SeatArrangement[] seatArrangement;
 
     private void Start()
     {
-        FindUsers();
-        tableViews = FindObjectsOfType<TableView>();
-        for (int i = 0; i < tableViews.Length; i++)
+        FindTables();
+
+        for (int tableIndex = 0; tableIndex < tableViews.Length; tableIndex++)
         {
-            tableViews[i].userChangedPosition += SortUsers;
+            tableViews[tableIndex].userChangedPosition += SortUsers;
         }
     }
 
-    private void FindUsers()
-    {
-        strapiUserViews = FindObjectsOfType<StrapiUserView>();
-    }
+    private void FindTables() => tableViews = FindObjectsOfType<TableView>();
 
-    private void SortUsers(string seatTableId)
+    private StrapiUserView[] FindUsersFromTable(SeatArrangement seatArrangement) => seatArrangement.GetComponentsInChildren<StrapiUserView>();
+
+    private SeatArrangement[] FindSeatArrangements() => seatArrangement = FindObjectsOfType<SeatArrangement>();
+
+    private void SortUsers(WhooTable seatTable, GameObject currentTableGO)
     {
-        for (int strapiUsers = 0; strapiUsers < strapiUserViews.Length; strapiUsers++)
+        FindSeatArrangements();
+
+        for (int seat = 0; seat < seatArrangement.Length; seat++)
         {
-            for (int tables = 0; tables < roomView.WhooRoom.Tables.Count; tables++)
+            userViews = FindUsersFromTable(seatArrangement[seat]);
+
+            if (currentTableGO.gameObject.GetComponentInChildren<SeatArrangement>() == seatArrangement[seat])
             {
+                if (userViews != null)
+                {
+                    for (int i = 0; i < userViews.Length; i++)
+                    {
+                        DiscordApp.GetDiscordApp(out DiscordApp app);
+                        app.VoiceManager.SetLocalMute(Int64.Parse(userViews[i].User.UniqueId), true);
+                        Debug.Log(userViews[i].User.Name);
+                    }
+                }
             }
         }
     }

@@ -21,8 +21,6 @@ namespace Whoo.Views
 
         #region Room Binding
 
-        public Action userAdded;
-
         public WhooRoom WhooRoom { get; private set; }
 
         public void Setup(WhooRoom whooRoom)
@@ -109,7 +107,6 @@ namespace Whoo.Views
         {
             var instance = Instantiate(perUserView, usersContentContainer);
             _views[user] = instance;
-            userAdded?.Invoke();
             instance.RegisterUser(user, WhooRoom);
         }
 
