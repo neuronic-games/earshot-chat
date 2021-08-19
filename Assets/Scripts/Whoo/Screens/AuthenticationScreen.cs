@@ -153,5 +153,10 @@ namespace Whoo.Screens
         }
 
         #endregion
+
+        public void ResetAcc()
+        {
+            PlayerPrefs.SetString("discord_oauth", string.Empty);
+        }
     }
 }

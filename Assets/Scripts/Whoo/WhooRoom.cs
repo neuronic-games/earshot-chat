@@ -141,6 +141,8 @@ namespace Whoo
 
                 var tableGroup = RoomGroup;
                 var zone       = table.ZoneInstance.zone;
+
+                Debug.Log("------------ZoneIdStart--------------- " + zone.id);
                 //todo -- keep history of tables last joined.
                 if (tableGroup == null)
                 {
@@ -178,7 +180,7 @@ namespace Whoo
                                                                 id = zi.id,
                                                                 credentials = new PlatformCredentials()
                                                                 {
-                                                                    platform_id     = platform_id,
+                                                                    platform_id = platform_id,
                                                                     platform_secret = pass
                                                                 }
                                                             };

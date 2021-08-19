@@ -194,7 +194,6 @@ namespace Whoo
         private static async UniTask<DiscordExchangeResponse> GetDiscordOAuth(params string[] scopes)
         {
             CancelOngoing();
-
             string savedOauthString = PlayerPrefs.GetString("discord_oauth");
             if (!string.IsNullOrEmpty(savedOauthString))
             {

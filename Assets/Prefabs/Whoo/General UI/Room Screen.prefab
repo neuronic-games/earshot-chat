@@ -296,7 +296,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6e085dd3f48840a98cd9804b4249d5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  strapiUserViews: []
+  userViews: []
+  tableViews: []
+  seatArrangement: []
 --- !u!1 &2834008573038083472
 GameObject:
   m_ObjectHideFlags: 0
@@ -791,7 +793,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -100, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &2834008573724410289
@@ -830,8 +832,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 3053453311
-  m_fontColor: {r: 1, g: 1, b: 1, a: 0.70980394}
+    rgba: 3036676096
+  m_fontColor: {r: 0, g: 0, b: 0, a: 0.70980394}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
